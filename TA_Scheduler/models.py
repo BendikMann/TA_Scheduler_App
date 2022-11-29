@@ -51,6 +51,22 @@ class Account(models.Model):
         pass
 
 
+class Course(models.Model):
+    # instructor foreign key
+    instructor = models.ManyToManyField(Account)
+
+    # represented as a string because some courses might have a letter after their course numbers (i.e. 422G)
+    course_number = models.CharField(max_length=5)
+
+    # course subject (i.e. COMPSCI)
+    subject = models.CharField(max_length=10)
+
+    section = models.CharField(max_length=5)
+
+    # course name (i.e Compsci 361 has a name of Introduction to Software Engineering)
+    name = models.CharField(max_length=30)
+
+
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
@@ -63,9 +79,6 @@ def create_user_profile(sender, instance, created, **kwargs):
 def save_user_profile(sender, instance, **kwargs):
     instance.account.save()
 
-class Course(models.Model):
-    # TODO: Actually make course Model
-    pass
 
 class LabSection(models.Model):
     # TODO: Actually make Lab Section model.
