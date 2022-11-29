@@ -67,6 +67,12 @@ class Course(models.Model):
     name = models.CharField(max_length=30)
 
 
+class Lab(models.Model):
+    section = models.CharField(max_length=5)
+    ta = models.OneToOneField(Account, on_delete=models.SET_NULL)
+    course = models.OneToOneField(Course, on_delete=models.SET_NULL)
+
+
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
