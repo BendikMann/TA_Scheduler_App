@@ -51,18 +51,6 @@ class Account(models.Model):
         pass
 
 
-# Whenever we create a user, also create a account attached to it.
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Account.objects.create(user=instance)
-
-
-# Whenever we save a User, also update the account attached to it.
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.account.save()
-
 class Course(models.Model):
     # instructor foreign key
     instructor = models.ManyToManyField(Account)
@@ -77,6 +65,20 @@ class Course(models.Model):
 
     # course name (i.e Compsci 361 has a name of Introduction to Software Engineering)
     name = models.CharField(max_length=30)
+
+
+# Whenever we create a user, also create a account attached to it.
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Account.objects.create(user=instance)
+
+
+# Whenever we save a User, also update the account attached to it.
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
+    instance.account.save()
+
 
 class LabSection(models.Model):
     # TODO: Actually make Lab Section model.
