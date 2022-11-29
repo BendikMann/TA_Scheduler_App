@@ -53,8 +53,8 @@ class Account(models.Model):
 
 class Lab(models.Model):
     section = models.CharField(max_length=5)
-    ta = models.OneToOneField(Account, on_delete=models.CASCADE)
-    course = models.OneToOneField(Course, on_delete=models.CASCADE)
+    ta = models.OneToOneField(Account, on_delete=models.SET_NULL)
+    course = models.OneToOneField(Course, on_delete=models.SET_NULL)
 
 
 # Whenever we create a user, also create a account attached to it.
