@@ -1,14 +1,14 @@
-from unittest import TestCase
+import unittest
 from TA_Scheduler.models import Account
 from TA_Scheduler.user import Admin, Instructor, Ta
 
-class TestAdmin(TestCase):
 
-    def TestAdminInit(self):
-        test_acct = Account
+class AdminTests(unittest.TestCase):
+
+    def test_admin_init(self):
         pass
 
-    def TestAdminInitWrongType(self):
+    def test_admin_init_wrong_type(self):
         test_string = "hello"
         test_int = 1
 
@@ -18,16 +18,16 @@ class TestAdmin(TestCase):
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Admin an integer"):
             a = Admin(test_int)
 
-    def TestAdminInitWrongAccountType(self):
+    def test_admin_init_wrong_account_type(self):
         pass
 
 
-class TestInstructor(TestCase):
+class InstructorTests(unittest.TestCase):
 
-    def TestInstructorInit(self):
+    def test_instructor_init(self):
         pass
 
-    def TestInstructorInitWrongType(self):
+    def test_instructor_init_wrong_type(self):
         test_string = "hello"
         test_int = 1
 
@@ -37,16 +37,16 @@ class TestInstructor(TestCase):
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Instructor an integer"):
             a = Instructor(test_int)
 
-    def TestInstructorInitWrongAccountType(self):
+    def test_instructor_init_wrong_account_type(self):
         pass
 
 
-class TestTa(TestCase):
+class TaTests(unittest.TestCase):
 
-    def TestTaInit(self):
+    def test_ta_init(self):
         pass
 
-    def TestTaInitWrongType(self):
+    def test_ta_init_wrong_type(self):
         test_string = "hello"
         test_int = 1
 
@@ -56,5 +56,5 @@ class TestTa(TestCase):
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Ta an integer"):
             a = Ta(test_int)
 
-    def TestTaInitWrongAccountType(self):
+    def test_ta_init_wrong_account_type(self):
         pass
