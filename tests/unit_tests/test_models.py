@@ -20,10 +20,8 @@ class TestModels(TestCase):
 
     def test_update_state_same_state(self):
         us_address = UsAddress.objects.get()
-        self.assertEqual(True, us_address.update_state("WI"),
-                         "update_state didnt return true when trying to change state to the current state")
-        self.assertEqual("WI", us_address.state,
-                         "UsAddress state was  changed when update_state was called with the same state")
+        self.assertEqual(True, us_address.update_state("WI"), "update_state didnt return true when trying to change state to the current state")
+        self.assertEqual("WI", us_address.state, "UsAddress state was  changed when update_state was called with the same state")
 
     def test_update_state_invalid_state(self):
         us_address = UsAddress.objects.get()
@@ -31,9 +29,6 @@ class TestModels(TestCase):
                          "update_state failed to return False when the input was invalid")
         self.assertEqual("WI", us_address.state,
                          "UsAddress state was  changed when update_state was called with an invalid state")
-
-    def test_update_state_not_us_country(self):
-        pass
 
     def test_update_city_default(self):
         us_address = UsAddress.objects.get()
@@ -66,31 +61,45 @@ class TestModels(TestCase):
         self.assertEqual("53211", us_address.zip_code, "update_zip_code didnt changed the zip code when it shouldnt have")
 
     def test_update_zip_code_invalid(self):
-        pass
+        us_address = UsAddress.objects.get()
+        self.assertEqual(False, us_address.update_zip_code("dsfgdfgdf"),
+                         "update_zip_code failed to return False when the input was invalid")
+        self.assertEqual("53211", us_address.zip_code,
+                         "UsAddress zip code was changed when update_zip_code was called with an invalid zip code")
 
     def test_update_first_name_default(self):
-        pass
+        account = Account.objects.get()
+        self.assertEqual(True, account.update_first_name("bruh"), "update_first_name failed to return true when first name was changed")
+        self.assertEqual("bruh", account.user.first_name, "update_first_name failed to change the first name to the expected result")
 
     def test_update_first_name_same(self):
-        pass
-
-    def test_update_first_name_invalid(self):
-        pass
+        account = Account.objects.get()
+        self.assertEqual(True, account.update_first_name("Lebron"), "update_first_name failed to return true when first name was changed to the same thing")
+        self.assertEqual("Lebron", account.user.first_name, "update_first_name changed first name to something that was not expected")
 
     def test_update_last_name_default(self):
-        pass
+        account = Account.objects.get()
+        self.assertEqual(True, account.update_last_name("bruh"), "update_last_name failed to return true when last name was changed")
+        self.assertEqual("bruh", account.user.last_name, "update_last_name failed to change the last name to the expected result")
 
     def test_update_last_name_same(self):
-        pass
-
-    def test_update_last_name_invalid(self):
-        pass
+        account = Account.objects.get()
+        self.assertEqual(True, account.update_last_name("James"), "update_last_name failed to return true when last name was changed to the same thing")
+        self.assertEqual("James", account.user.last_name, "update_last_name changed last name to something that was not expected")
 
     def test_update_phone_number_default(self):
-        pass
+        account = Account.objects.get()
+        self.assertEqual(True, account.update_phone_number("1234567890"), "update_phone_number failed to return true when it was changed")
+        self.assertEqual("1234567890", account.phone_number, "update_phone_number failed to change phone number to the expected result")
 
     def test_update_phone_number_same(self):
-        pass
+        account = Account.objects.get()
+        account.update_phone_number("1231231230")
+        self.assertEqual(True, account.update_phone_number("1231231230"), "update_phone_number failed to return true when it was changed to the same thing")
+        self.assertEqual("1231231230", account.phone_number, "update_phone_number changed the phone number when it wasnt expected to")
 
     def test_update_phone_number_invalid(self):
-        pass
+        account = Account.objects.get()
+        account.update_phone_number("1234567890")
+        self.assertEqual(False, account.update_phone_number("ygvyvyvygvyg"), "update_phone_number failed to return False when the input was invalid")
+        self.assertEqual("1234567890", account.phone_number, "update_phone_number changed the phone number when the input was invalid")
