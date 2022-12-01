@@ -6,7 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
-
+from localflavor.us import us_states
 
 # This model uses an extension of django which makes validation and form creation easier.
 # See: https://github.com/django/django-localflavor
@@ -17,9 +17,15 @@ class UsAddress(models.Model):
     zip_code = USZipCodeField(default='53201')
 
     def update_state(self, state: str) -> bool:
-        self.state = state
-        self.save()
-        return True
+        # simple sanitization
+        state = state.strip().upper()
+
+        # make a list of all states that match our state input.
+        state_exists_in_us_states = len([(x, y) for x, y in us_states.US_STATES if state in x]) > 0
+        if state_exists_in_us_states:  # if we have more than zero states in that list, it must be valid.
+            self.state = state
+            self.save()
+        return state_exists_in_us_states
 
     def update_city(self, postal_code: str) -> bool:
         pass
@@ -44,7 +50,7 @@ class Account(models.Model):
     # This is an extension of django which makes validation and form creation easier.
     # See: https://django-phonenumber-field.readthedocs.io/en/latest/index.html
     phone_number = PhoneNumberField(blank=True)
-
+    
     def update_first_name(self, first_name: str) -> bool:
         pass
 
