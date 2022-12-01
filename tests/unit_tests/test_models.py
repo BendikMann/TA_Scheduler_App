@@ -1,3 +1,5 @@
+from collections import namedtuple
+
 from django.test import TestCase
 
 from django.contrib.auth.models import User
@@ -103,3 +105,8 @@ class TestModels(TestCase):
         account.update_phone_number("1234567890")
         self.assertEqual(False, account.update_phone_number("ygvyvyvygvyg"), "update_phone_number failed to return False when the input was invalid")
         self.assertEqual("1234567890", account.phone_number, "update_phone_number changed the phone number when the input was invalid")
+
+    def test_get_public_info(self):
+        account = Account.objects.get()
+        test_tuple = namedtuple("public_info", ["Lebron", "James"])
+        self.assertEqual(test_tuple, account.get_public_info(), "get_public_info failed to return a named tuple that was correct")
