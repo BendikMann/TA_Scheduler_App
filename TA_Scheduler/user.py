@@ -64,7 +64,7 @@ class Ta:
 class Instructor:
     def __init__(self, account: Account):
         """
-        :param account: Account to wrap as an admin. Must be an admin, otherwise raise exception.
+        :param account: Account to wrap as an Instructor. Must be an Instructor, otherwise raise exception.
         """
         pass
 
