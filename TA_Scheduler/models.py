@@ -17,9 +17,11 @@ class UsAddress(models.Model):
     zip_code = USZipCodeField(default='53201')
 
     def update_state(self, state: str) -> bool:
-        pass
+        self.state = state
+        self.save()
+        return True
 
-    def update_postal_code(self, postal_code: str) -> bool:
+    def update_city(self, postal_code: str) -> bool:
         pass
 
     def update_street_address(self, street_address: str) -> bool:
