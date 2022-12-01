@@ -11,7 +11,7 @@ def init_dummy_database():
     All randomly linked in legal (and logical) ways.
     """
     for i in range(0, 50):
-        UserFactory()
+        UserFactory(password="not_signinable")
 
     for i in range(0, 10):
         CourseFactory()

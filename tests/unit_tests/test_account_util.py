@@ -1,4 +1,6 @@
 from django.test import TestCase
+
+import TA_Scheduler.user
 from TA_Scheduler.models import Account
 from TA_Scheduler import account_util
 from django.contrib.auth.models import Group
@@ -7,7 +9,6 @@ import Factories
 
 
 class Test_is_admin(TestCase):
-
     account = None
     instructor_account = None
     ta_account = None
@@ -16,7 +17,6 @@ class Test_is_admin(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         # make a admin account
         cls.admin_account: Account = Factories.UserFactory.create().account
         cls.admin_account.user.groups.clear()
@@ -62,7 +62,6 @@ class Test_is_admin(TestCase):
 
 
 class Test_is_ta(TestCase):
-
     account = None
     instructor_account = None
     ta_account = None
@@ -112,7 +111,6 @@ class Test_is_ta(TestCase):
 
 
 class Test_is_instructor(TestCase):
-
     account = None
     instructor_account = None
     ta_account = None
@@ -121,7 +119,6 @@ class Test_is_instructor(TestCase):
 
     @classmethod
     def setUpTestData(cls):
-
         # make a admin account
         cls.admin_account: Account = Factories.UserFactory.create().account
         cls.admin_account.user.groups.clear()
@@ -147,7 +144,8 @@ class Test_is_instructor(TestCase):
         cls.account.user.groups.clear()
 
     def test_type(self):
-        self.assertIsInstance(account_util.is_instructor(self.instructor_account), bool, 'is_admin should always return a bool.')
+        self.assertIsInstance(account_util.is_instructor(self.instructor_account), bool,
+                              'is_admin should always return a bool.')
 
     def test_not_instructor_no_perm(self):
         self.assertEqual(False, account_util.is_instructor(self.account),
@@ -204,15 +202,15 @@ class Test_make_admin(TestCase):
             account_util.make_admin(None)
 
     def test_on_user_input(self):
-        with self.assertRaises(ValueError, msg="User type should raise a value error! We want to accept only accounts!"):
+        with self.assertRaises(ValueError,
+                               msg="User type should raise a value error! We want to accept only accounts!"):
             account_util.make_admin(self.account)
 
     def arbitrary_positive(self, account: Account):
-        self.assertTrue(account_util.make_admin(account),
+        self.assertIsInstance(account_util.make_admin(account), TA_Scheduler.user.Ta,
                         msg="This account should have been made admin and make admin returned true.")
         self.assertEqual(Group.objects.get(name="Admin"), account.user.groups.get(name="Admin"),
                          msg="make admin reported true, but is not in admin group.")
-
 
     def test_no_groups(self):
         self.arbitrary_positive(self.account)
@@ -222,6 +220,7 @@ class Test_make_admin(TestCase):
 
     def test_is_ta(self):
         self.arbitrary_positive(self.ta_account)
+
     def test_already_admin_ta(self):
         self.arbitrary_positive(self.admin_ta_account)
 
@@ -230,5 +229,120 @@ class Test_make_admin(TestCase):
         pass
 
 
+class Test_make_ta(TestCase):
 
+    def setUp(self):  # setUp is used here because we will be changing this data.
 
+        # make a admin account
+        self.admin_account: Account = Factories.UserFactory.create().account
+        self.admin_account.user.groups.clear()
+        self.admin_account.user.groups.add(Group.objects.get(name="Admin"))
+
+        # make a ta account
+        self.ta_account: Account = Factories.UserFactory.create().account
+        self.ta_account.user.groups.clear()
+        self.ta_account.user.groups.add(Group.objects.get(name="TA"))
+
+        # make a instructor account.
+        self.instructor_account: Account = Factories.UserFactory.create().account
+        self.instructor_account.user.groups.clear()
+        self.instructor_account.user.groups.add(Group.objects.get(name="Instructor"))
+
+        self.admin_instructor_account: Account = Factories.UserFactory.create().account
+        self.admin_instructor_account.user.groups.clear()
+        self.admin_instructor_account.user.groups.add(Group.objects.get(name="Instructor"))
+        self.admin_instructor_account.user.groups.add(Group.objects.get(name="Admin"))
+
+        self.admin_ta_account: Account = Factories.UserFactory.create().account
+        self.admin_ta_account.user.groups.clear()
+        self.admin_ta_account.user.groups.add(Group.objects.get(name="TA"))
+        self.admin_ta_account.user.groups.add(Group.objects.get(name="Admin"))
+
+        # make a none account.
+        self.account: Account = Factories.UserFactory.create().account
+        self.account.user.groups.clear()
+
+    def test_on_none_input(self):
+        with self.assertRaises(ValueError, msg="None type should raise a value error!"):
+            account_util.make_ta(None)
+
+    def test_on_user_input(self):
+        with self.assertRaises(ValueError,
+                               msg="User type should raise a value error! We want to accept only accounts!"):
+            account_util.make_ta(self.account.user)
+
+    def arbitrary_positive(self, account: Account):
+        self.assertIsInstance(account_util.make_ta(account), TA_Scheduler.user.Ta,
+                              msg="This account should have been made ta and returned a Ta instance.")
+        self.assertEqual(Group.objects.get(name="TA"), account.user.groups.get(name="TA"),
+                         msg="make ta reported Ta model, but is not in ta group.")
+
+    def test_account_no_perms(self):
+        self.arbitrary_positive(self.account)
+
+    def test_account_admin(self):
+        self.arbitrary_positive(self.admin_account)
+
+    def test_account_ta(self):
+        self.arbitrary_positive(self.ta_account)
+
+    def test_instructor(self):
+        self.assertIsNone(account_util.make_ta(self.instructor_account),
+                          msg="Instructors cannot add a ta, should return none type.")
+
+class Test_make_instructor(TestCase):
+    def setUp(self):  # setUp is used here because we will be changing this data.
+
+        # make a admin account
+        self.admin_account: Account = Factories.UserFactory.create().account
+        self.admin_account.user.groups.clear()
+        self.admin_account.user.groups.add(Group.objects.get(name="Admin"))
+
+        # make a ta account
+        self.ta_account: Account = Factories.UserFactory.create().account
+        self.ta_account.user.groups.clear()
+        self.ta_account.user.groups.add(Group.objects.get(name="TA"))
+
+        # make a instructor account.
+        self.instructor_account: Account = Factories.UserFactory.create().account
+        self.instructor_account.user.groups.clear()
+        self.instructor_account.user.groups.add(Group.objects.get(name="Instructor"))
+
+        self.admin_instructor_account: Account = Factories.UserFactory.create().account
+        self.admin_instructor_account.user.groups.clear()
+        self.admin_instructor_account.user.groups.add(Group.objects.get(name="Instructor"))
+        self.admin_instructor_account.user.groups.add(Group.objects.get(name="Admin"))
+
+        self.admin_ta_account: Account = Factories.UserFactory.create().account
+        self.admin_ta_account.user.groups.clear()
+        self.admin_ta_account.user.groups.add(Group.objects.get(name="TA"))
+        self.admin_ta_account.user.groups.add(Group.objects.get(name="Admin"))
+
+        # make a none account.
+        self.account: Account = Factories.UserFactory.create().account
+        self.account.user.groups.clear()
+
+    def test_on_none_input(self):
+        with self.assertRaises(ValueError, msg="None type should raise a value error!"):
+            account_util.make_ta(None)
+
+    def test_on_user_input(self):
+        with self.assertRaises(ValueError,
+                               msg="User type should raise a value error! We want to accept only accounts!"):
+            account_util.make_ta(self.account.user)
+
+    def arbitrary_positive(self, account: Account):
+        self.assertIsInstance(account_util.make_ta(account), TA_Scheduler.user.Ta,
+                              msg="This account should have been made instructor and returned a instructor instance.")
+        self.assertEqual(Group.objects.get(name="TA"), account.user.groups.get(name="TA"),
+                         msg="make instructor returned instructor object, but is not in ta group.")
+
+    def test_already_instructor(self):
+        self.arbitrary_positive(self.instructor_account)
+
+    def test_no_groups(self):
+        self.arbitrary_positive(self.account)
+
+    def test_ta(self):
+        self.assertIsNone(account_util.make_ta(self.ta_account),
+                          msg="TA cannot add a instructor group, should return none type.")
