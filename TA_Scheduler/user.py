@@ -1,7 +1,5 @@
 import abc
-
-from user import  Instructor  # This is needed otherwise ordering matters...
-from models import Account, Course, LabSection
+from TA_Scheduler.models import Account, Course, Lab
 
 
 class Admin:
@@ -25,7 +23,6 @@ class Admin:
         pass
     pass
 
-
 class Ta:
     def __init__(self, account: Account):
         """
@@ -33,15 +30,17 @@ class Ta:
         """
         pass
 
-    def assign_instructor(self, instructor: Instructor) -> bool:
+    def assign_instructor(self, instructor: "Instructor") -> bool:
         """
         Assigns this ta to the specified instructor.
         :param instructor:
         :return: True if the instructor is or has had the ta assigned to the ta. False otherwise
         """
+
+
         pass
 
-    def remove_instructor(self, instructor: Instructor) -> bool:
+    def remove_instructor(self, instructor: "Instructor") -> bool:
         """
         Removes the assignment of this ta to the specified instructor.
         :param instructor:  True if the ta is or has been removed from the ta. False otherwise.
@@ -49,19 +48,16 @@ class Ta:
         """
         pass
 
-    def remove_instructor(self, instructor: Instructor) -> bool:
+    def assign_lab_section(self, lab_section: Lab) -> bool:
         pass
 
-    def assign_lab_section(self, lab_section: LabSection) -> bool:
-        pass
-
-    def remove_lab_section(self, lab_section: LabSection) -> bool:
+    def remove_lab_section(self, lab_section: Lab) -> bool:
         pass
 
     def get_courses(self) -> list[Course]:
         pass
 
-    def get_lab_sections(self) -> list[LabSection]:
+    def get_lab_sections(self) -> list[Lab]:
         pass
 
 
