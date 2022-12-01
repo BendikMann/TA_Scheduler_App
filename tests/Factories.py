@@ -5,7 +5,7 @@ from django.db.models.signals import post_save
 from localflavor.us import us_states
 from django.contrib.auth.models import Group
 from TA_Scheduler import models
-
+from django.contrib.auth.hashers import make_password
 # Use these to make 'mock' objects for the database that are robust.
 
 
@@ -81,7 +81,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         last_name = factory.Faker('last_name')
         email = factory.Faker('email')
         username = factory.Sequence(lambda n: f"GenericUsername{n}")
-
+        password = factory.LazyFunction(lambda : make_password("password"))
         account = factory.RelatedFactory(_AccountFactory, factory_related_name='user')
 
         @factory.post_generation

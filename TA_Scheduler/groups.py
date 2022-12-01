@@ -1,6 +1,8 @@
 from django.contrib.auth.models import Group, Permission
 from TA_Scheduler.models import *
+
 app_name: str = "Ta_Scheduler"
+
 
 # To make a long story short:
 # Django permissions and groups are the most asinine implementation for
@@ -14,11 +16,6 @@ def init_groups(apps, schema_migration):
     :return:
     """
 
-    # migrations cannot access this stuff directly, so we need to do this instead.
-    user: User = apps.get_model('auth', 'User')
-    group: Group = apps.get_model('auth', 'Group')
-    permission: Permission = apps.get_model('auth', 'Permission')
-    # Groups are persistent, so all we need to do is run this once!
     AdminGroup: Group = Group(name='Admin')
     InstructorGroup: Group = Group(name='Instructor')
     TAGroup: Group = Group(name='TA')
@@ -26,13 +23,13 @@ def init_groups(apps, schema_migration):
     InstructorGroup.save()
     TAGroup.save()
 
+
 def init_group_perms():
     """
     Assigns the required perms to the
     :return:
     """
     # TODO: Complete at least the admin permissions.
-
 
     pass
 
@@ -47,9 +44,7 @@ def get_change_perm(permission, model: models):
 
 def get_delete_perm(permission, model: models):
     return permission.objects.get(codename=f"delete_{model.__name__}")
-    pass
 
 
 def get_view_perm(permission, model: models):
     return permission.objects.get(codename=f"delete_{model.__name__}")
-
