@@ -46,7 +46,7 @@ class CourseFactory(factory.django.DjangoModelFactory):
     def course_instructor_set(self, create, extracted, **kwargs):
         if not create:
             return
-        #get the list of instrucctors and add an arbitrary amount of instructors to each course.
+        # get the list of instructors and add an arbitrary amount of instructors to each course.
         instructors = models.Account.objects.filter(user__groups__name="Instructor")
         for instructor in random.choices(instructors, k=random.randint(0, len(instructors))):
             self.instructor.add(instructor)
