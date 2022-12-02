@@ -1,5 +1,6 @@
 import abc
 from TA_Scheduler.models import Account, Course, Lab
+from TA_Scheduler.account_util import is_admin, is_instructor, is_ta
 
 
 class Admin:
@@ -11,7 +12,13 @@ class Admin:
         """
         :param account: Account to wrap as an admin. Must be an admin, otherwise raise exception.
         """
-        pass
+        if not (isinstance(account, Account)):
+            raise TypeError('Instance supplied to Admin constructor is not an account')
+
+        if not is_admin(account):
+            raise ValueError('Account supplied to Admin constructor is not in the Admin group')
+
+        self.account = account
 
     def send_email(self, header: str, content: str) -> bool:
         """
@@ -21,14 +28,23 @@ class Admin:
         :return: True if the email was succesfully sent, false otherwise.
         """
         pass
+
     pass
+
 
 class Ta:
     def __init__(self, account: Account):
         """
         :param account: Account to wrap as an TA. Must be a TA, otherwise raise exception.
         """
-        pass
+        if not (isinstance(account, Account)):
+            raise TypeError('Instance supplied to Ta constructor is not an account')
+
+        if not is_ta(account):
+            raise ValueError('Account supplied to Ta constructor is not in the TA group')
+
+        self.account = account
+
 
     def assign_instructor(self, instructor: "Instructor") -> bool:
         """
@@ -36,7 +52,6 @@ class Ta:
         :param instructor:
         :return: True if the instructor is or has had the ta assigned to the ta. False otherwise
         """
-
 
         pass
 
@@ -66,7 +81,13 @@ class Instructor:
         """
         :param account: Account to wrap as an admin. Must be an admin, otherwise raise exception.
         """
-        pass
+        if not (isinstance(account, Account)):
+            raise TypeError('Instance supplied to Instructor constructor is not an account')
+
+        if not is_instructor(account):
+            raise ValueError('Account supplied to Instructor constructor is not in the Instructor group')
+
+        self.account = account
 
     def assign_course(self, course: Course) -> bool:
         pass
@@ -119,6 +140,3 @@ def get_all_admins() -> list[Admin]:
     """
 
     pass
-
-
-
