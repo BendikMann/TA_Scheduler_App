@@ -1,8 +1,8 @@
 from typing import Union
 from django.contrib.auth.models import User
 
-from user import *
-from models import Account, UsAddress
+from TA_Scheduler.user import *
+from TA_Scheduler.models import Account, UsAddress
 
 
 def is_admin(account: Account) -> bool:
