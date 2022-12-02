@@ -208,7 +208,7 @@ class Test_make_admin(TestCase):
 
     def arbitrary_positive(self, account: Account):
         self.assertIsInstance(account_util.make_admin(account), TA_Scheduler.user.Ta,
-                        msg="This account should have been made admin and make admin returned true.")
+                              msg="This account should have been made admin and make admin returned true.")
         self.assertEqual(Group.objects.get(name="Admin"), account.user.groups.get(name="Admin"),
                          msg="make admin reported true, but is not in admin group.")
 
@@ -289,6 +289,7 @@ class Test_make_ta(TestCase):
     def test_instructor(self):
         self.assertIsNone(account_util.make_ta(self.instructor_account),
                           msg="Instructors cannot add a ta, should return none type.")
+
 
 class Test_make_instructor(TestCase):
     def setUp(self):  # setUp is used here because we will be changing this data.

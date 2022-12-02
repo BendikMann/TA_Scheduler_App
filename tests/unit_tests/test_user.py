@@ -69,17 +69,19 @@ class UserInitTests(TestCase):
     def test_admin_init(self):
         try:
             a = Admin(self.admin_account)
+            self.assertEqual(a.account, self.admin_account)
         except TypeError:
             self.fail("Admin __init__ raised TypeError when Admin Account was passed")
         except ValueError:
             self.fail("Admin __init__ raised ValueError when Admin Account was passed")
+
 
     def test_admin_init_wrong_type(self):
         with self.assertRaises(TypeError, msg="TypeError not raised when passing Admin __init__ a string"):
             a = Admin(self.random_string)
 
         with self.assertRaises(TypeError, msg="TypeError not raised when passing Admin __init__ an integer"):
-            a = Admin(self.random_integer)
+            b = Admin(self.random_integer)
 
     def test_admin_init_wrong_account_group(self):
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Admin __init__ an account with no "
@@ -88,16 +90,18 @@ class UserInitTests(TestCase):
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Admin __init__ an account only in "
                                                "TA group"):
-            a = Admin(self.ta_account)
+            b = Admin(self.ta_account)
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Admin __init__ an account only in "
                                                "Instructor group"):
-            a = Admin(self.instructor_account)
+            c = Admin(self.instructor_account)
 
     def test_admin_init_mult_groups(self):
         try:
             a = Admin(self.admin_instructor_account)
-            a = Admin(self.admin_ta_account)
+            b = Admin(self.admin_ta_account)
+            self.assertEqual(a.account, self.admin_instructor_account)
+            self.assertEqual(b.account, self.admin_ta_account)
         except TypeError:
             self.fail("Admin __init__ raised TypeError when account with multiple groups (Admin included) was passed")
         except ValueError:
@@ -105,11 +109,12 @@ class UserInitTests(TestCase):
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Admin __init__ an account with "
                                                "multiple invalid groups"):
-            a = Admin(self.ta_instructor_account)
+            c = Admin(self.ta_instructor_account)
 
     def test_instructor_init(self):
         try:
             a = Instructor(self.instructor_account)
+            self.assertEqual(a.account, self.instructor_account)
         except TypeError:
             self.fail("Instructor __init__ raised TypeError when Instructor Account was passed")
         except ValueError:
@@ -120,7 +125,7 @@ class UserInitTests(TestCase):
             a = Instructor(self.random_string)
 
         with self.assertRaises(TypeError, msg="TypeError not raised when passing Instructor __init__ an integer"):
-            a = Instructor(self.random_integer)
+            b = Instructor(self.random_integer)
 
     def test_instructor_init_wrong_account_group(self):
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Instructor __init__ an account "
@@ -129,16 +134,18 @@ class UserInitTests(TestCase):
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Instructor __init__ an account "
                                                "only in TA group"):
-            a = Instructor(self.ta_account)
+            b = Instructor(self.ta_account)
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Instructor __init__ an account "
                                                "only in Admin group"):
-            a = Instructor(self.admin_account)
+            c = Instructor(self.admin_account)
 
     def test_instructor_init_mult_groups(self):
         try:
             a = Instructor(self.admin_instructor_account)
-            a = Instructor(self.ta_instructor_account)
+            b = Instructor(self.ta_instructor_account)
+            self.assertEqual(a.account, self.admin_instructor_account)
+            self.assertEqual(b.account, self.ta_instructor_account)
         except TypeError:
             self.fail("Instructor __init__ raised TypeError when account with multiple groups (Instructor included) "
                       "was passed")
@@ -148,11 +155,12 @@ class UserInitTests(TestCase):
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Instructor __init__ an account with "
                                                "multiple invalid groups"):
-            a = Instructor(self.admin_ta_account)
+            c = Instructor(self.admin_ta_account)
 
     def test_ta_init(self):
         try:
             a = Ta(self.ta_account)
+            self.assertEqual(a.account, self.ta_account)
         except TypeError:
             self.fail("Ta __init__ raised TypeError when Ta Account was passed")
         except ValueError:
@@ -163,7 +171,7 @@ class UserInitTests(TestCase):
             a = Ta(self.random_string)
 
         with self.assertRaises(TypeError, msg="TypeError not raised when passing Ta __init__ an integer"):
-            a = Ta(self.random_integer)
+            b = Ta(self.random_integer)
 
     def test_ta_init_wrong_account_group(self):
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Ta __init__ an account with no "
@@ -172,16 +180,18 @@ class UserInitTests(TestCase):
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Ta __init__ an account only in "
                                                "Admin group"):
-            a = Ta(self.admin_account)
+            b = Ta(self.admin_account)
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Ta __init__ an account only in "
                                                "Instructor group"):
-            a = Ta(self.instructor_account)
+            c = Ta(self.instructor_account)
 
     def test_ta_init_mult_groups(self):
         try:
             a = Ta(self.admin_ta_account)
-            a = Ta(self.ta_instructor_account)
+            b = Ta(self.ta_instructor_account)
+            self.assertEqual(a.account, self.admin_ta_account)
+            self.assertEqual(b.account, self.ta_instructor_account)
         except TypeError:
             self.fail("Ta __init__ raised TypeError when account with multiple groups (Ta included) was passed")
         except ValueError:
@@ -189,7 +199,7 @@ class UserInitTests(TestCase):
 
         with self.assertRaises(ValueError, msg="ValueError not raised when passing Ta __init__ an account with "
                                                "multiple invalid groups"):
-            a = Ta(self.admin_instructor_account)
+            c = Ta(self.admin_instructor_account)
 
 class Test_Get_All_Tas(TestCase):
     @classmethod
@@ -302,7 +312,7 @@ class Test_Get_All_Admins(TestCase):
         tas = list(models.Account.objects.filter(user__groups__name="Admin").all())
         tas = sorted(tas, key=lambda x: x.user.username)
         list_tas: list = user.get_all_admins()
-        list_tas = sorted(list_tas, key=lambda x: x.user.username)
+        list_tas = sorted(tas, key=lambda x: x.user.username)
 
         for i in range(0, min(len(tas), len(list_tas))):
             self.assertEqual(tas[i], list_tas[i], msg="All elements in the list should be the same as the db.")
