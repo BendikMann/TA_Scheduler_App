@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+from TA_Scheduler.account_util import *
 import TA_Scheduler.user
 from TA_Scheduler.models import Account
 from TA_Scheduler import account_util
@@ -347,3 +348,63 @@ class Test_make_instructor(TestCase):
     def test_ta(self):
         self.assertIsNone(account_util.make_ta(self.ta_account),
                           msg="TA cannot add a instructor group, should return none type.")
+
+
+class TestAccount(TestCase):
+    def setUp(self):
+        self.address = UsAddress.objects.create(state="WI", city="Milwaukee", street_address="2200 E Kenwood Blvd",
+                                                zip_code="53211")
+        self.full = create_account("username", "first", "last", "email@email.com", "password", self.address,
+                                   "1234567890")
+
+    def test_create_empty(self):
+        with self.assertRaises(TypeError, msg="Incorrect parameters"):
+            create_account()
+
+    def test_create_detailed(self):
+        acc = create_account("username2", "first", "name", "e@e.e", "password", self.address, "1234567890")
+        self.assertIsNotNone(acc)
+
+    def test_create_full_username(self):
+        self.assertIsNotNone(self.full)
+        self.assertEqual(self.full.user.username, "username", "username was not assigned")
+
+    def test_create_full_first_name(self):
+        self.assertIsNotNone(self.full)
+        self.assertEqual(self.full.user.first_name, "first", "first name was not assigned")
+
+    def test_create_full_last_name(self):
+        self.assertIsNotNone(self.full)
+        self.assertEqual(self.full.user.last_name, "last", "last name was not assigned")
+
+    def test_create_full_email(self):
+        self.assertIsNotNone(self.full)
+        self.assertEqual(self.full.user.email, "email@email.com", "email was not assigned")
+
+    def test_create_full_password(self):
+        self.assertIsNotNone(self.full)
+        self.assertEqual(self.full.user.password, "password", "password was not assigned")
+
+    def test_create_full_address(self):
+        self.assertIsNotNone(self.full)
+        self.assertEqual(self.full.address, self.address, "address was not assigned")
+
+    def test_create_full_phone(self):
+        self.assertIsNotNone(self.full)
+        self.assertEqual(self.full.phone_number, "1234567890", "phone number was not assigned")
+
+    def test_create_username_already_exists(self):
+        with self.assertRaises(ValueError, msg="duplicate username"):
+            create_account("username", "first", "last", "mail@mail.com", "password", self.address, "1234567890")
+
+    def test_create_email_already_exists(self):
+        with self.assertRaises(ValueError, msg="duplicate email"):
+            create_account("username2", "first", "last", "email@email.com", "password", self.address, "1234567890")
+
+    def test_deleteNone(self):
+        with self.assertRaises(ValueError, msg="cannot be type None"):
+            delete_account(None)
+
+    def test_deleteDetailed(self):
+        self.assertEqual(delete_account(self.full), True, "delete did not return true")
+        self.assertNotEqual(self.full.user.username, "username", "account details can still be referenced")
