@@ -2,10 +2,10 @@ from django.test import TestCase
 
 from TA_Scheduler.account_util import *
 import TA_Scheduler.user
-from TA_Scheduler.models import Account
-from TA_Scheduler import account_util
+from TA_Scheduler.models import Account, UsAddress
+from TA_Scheduler import user
+from TA_Scheduler.user import *
 from django.contrib.auth.models import Group
-
 import Factories
 
 
@@ -43,22 +43,22 @@ class Test_is_admin(TestCase):
         cls.account.user.groups.clear()
 
     def test_type(self):
-        self.assertIsInstance(account_util.is_admin(self.admin_account), bool, 'is_admin should always return a bool.')
+        self.assertIsInstance(is_admin(self.admin_account), bool, 'is_admin should always return a bool.')
 
     def test_not_admin_no_perm(self):
-        self.assertEqual(False, account_util.is_admin(self.account),
+        self.assertEqual(False, is_admin(self.account),
                          "This account is not an admin, but is admin said it was.")
 
     def test_not_admin_but_other(self):
-        self.assertEqual(False, account_util.is_admin(self.ta_account),
+        self.assertEqual(False, is_admin(self.ta_account),
                          "This account is not an admin, but is admin said it was.")
 
     def test_admin(self):
-        self.assertEqual(True, account_util.is_admin(self.admin_account),
+        self.assertEqual(True, is_admin(self.admin_account),
                          "This account is an admin, but is admin said it was not.")
 
     def test_admin_and_instructor(self):
-        self.assertEqual(True, account_util.is_admin(self.admin_instructor_account),
+        self.assertEqual(True, is_admin(self.admin_instructor_account),
                          "This account is an admin, but is admin said it was not.")
 
 
@@ -96,18 +96,18 @@ class Test_is_ta(TestCase):
         cls.account.user.groups.clear()
 
     def test_type(self):
-        self.assertIsInstance(account_util.is_ta(self.admin_account), bool, 'is_ta should always return a bool.')
+        self.assertIsInstance(is_ta(self.admin_account), bool, 'is_ta should always return a bool.')
 
     def test_not_ta_no_perm(self):
-        self.assertEqual(False, account_util.is_ta(self.account),
+        self.assertEqual(False, is_ta(self.account),
                          "This account is not a ta, but is ta said it was.")
 
     def test_not_ta_but_other(self):
-        self.assertEqual(False, account_util.is_ta(self.instructor_account),
+        self.assertEqual(False, is_ta(self.instructor_account),
                          "This account is not a ta, but is ta said it was.")
 
     def test_is_ta(self):
-        self.assertEqual(True, account_util.is_ta(self.ta_account),
+        self.assertEqual(True, is_ta(self.ta_account),
                          "This account is a ta, but is ta said it was not.")
 
 
@@ -145,23 +145,23 @@ class Test_is_instructor(TestCase):
         cls.account.user.groups.clear()
 
     def test_type(self):
-        self.assertIsInstance(account_util.is_instructor(self.instructor_account), bool,
+        self.assertIsInstance(is_instructor(self.instructor_account), bool,
                               'is_admin should always return a bool.')
 
     def test_not_instructor_no_perm(self):
-        self.assertEqual(False, account_util.is_instructor(self.account),
+        self.assertEqual(False, is_instructor(self.account),
                          "This account is not an instructor, but is instructor said it was.")
 
     def test_not_instructor_but_other(self):
-        self.assertEqual(False, account_util.is_instructor(self.ta_account),
+        self.assertEqual(False, is_instructor(self.ta_account),
                          "This account is not an instructor, but is instructor said it was.")
 
     def test_instructor(self):
-        self.assertEqual(True, account_util.is_instructor(self.instructor_account),
+        self.assertEqual(True, is_instructor(self.instructor_account),
                          "This account is an instructor, but is instructor said it was not.")
 
     def test_admin_and_instructor(self):
-        self.assertEqual(True, account_util.is_instructor(self.admin_instructor_account),
+        self.assertEqual(True, is_instructor(self.admin_instructor_account),
                          "This account is an instructor, but is instructor said it was not.")
 
 
@@ -200,15 +200,15 @@ class Test_make_admin(TestCase):
 
     def test_on_none_input(self):
         with self.assertRaises(ValueError, msg="None type should raise a value error!"):
-            account_util.make_admin(None)
+            make_admin(None)
 
     def test_on_user_input(self):
         with self.assertRaises(ValueError,
                                msg="User type should raise a value error! We want to accept only accounts!"):
-            account_util.make_admin(self.account)
+            make_admin(self.account)
 
     def arbitrary_positive(self, account: Account):
-        self.assertIsInstance(account_util.make_admin(account), TA_Scheduler.user.Ta,
+        self.assertIsInstance(make_admin(account), TA_Scheduler.user.Ta,
                               msg="This account should have been made admin and make admin returned true.")
         self.assertEqual(Group.objects.get(name="Admin"), account.user.groups.get(name="Admin"),
                          msg="make admin reported true, but is not in admin group.")
@@ -265,15 +265,15 @@ class Test_make_ta(TestCase):
 
     def test_on_none_input(self):
         with self.assertRaises(ValueError, msg="None type should raise a value error!"):
-            account_util.make_ta(None)
+            make_ta(None)
 
     def test_on_user_input(self):
         with self.assertRaises(ValueError,
                                msg="User type should raise a value error! We want to accept only accounts!"):
-            account_util.make_ta(self.account.user)
+            make_ta(self.account.user)
 
     def arbitrary_positive(self, account: Account):
-        self.assertIsInstance(account_util.make_ta(account), TA_Scheduler.user.Ta,
+        self.assertIsInstance(make_ta(account), TA_Scheduler.user.Ta,
                               msg="This account should have been made ta and returned a Ta instance.")
         self.assertEqual(Group.objects.get(name="TA"), account.user.groups.get(name="TA"),
                          msg="make ta reported Ta model, but is not in ta group.")
@@ -288,7 +288,7 @@ class Test_make_ta(TestCase):
         self.arbitrary_positive(self.ta_account)
 
     def test_instructor(self):
-        self.assertIsNone(account_util.make_ta(self.instructor_account),
+        self.assertIsNone(make_ta(self.instructor_account),
                           msg="Instructors cannot add a ta, should return none type.")
 
 
@@ -326,15 +326,15 @@ class Test_make_instructor(TestCase):
 
     def test_on_none_input(self):
         with self.assertRaises(ValueError, msg="None type should raise a value error!"):
-            account_util.make_ta(None)
+            make_ta(None)
 
     def test_on_user_input(self):
         with self.assertRaises(ValueError,
                                msg="User type should raise a value error! We want to accept only accounts!"):
-            account_util.make_ta(self.account.user)
+            make_ta(self.account.user)
 
     def arbitrary_positive(self, account: Account):
-        self.assertIsInstance(account_util.make_ta(account), TA_Scheduler.user.Ta,
+        self.assertIsInstance(make_ta(account), TA_Scheduler.user.Ta,
                               msg="This account should have been made instructor and returned a instructor instance.")
         self.assertEqual(Group.objects.get(name="TA"), account.user.groups.get(name="TA"),
                          msg="make instructor returned instructor object, but is not in ta group.")
@@ -346,7 +346,7 @@ class Test_make_instructor(TestCase):
         self.arbitrary_positive(self.account)
 
     def test_ta(self):
-        self.assertIsNone(account_util.make_ta(self.ta_account),
+        self.assertIsNone(make_ta(self.ta_account),
                           msg="TA cannot add a instructor group, should return none type.")
 
 
