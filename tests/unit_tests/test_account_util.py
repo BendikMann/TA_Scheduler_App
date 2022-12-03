@@ -1,9 +1,7 @@
 from django.test import TestCase
 
-from TA_Scheduler.account_util import *
 import TA_Scheduler.user
 from TA_Scheduler.models import Account, UsAddress
-from TA_Scheduler import user
 from TA_Scheduler.user import *
 from django.contrib.auth.models import Group
 import Factories
@@ -199,11 +197,11 @@ class Test_make_admin(TestCase):
         self.account.user.groups.clear()
 
     def test_on_none_input(self):
-        with self.assertRaises(ValueError, msg="None type should raise a value error!"):
+        with self.assertRaises(TypeError, msg="None type should raise a value error!"):
             make_admin(None)
 
     def test_on_user_input(self):
-        with self.assertRaises(ValueError,
+        with self.assertRaises(TypeError,
                                msg="User type should raise a value error! We want to accept only accounts!"):
             make_admin(self.account)
 
@@ -264,11 +262,11 @@ class Test_make_ta(TestCase):
         self.account.user.groups.clear()
 
     def test_on_none_input(self):
-        with self.assertRaises(ValueError, msg="None type should raise a value error!"):
+        with self.assertRaises(TypeError, msg="None type should raise a value error!"):
             make_ta(None)
 
     def test_on_user_input(self):
-        with self.assertRaises(ValueError,
+        with self.assertRaises(TypeError,
                                msg="User type should raise a value error! We want to accept only accounts!"):
             make_ta(self.account.user)
 
@@ -325,11 +323,11 @@ class Test_make_instructor(TestCase):
         self.account.user.groups.clear()
 
     def test_on_none_input(self):
-        with self.assertRaises(ValueError, msg="None type should raise a value error!"):
+        with self.assertRaises(TypeError, msg="None type should raise a value error!"):
             make_ta(None)
 
     def test_on_user_input(self):
-        with self.assertRaises(ValueError,
+        with self.assertRaises(TypeError,
                                msg="User type should raise a value error! We want to accept only accounts!"):
             make_ta(self.account.user)
 

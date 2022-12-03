@@ -1,6 +1,6 @@
 from typing import Union
 
-from TA_Scheduler.models import Account, Course, Lab
+from TA_Scheduler.models import Account, Course, Lab, UsAddress
 
 
 class Admin:
@@ -116,14 +116,6 @@ class Instructor:
         pass
 
 
-def get_all_tas() -> list[Ta]:
-    """
-
-    :return: All users in the Ta group.
-    """
-    pass
-
-
 def login():
     """
     Logs the specified user in.
@@ -137,7 +129,7 @@ def get_all_instructors() -> list[Instructor]:
 
     :return: All instructors in the Instructor group.
     """
-    pass
+    return list(Account.objects.all().filter(user__groups__name='Instructor'))
 
 
 def get_all_admins() -> list[Admin]:
@@ -145,12 +137,15 @@ def get_all_admins() -> list[Admin]:
 
     :return: All Admins in the admin group.
     """
+    return list(Account.objects.all().filter(user__groups__name='Admin'))
 
-    pass
 
+def get_all_tas() -> list[Ta]:
+    """
 
-from TA_Scheduler.user import *
-from TA_Scheduler.models import Account, UsAddress
+    :return: All users in the Ta group.
+    """
+    return list(Account.objects.all().filter(user__groups__name='TA'))
 
 
 def is_admin(account: Account) -> bool:
@@ -165,17 +160,6 @@ def is_admin(account: Account) -> bool:
     return account.user.groups.filter(name='Admin').exists()
 
 
-def make_admin(account: Account) -> Union["Admin", None]:
-    """
-    Makes the specified Account an Admin.
-    :param account: The Account Model to make admin.
-    :return: The Admin instance if account was made admin or was already Admin, None otherwise.
-    """
-    if not (isinstance(account, Account)):
-        raise TypeError('Instance supplied to make_admin is not an account')
-    pass
-
-
 def is_instructor(account: Account) -> bool:
     """
 
@@ -186,17 +170,6 @@ def is_instructor(account: Account) -> bool:
         raise TypeError('Instance supplied to is_instructor is not an account')
 
     return account.user.groups.filter(name='Instructor').exists()
-
-
-def make_instructor(account: Account) -> Union["Instructor", None]:
-    """
-    Makes the specified Account an Instructor
-    :param account: The Account Model to make instructor
-    :return: The Instructor instance if account was made instructor or was already instructor, None otherwise.
-    """
-    if not (isinstance(account, Account)):
-        raise TypeError('Instance supplied to make_instructor is not an account')
-    pass
 
 
 def is_ta(account: Account) -> bool:
@@ -211,7 +184,29 @@ def is_ta(account: Account) -> bool:
     return account.user.groups.filter(name='TA').exists()
 
 
-def make_ta(account: Account) -> Union["Ta", None]:
+def make_admin(account: Account) -> Union[Admin, None]:
+    """
+    Makes the specified Account an Admin.
+    :param account: The Account Model to make admin.
+    :return: The Admin instance if account was made admin or was already Admin, None otherwise.
+    """
+    if not (isinstance(account, Account)):
+        raise TypeError('Instance supplied to make_admin is not an account')
+    pass
+
+
+def make_instructor(account: Account) -> Union[Instructor, None]:
+    """
+    Makes the specified Account an Instructor
+    :param account: The Account Model to make instructor
+    :return: The Instructor instance if account was made instructor or was already instructor, None otherwise.
+    """
+    if not (isinstance(account, Account)):
+        raise TypeError('Instance supplied to make_instructor is not an account')
+    pass
+
+
+def make_ta(account: Account) -> Union[Ta, None]:
     """
     Makes the specified Account a TA
     :param account: The Account Model to make TA
