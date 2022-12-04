@@ -1,5 +1,6 @@
 from collections import namedtuple
 
+import phonenumbers.phonenumberutil
 from django.test import TestCase
 
 from django.contrib.auth.models import User
@@ -42,6 +43,15 @@ class TestModels(TestCase):
         self.assertEqual(True, us_address.update_city("Milwaukee"), "update_city didnt return true when city was changed to the same city")
         self.assertEqual("Milwaukee", us_address.city, "update_city changed city when it was supposed to remain the same")
 
+    def test_update_city_invalid(self):
+        us_address = UsAddress.objects.get()
+        self.assertFalse(us_address.update_city("""1234567890
+        12345678901234567890123456789012345678901234567890
+        12345678901234567890123456789012345678901234567890
+        123456789012345678901234567890
+        """), "passing update_city an invalid string fails to return False")
+        self.assertEqual("Milwaukee", us_address.city, "Passing update_city an invalid string changes the city")
+
     def test_update_street_address_default(self):
         us_address = UsAddress.objects.get()
         self.assertEqual(True, us_address.update_street_address("221B Baker St."), "update_street_address didnt return true when it was changed")
@@ -51,6 +61,15 @@ class TestModels(TestCase):
         us_address = UsAddress.objects.get()
         self.assertEqual(True, us_address.update_street_address("3200 N Cramer St."), "update_street_address didnt return true when it was changed to the same address")
         self.assertEqual("3200 N Cramer St.", us_address.street_address, "update_street_address changed street address when it shouldnt have")
+
+    def test_update_street_address_invalid(self):
+        us_address = UsAddress.objects.get()
+        self.assertFalse(us_address.update_street_address("""1234567890
+        12345678901234567890123456789012345678901234567890
+        12345678901234567890123456789012345678901234567890
+        123456789012345678901234567890
+        """), "passing update_street_address an invalid string fails to return False")
+        self.assertEqual("3200 N Cramer St.", us_address.street_address, "Passing update_street_address an invalid string changes the street_address")
 
     def test_update_zip_code_default(self):
         us_address = UsAddress.objects.get()
@@ -79,6 +98,15 @@ class TestModels(TestCase):
         self.assertEqual(True, account.update_first_name("Lebron"), "update_first_name failed to return true when first name was changed to the same thing")
         self.assertEqual("Lebron", account.user.first_name, "update_first_name changed first name to something that was not expected")
 
+    def test_update_first_name_invalid(self):
+        account = Account.objects.get()
+        self.assertFalse(account.update_first_name("""1234567890
+        12345678901234567890123456789012345678901234567890
+        12345678901234567890123456789012345678901234567890
+        12345678901234567890123456789012345678901234567890
+        """), "passing update_first_name an invalid string fails to return False")
+        self.assertEqual("Lebron", account.user.first_name, "Passing update_first_name an invalid string changes the first name")
+
     def test_update_last_name_default(self):
         account = Account.objects.get()
         self.assertEqual(True, account.update_last_name("bruh"), "update_last_name failed to return true when last name was changed")
@@ -89,10 +117,19 @@ class TestModels(TestCase):
         self.assertEqual(True, account.update_last_name("James"), "update_last_name failed to return true when last name was changed to the same thing")
         self.assertEqual("James", account.user.last_name, "update_last_name changed last name to something that was not expected")
 
+    def test_update_last_name_invalid(self):
+        account = Account.objects.get()
+        self.assertFalse(account.update_last_name("""1234567890
+        12345678901234567890123456789012345678901234567890
+        12345678901234567890123456789012345678901234567890
+        12345678901234567890123456789012345678901234567890
+        """), "passing update_last_name an invalid string fails to return False")
+        self.assertEqual("James", account.user.last_name, "Passing update_last_name an invalid string changes the last name")
+
     def test_update_phone_number_default(self):
         account = Account.objects.get()
         self.assertEqual(True, account.update_phone_number("+14155552671"), "update_phone_number failed to return true when it was changed")
-        self.assertEqual("1234567890", account.phone_number, "update_phone_number failed to change phone number to the expected result")
+        self.assertEqual("+14155552671", account.phone_number, "update_phone_number failed to change phone number to the expected result")
 
     def test_update_phone_number_same(self):
         account = Account.objects.get()
@@ -103,9 +140,9 @@ class TestModels(TestCase):
     def test_update_phone_number_invalid(self):
         account = Account.objects.get()
         account.update_phone_number("+14155552671")
-        self.assertEqual(False, account.update_phone_number("ygvyvyvygvyg"), "update_phone_number failed to return False when the input was invalid")
-        self.assertEqual("1234567890", account.phone_number, "update_phone_number changed the phone number when the input was invalid")
-
+        with self.assertRaises(phonenumbers.phonenumberutil.NumberParseException):
+            self.assertFalse(account.update_phone_number("ygvyvyvygvyg"), "Passing an invalid phone number to update_phone_number failed to return False")
+        self.assertEqual("+14155552671", account.phone_number, "Passing an invalid phone number to update_phone_number changed the phone number")
     def test_get_public_info(self):
         account = Account.objects.get()
         self.assertEqual(account.user.first_name, account.get_public_info().first_name, "get_public_info failed to return a named tuple that was correct")

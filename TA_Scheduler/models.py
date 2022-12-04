@@ -6,6 +6,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
+import phonenumbers
 from localflavor.us import us_states
 
 # This model uses an extension of django which makes validation and form creation easier.
@@ -28,14 +29,18 @@ class UsAddress(models.Model):
         return state_exists_in_us_states
 
     def update_city(self, city: str) -> bool:
-        self.city = city
-        self.save()
-        return True
+        if len(city) <= 128:
+            self.city = city
+            self.save()
+            return True
+        return False
 
     def update_street_address(self, street_address: str) -> bool:
-        self.street_address = street_address
-        self.save()
-        return True
+        if len(street_address) <= 128:
+            self.street_address = street_address
+            self.save()
+            return True
+        return False
 
     def update_zip_code(self, zip_code: str) -> bool:
         if (len(zip_code) == 5) or (len(zip_code) == 9):
@@ -65,17 +70,22 @@ class Account(models.Model):
     phone_number = PhoneNumberField(blank=True)
     
     def update_first_name(self, first_name: str) -> bool:
-        self.user.first_name = first_name
-        self.save()
-        return True
+        if len(first_name) <= 150:
+            self.user.first_name = first_name
+            self.save()
+            return True
+        return False
 
     def update_last_name(self, last_name: str) -> bool:
-        self.user.last_name = last_name
-        self.save()
-        return True
+        if len(last_name) <= 150:
+            self.user.last_name = last_name
+            self.save()
+            return True
+        return False
 
     def update_phone_number(self, phone_number: str) -> bool:
-        if self.phone_number.is_valid():
+        parsed_phone_number = phonenumbers.parse(phone_number)
+        if phonenumbers.is_valid_number(parsed_phone_number):
             self.phone_number = phone_number
             self.save()
             return True
