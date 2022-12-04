@@ -201,6 +201,7 @@ class UserInitTests(TestCase):
                                                "multiple invalid groups"):
             c = Ta(self.admin_instructor_account)
 
+
 class Test_Get_All_Tas(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -231,7 +232,7 @@ class Test_Get_All_Tas(TestCase):
                          msg=f"All tas should include all tas in the db. Actual: {len(tas)} Is {len(list_tas)}")
 
     def test_exhaustive(self):
-        tas = list(models.Account.objects.filter(user__groups__name="Ta").all())
+        tas = list(models.Account.objects.filter(user__groups__name="TA").all())
         tas = sorted(tas, key=lambda x: x.user.username)
         list_tas: list[user.Ta] = user.get_all_tas()
         list_tas = sorted(tas, key=lambda x: x.user.username)
@@ -262,13 +263,13 @@ class Test_Get_All_Instructors(TestCase):
                               msg=f"Get all should return list, returned {type(user.get_all_instructors())}")
 
     def test_count_correct(self):
-        tas = models.Account.objects.filter(user__groups__name="Instructor")
+        instructors = models.Account.objects.filter(user__groups__name="Instructor")
 
-        list_tas: list = user.get_all_instructors()
+        list_instructors: list = user.get_all_instructors()
 
-        self.assertIsNotNone(list_tas, msg="Should return empty list instead!")
-        self.assertEqual(len(tas), len(list_tas),
-                         msg=f"All tas should include all tas in the db. Actual: {len(tas)} Is {len(list_tas)}")
+        self.assertIsNotNone(list_instructors, msg="Should return empty list instead!")
+        self.assertEqual(len(instructors), len(list_instructors),
+                         msg=f"All tas should include all tas in the db. Actual: {len(instructors)} Is {len(list_instructors)}")
 
     def test_exhaustive(self):
         tas = list(models.Account.objects.filter(user__groups__name="Instructor").all())
@@ -300,13 +301,13 @@ class Test_Get_All_Admins(TestCase):
                               msg=f"Get all should return list, returned {type(user.get_all_admins())}")
 
     def test_count_correct(self):
-        tas = models.Account.objects.filter(user__groups__name="Admin")
+        admins = models.Account.objects.filter(user__groups__name="Admin")
 
-        list_tas: list = user.get_all_admins()
+        list_admins: list = user.get_all_admins()
 
-        self.assertIsNotNone(list_tas, msg="Should return empty list instead!")
-        self.assertEqual(len(tas), len(list_tas),
-                         msg=f"All tas should include all tas in the db. Actual: {len(tas)} Is {len(list_tas)}")
+        self.assertIsNotNone(list_admins, msg="Should return empty list instead!")
+        self.assertEqual(len(admins), len(list_admins),
+                         msg=f"All tas should include all tas in the db. Actual: {len(admins)} Is {len(list_admins)}")
 
     def test_exhaustive(self):
         tas = list(models.Account.objects.filter(user__groups__name="Admin").all())
