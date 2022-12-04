@@ -203,10 +203,10 @@ class Test_make_admin(TestCase):
     def test_on_user_input(self):
         with self.assertRaises(TypeError,
                                msg="User type should raise a value error! We want to accept only accounts!"):
-            make_admin(self.account)
+            make_admin(self.account.user)
 
     def arbitrary_positive(self, account: Account):
-        self.assertIsInstance(make_admin(account), TA_Scheduler.user.Ta,
+        self.assertIsInstance(make_admin(account), TA_Scheduler.user.Admin,
                               msg="This account should have been made admin and make admin returned true.")
         self.assertEqual(Group.objects.get(name="Admin"), account.user.groups.get(name="Admin"),
                          msg="make admin reported true, but is not in admin group.")
@@ -225,7 +225,6 @@ class Test_make_admin(TestCase):
 
     def test_already_admin_instructor(self):
         self.arbitrary_positive(self.admin_instructor_account)
-        pass
 
 
 class Test_make_ta(TestCase):
@@ -324,17 +323,17 @@ class Test_make_instructor(TestCase):
 
     def test_on_none_input(self):
         with self.assertRaises(TypeError, msg="None type should raise a value error!"):
-            make_ta(None)
+            make_instructor(None)
 
     def test_on_user_input(self):
         with self.assertRaises(TypeError,
                                msg="User type should raise a value error! We want to accept only accounts!"):
-            make_ta(self.account.user)
+            make_instructor(self.account.user)
 
     def arbitrary_positive(self, account: Account):
-        self.assertIsInstance(make_ta(account), TA_Scheduler.user.Ta,
+        self.assertIsInstance(make_instructor(account), TA_Scheduler.user.Instructor,
                               msg="This account should have been made instructor and returned a instructor instance.")
-        self.assertEqual(Group.objects.get(name="TA"), account.user.groups.get(name="TA"),
+        self.assertEqual(Group.objects.get(name="Instructor"), account.user.groups.get(name="Instructor"),
                          msg="make instructor returned instructor object, but is not in ta group.")
 
     def test_already_instructor(self):
@@ -344,7 +343,7 @@ class Test_make_instructor(TestCase):
         self.arbitrary_positive(self.account)
 
     def test_ta(self):
-        self.assertIsNone(make_ta(self.ta_account),
+        self.assertIsNone(make_instructor(self.ta_account),
                           msg="TA cannot add a instructor group, should return none type.")
 
 

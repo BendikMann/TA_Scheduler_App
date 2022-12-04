@@ -1,6 +1,7 @@
 from typing import Union
 
 from TA_Scheduler.models import Account, Course, Lab, UsAddress
+from django.contrib.auth.models import Group
 
 
 class Admin:
@@ -192,7 +193,11 @@ def make_admin(account: Account) -> Union[Admin, None]:
     """
     if not (isinstance(account, Account)):
         raise TypeError('Instance supplied to make_admin is not an account')
-    pass
+
+    if not is_admin(account):
+        account.user.groups.add(Group.objects.get(name="Admin"))
+
+    return Admin(account)
 
 
 def make_instructor(account: Account) -> Union[Instructor, None]:
@@ -203,7 +208,14 @@ def make_instructor(account: Account) -> Union[Instructor, None]:
     """
     if not (isinstance(account, Account)):
         raise TypeError('Instance supplied to make_instructor is not an account')
-    pass
+
+    if is_ta(account):
+        return None
+
+    if not is_instructor(account):
+        account.user.groups.add(Group.objects.get(name="Instructor"))
+
+    return Instructor(account)
 
 
 def make_ta(account: Account) -> Union[Ta, None]:
@@ -214,7 +226,14 @@ def make_ta(account: Account) -> Union[Ta, None]:
     """
     if not (isinstance(account, Account)):
         raise TypeError('Instance supplied to make_ta is not an account')
-    pass
+
+    if is_instructor(account):
+        return None
+
+    if not is_ta(account):
+        account.user.groups.add(Group.objects.get(name="TA"))
+
+    return Ta(account)
 
 
 def create_account(username: str,
