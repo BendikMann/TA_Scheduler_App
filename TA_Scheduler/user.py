@@ -116,14 +116,6 @@ class Instructor:
         pass
 
 
-def get_all_tas() -> list[Ta]:
-    """
-
-    :return: All users in the Ta group.
-    """
-    return list(Account.objects.filter(user__groups__name="TA").all())
-
-
 def get_all_instructors() -> list[Instructor]:
     """
 
@@ -133,7 +125,6 @@ def get_all_instructors() -> list[Instructor]:
     return list(Account.objects.all().filter(user__groups__name='Instructor'))
 
 
-
 def get_all_admins() -> list[Admin]:
     """
 
@@ -141,6 +132,7 @@ def get_all_admins() -> list[Admin]:
     """
 
     return list(Account.objects.all().filter(user__groups__name='Admin'))
+
 
 def get_all_users() -> list[Account]:
     return list(Account.objects.all())
