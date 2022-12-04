@@ -209,7 +209,7 @@ class Test_Get_All_Tas(TestCase):
             All randomly linked in legal (and logical) ways.
             """
         for i in range(0, 50):
-            UserFactory()
+            UserFactory(password="sdfasfasdf")
 
         for i in range(0, 10):
             CourseFactory()
@@ -222,7 +222,7 @@ class Test_Get_All_Tas(TestCase):
                               msg=f"Get all should return list, returned {type(user.get_all_tas())}")
 
     def test_count_correct(self):
-        tas = models.Account.objects.filter(user__groups__name="Ta")
+        tas = models.Account.objects.filter(user__groups__name="TA")
 
         list_tas: list[user.Ta] = user.get_all_tas()
 
@@ -249,7 +249,7 @@ class Test_Get_All_Instructors(TestCase):
             All randomly linked in legal (and logical) ways.
             """
         for i in range(0, 50):
-            UserFactory()
+            UserFactory(password="shjsfahjk")
 
         for i in range(0, 10):
             CourseFactory()
@@ -287,7 +287,7 @@ class Test_Get_All_Admins(TestCase):
             All randomly linked in legal (and logical) ways.
             """
         for i in range(0, 50):
-            UserFactory()
+            UserFactory(password="sdfshsd")
 
         for i in range(0, 10):
             CourseFactory()

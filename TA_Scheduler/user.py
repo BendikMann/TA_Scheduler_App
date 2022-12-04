@@ -121,23 +121,15 @@ def get_all_tas() -> list[Ta]:
 
     :return: All users in the Ta group.
     """
-    pass
-
-
-def login():
-    """
-    Logs the specified user in.
-    :return:
-    """
-    pass
-
+    return list(Account.objects.filter(user__groups__name="TA").all())
 
 def get_all_instructors() -> list[Instructor]:
     """
 
     :return: All instructors in the Instructor group.
     """
-    pass
+    return list(Account.objects.filter(user__groups__name="Instructor").all())
+
 
 
 def get_all_admins() -> list[Admin]:
@@ -145,8 +137,10 @@ def get_all_admins() -> list[Admin]:
 
     :return: All Admins in the admin group.
     """
+    return list(Account.objects.filter(user__groups__name="Admin").all())
 
-    pass
+def get_all_users() -> list[Account]:
+    return list(Account.objects.all())
 
 
 from TA_Scheduler.user import *
