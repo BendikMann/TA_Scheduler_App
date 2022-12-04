@@ -152,8 +152,11 @@ class DeleteAccount(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         return reverse_lazy('home-page')
 
 
-class HomeView(View):
+class HomeView(LoginRequiredMixin, UserPassesTestMixin , View):
     template_name = 'adminHomepage.html'
+
+    def test_func(self):
+        return is_admin(self.request.user.account)
 
     def get(self, request):
         return render(request, self.template_name, {"users": get_all_users()})

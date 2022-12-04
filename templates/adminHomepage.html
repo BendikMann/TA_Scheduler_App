@@ -25,7 +25,9 @@
             <div class="card-body">
                 <button type="button" class="btn-close float-end" aria-label="Close"></button>
                 <h5 class="card-title">{{user.user.first_name}}</h5>
-                <a href="#" class="card-link"> User Detail</a>
+                {% url 'account-view' pk=user.id as account_view %}
+
+                <a href="{{ account_view }}" class="card-link"> User Detail</a>
 
 
             </div>
