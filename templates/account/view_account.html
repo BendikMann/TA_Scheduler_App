@@ -47,4 +47,12 @@
         <a href='{{ account_update }}' class="btn btn-primary">Set Email</a>
     {% endif %}
 {% endif %}
+<hr>
+
+{% if request.user|has_group:'Admin' %}
+    {% url 'account-delete' pk=object.id as account_delete %}
+    <a href='{{ account_delete }}' class="btn btn-primary">Delete this Account</a>
+{% endif %}
+
+
 {% endblock %}

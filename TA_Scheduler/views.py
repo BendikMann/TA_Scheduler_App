@@ -20,8 +20,6 @@ from TA_Scheduler.user import is_admin
 # Create your views here.
 
 
-
-
 class CreateAddress(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = UsAddress
     fields = '__all__'
@@ -63,6 +61,7 @@ class UpdateAddress(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     def get_success_url(self):
         return reverse_lazy('account-view', args=[self.get_object().account.id])
 
+
 class ViewAddress(UserPassesTestMixin, LoginRequiredMixin, DetailView):
     model = UsAddress
 
@@ -74,9 +73,6 @@ class ViewAddress(UserPassesTestMixin, LoginRequiredMixin, DetailView):
         return True
 
     pass
-
-
-
 
 
 class CreateAccount(UserPassesTestMixin, View):
@@ -102,7 +98,6 @@ class CreateAccount(UserPassesTestMixin, View):
 
     def test_func(self):
         return self.request.user.is_anonymous or is_admin(self.request.user.account)
-
 
 
 class UpdateAccount(View):
@@ -140,13 +135,25 @@ class ViewAccount(UserPassesTestMixin, LoginRequiredMixin, DetailView):
     def test_func(self):
         # we use this to know what account we need to create an address for.
         self.request.session['account_id_to_change'] = self.get_object().id
-
-
         return True
+
+
+class DeleteAccount(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
+    model = Account
+
+    def form_valid(self, form):
+        self.get_object().user.delete()
+        return super().form_valid(form)
+    def test_func(self):
+        return is_admin(self.request.user.account)
+
+    def get_success_url(self):
+        return reverse_lazy('home-page')
 
 
 class HomeView(View):
     template_name = 'adminHomepage.html'
+
     def get(self, request):
         return render(request, self.template_name)
 
