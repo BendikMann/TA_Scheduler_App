@@ -1,6 +1,8 @@
 from typing import Union
 
 from TA_Scheduler.models import Account, Course, Lab
+from TA_Scheduler.models import Account, UsAddress
+
 
 
 class Admin:
@@ -142,9 +144,6 @@ def get_all_admins() -> list[Admin]:
 def get_all_users() -> list[Account]:
     return list(Account.objects.all())
 
-
-from TA_Scheduler.user import *
-from TA_Scheduler.models import Account, UsAddress
 
 
 def is_admin(account: Account) -> bool:

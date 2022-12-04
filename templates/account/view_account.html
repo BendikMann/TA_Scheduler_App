@@ -1,0 +1,50 @@
+{% extends "base.html"%}
+{% block content %}
+
+
+{% if request.user == object.user %}
+<h1>Hiya
+        {{object.user.first_name|default:"pal"}}
+</h1>
+{%else%}
+<h1> {{object.user.first_name|default:"(No First Name Set)"}} {{object.user.last_name|default:"(No Last Name Set)"}}</h1>
+{% endif%}
+
+
+<br>
+<!-- Private User information goes here! -->
+<!-- if user is in admin group or this is their account -->
+{% if request.user|has_group:"Admin" or request.user == object.user %}
+    {% url 'account-update' object.id as account_update %}
+    {% if object.address %}
+        <p>{{object.address.street_address}} <br>
+            {{object.address.city}}, {{object.address.state}} {{object.address.zip_code}} <br>
+            USA
+        </p>
+
+        {% url 'address-update' pk=object.address.id as address_update %}
+        <a href='{{ address_update }}' class="btn btn-primary">Edit Address</a>
+    {% else %}
+        <p>No address set</p>
+        {% url 'address-create' as address_create %}
+        <a href='{{ address_create }}' class="btn btn-primary">Make One</a>
+    {% endif %}
+    <hr>
+    {%if object.phone_number%}
+        <p>{{object.phone_number}}</p>
+        <a href='{{ account_update }}' class="btn btn-primary">Edit Phone Number</a>
+
+    {% else %}
+        <p>No phone number set: </p>
+        <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
+    {% endif %}
+    <hr>
+    {%if object.user.email%}
+        <p>{{object.user.email}}</p>
+        <a href='{{ account_update }}' class="btn btn-primary">Edit Email</a>
+    {% else %}
+        <p>No email set: </p>
+        <a href='{{ account_update }}' class="btn btn-primary">Set Email</a>
+    {% endif %}
+{% endif %}
+{% endblock %}
