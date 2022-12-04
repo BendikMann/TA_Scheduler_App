@@ -210,7 +210,7 @@ class Test_Get_All_Tas(TestCase):
             All randomly linked in legal (and logical) ways.
             """
         for i in range(0, 50):
-            UserFactory()
+            UserFactory(password="sdfasfasdf")
 
         for i in range(0, 10):
             CourseFactory()
@@ -250,7 +250,7 @@ class Test_Get_All_Instructors(TestCase):
             All randomly linked in legal (and logical) ways.
             """
         for i in range(0, 50):
-            UserFactory()
+            UserFactory(password="shjsfahjk")
 
         for i in range(0, 10):
             CourseFactory()
@@ -288,7 +288,7 @@ class Test_Get_All_Admins(TestCase):
             All randomly linked in legal (and logical) ways.
             """
         for i in range(0, 50):
-            UserFactory()
+            UserFactory(password="sdfshsd")
 
         for i in range(0, 10):
             CourseFactory()
