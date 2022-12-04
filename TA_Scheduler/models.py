@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.forms import ModelForm
 from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
 from localflavor.us import us_states
@@ -41,7 +42,6 @@ class UsAddress(models.Model):
                f"{self.city}, {self.state} {self.zip_code}\n" \
                f"USA"
 
-
 # This clever way of extending User was found here:
 #   https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
 class Account(models.Model):
@@ -50,7 +50,7 @@ class Account(models.Model):
     # This is an extension of django which makes validation and form creation easier.
     # See: https://django-phonenumber-field.readthedocs.io/en/latest/index.html
     phone_number = PhoneNumberField(blank=True)
-    
+
     def update_first_name(self, first_name: str) -> bool:
         pass
 
@@ -71,6 +71,16 @@ class Account(models.Model):
 
         pass
 
+
+
+class UserModelForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email']
+class AccountModelForm(ModelForm):
+    class Meta:
+        model = Account
+        fields = ['phone_number']
 
 class Course(models.Model):
     # instructor foreign key

@@ -15,7 +15,26 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+
+import TA_Scheduler.views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('accounts/', include('django.contrib.auth.urls'))
+    #accounts
+    path('accounts/', include('django.contrib.auth.urls')),
+    path('accounts/register/', TA_Scheduler.views.CreateAccount.as_view()),
+    path('accounts/<int:pk>/update/', TA_Scheduler.views.UpdateAccount.as_view(template_name='account/update_account.html'),
+         name='account-update'),
+    path('accounts/<int:pk>/view/', TA_Scheduler.views.ViewAccount.as_view(template_name='account/view_account.html'),
+         name='account-view'),
+    #address
+    path('address/create/', TA_Scheduler.views.CreateAddress.as_view(template_name='address/create_address.html'),
+         name='address-create'),
+    path('address/<int:pk>/update/', TA_Scheduler.views.UpdateAddress.as_view(template_name='account/edit_account.html'),
+         name='address-update'),
+    path('address/<int:pk>/view/', TA_Scheduler.views.ViewAddress.as_view(template_name='address/view_address.html'),
+         name='address-view'),
+
+    #homepage
+    path('accounts/profile/', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'))
 ]

@@ -117,19 +117,12 @@ class Instructor:
         pass
 
 
-def login():
-    """
-    Logs the specified user in.
-    :return:
-    """
-    pass
-
-
 def get_all_instructors() -> list[Instructor]:
     """
 
     :return: All instructors in the Instructor group.
     """
+
     return list(Account.objects.all().filter(user__groups__name='Instructor'))
 
 
@@ -138,7 +131,12 @@ def get_all_admins() -> list[Admin]:
 
     :return: All Admins in the admin group.
     """
+
     return list(Account.objects.all().filter(user__groups__name='Admin'))
+
+
+def get_all_users() -> list[Account]:
+    return list(Account.objects.all())
 
 
 def get_all_tas() -> list[Ta]:
