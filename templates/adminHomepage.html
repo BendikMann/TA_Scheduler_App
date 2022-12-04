@@ -1,6 +1,9 @@
 {% extends "base.html"%}
+
+
 {% block content %}
 
+{% if user.is_authenticated %}
 <div>
     <div class="container-fluid text-center mb-5 ali">
         <h1>Home Page</h1>
@@ -16,30 +19,20 @@
 
 <div>
     <div class="container col-lg-10 text-center d-flex justify-content-lg-center">
+        {% for user in users %}
+
         <div class="card m-3" style="width: 18rem;">
             <div class="card-body">
                 <button type="button" class="btn-close float-end" aria-label="Close"></button>
-                <h5 class="card-title">Stephen Curry</h5>
-                <a href="#" class="card-link">User Detail</a>
+                <h5 class="card-title">{{user.user.first_name}}</h5>
+                <a href="#" class="card-link"> User Detail</a>
+
 
             </div>
         </div>
+        {% endfor %}
 
-        <div class="card m-3 p-1" style="width: 18rem;">
-            <div class="card-body">
-                <button type="button" class="btn-close float-end" aria-label="Close"></button>
-                <h5 class="card-title">Alex Hergott<i></i></h5>
-                <a href="#" class="card-link">User Detail</a>
-            </div>
-        </div>
 
-        <div class="card m-3 p-1" style="width: 18rem;">
-            <div class="card-body">
-                <button type="button" class="btn-close float-end" aria-label="Close"></button>
-                <h5 class="card-title">LeBron James<i></i></h5>
-                <a href="#" class="card-link">User Detail</a>
-            </div>
-        </div>
     </div>
 </div>
 </div>
@@ -79,6 +72,12 @@
         </div>
     </div>
 </div>
+{% else %}
+<p> nope</p>
+
+
+{% endif %}
+
 
 {% endblock %}
 

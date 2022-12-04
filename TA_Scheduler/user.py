@@ -135,7 +135,8 @@ def get_all_admins() -> list[Admin]:
 
 
 def get_all_users() -> list[Account]:
-    return list(Account.objects.all())
+    accounts = list(Account.objects.all())
+    return accounts
 
 
 def get_all_tas() -> list[Ta]:
