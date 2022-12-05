@@ -169,14 +169,6 @@ class CreateCourse(View):
         course = CourseModelForm()
         return render(request, self.template_name, {'course_form': course})
 
-    def get_account(self) -> Account:
-        try:
-            account_id = int(self.request.session.get('account_id_to_change'))
-        except TypeError:
-            raise PermissionDenied()
-        account = Account.objects.get(id=account_id)
-        return account
-
     def post(self, request):
         course = CourseModelForm(request.POST)
 
@@ -211,6 +203,4 @@ class ViewCourse(UserPassesTestMixin, LoginRequiredMixin, DetailView):
     model = Course
 
     def test_func(self):
-        self.request.session['account_id_to_change'] = self.get_object().id
-        # self.request.session['prev_page'] = reverse('course-view', args=[self.request.user.id])
         return True
