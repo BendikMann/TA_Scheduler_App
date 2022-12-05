@@ -30,14 +30,14 @@ class UsAddress(models.Model):
         return state_exists_in_us_states
 
     def update_city(self, city: str) -> bool:
-        if len(city) <= 128 and city.isalnum():
+        if len(city) <= 128 and city.replace(" ", "").isalpha():
             self.city = city
             self.save()
             return True
         return False
 
     def update_street_address(self, street_address: str) -> bool:
-        if len(street_address) <= 128 and street_address.isalnum():
+        if len(street_address) <= 128 and street_address.replace(" ", "").isalnum():
             self.street_address = street_address
             self.save()
             return True
@@ -75,14 +75,16 @@ class Account(models.Model):
     phone_number = PhoneNumberField(blank=True)
 
     def update_first_name(self, first_name: str) -> bool:
-        if len(first_name) <= 150 and first_name.isalnum():
+        # checks if the name is a valid size and if it only contains letters
+        if len(first_name) <= 150 and first_name.replace(" ", "").isalpha():
             self.user.first_name = first_name
             self.save()
             return True
         return False
 
     def update_last_name(self, last_name: str) -> bool:
-        if len(last_name) <= 150 and last_name.isalnum():
+        # checks if the name is a valid size and if it only contains letters
+        if len(last_name) <= 150 and last_name.replace(" ", "").isalpha():
             self.user.last_name = last_name
             self.save()
             return True
