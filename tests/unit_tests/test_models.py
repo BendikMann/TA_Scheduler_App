@@ -48,9 +48,13 @@ class TestModels(TestCase):
         self.assertFalse(us_address.update_city("""1234567890
         12345678901234567890123456789012345678901234567890
         12345678901234567890123456789012345678901234567890
-        123456789012345678901234567890
-        """), "passing update_city an invalid string fails to return False")
+        123456789012345678901234567890"""        ), "passing update_city an invalid string fails to return False")
         self.assertEqual("Milwaukee", us_address.city, "Passing update_city an invalid string changes the city")
+
+    def test_update_city_non_alpha_numeric(self):
+        us_address = UsAddress.objects.get()
+        self.assertEqual(False, us_address.update_city("@@"), "update_city didnt return false when a non-numeric string was passed")
+        self.assertEqual("Milwaukee", us_address.city, "update_city changed city when it was supposed to remain the same")
 
     def test_update_street_address_default(self):
         us_address = UsAddress.objects.get()
