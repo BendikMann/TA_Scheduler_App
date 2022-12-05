@@ -1,5 +1,10 @@
 import abc
+
+from django.contrib.auth.models import User
+
 from TA_Scheduler.models import Account, Course, Lab
+from TA_Scheduler.account_util import is_admin, is_instructor, is_ta
+from django.core.mail import send_mail
 
 
 class Admin:
@@ -11,24 +16,34 @@ class Admin:
         """
         :param account: Account to wrap as an admin. Must be an admin, otherwise raise exception.
         """
-        pass
+        if not (isinstance(account, Account)):
+            raise TypeError('Instance supplied to Admin constructor is not an account')
+
+        if not is_admin(account):
+            raise ValueError('Account supplied to Admin constructor is not in the Admin group')
+
+        self.account = account
 
     def send_email(self, header: str, content: str) -> bool:
-        """
-        Sends an email to all Accounts with header: header and content content.
-        :param header:
-        :param content:
-        :return: True if the email was succesfully sent, false otherwise.
-        """
-        pass
-    pass
+        # Gets a list of all user emails excluding blank ones
+        emails = list(User.objects.filter(is_active=True).exclude(email='').values_list('email', flat=True))
+        send_mail(subject=header, message=content, recipient_list=emails)
+        return True
+
 
 class Ta:
     def __init__(self, account: Account):
         """
         :param account: Account to wrap as an TA. Must be a TA, otherwise raise exception.
         """
-        pass
+        if not (isinstance(account, Account)):
+            raise TypeError('Instance supplied to Ta constructor is not an account')
+
+        if not is_ta(account):
+            raise ValueError('Account supplied to Ta constructor is not in the TA group')
+
+        self.account = account
+
 
     def assign_instructor(self, instructor: "Instructor") -> bool:
         """
@@ -36,7 +51,6 @@ class Ta:
         :param instructor:
         :return: True if the instructor is or has had the ta assigned to the ta. False otherwise
         """
-
 
         pass
 
@@ -66,7 +80,13 @@ class Instructor:
         """
         :param account: Account to wrap as an Instructor. Must be an Instructor, otherwise raise exception.
         """
-        pass
+        if not (isinstance(account, Account)):
+            raise TypeError('Instance supplied to Instructor constructor is not an account')
+
+        if not is_instructor(account):
+            raise ValueError('Account supplied to Instructor constructor is not in the Instructor group')
+
+        self.account = account
 
     def assign_course(self, course: Course) -> bool:
         pass
@@ -87,13 +107,14 @@ class Instructor:
         pass
 
     def send_email(self, header: str, content: str) -> bool:
-        """
-        Sends an email to all Ta's of the instructor with header: header and content: content.
-        :param header:
-        :param content:
-        :return: True if the email was successfully sent, false otherwise.
-        """
-        pass
+        # Gets a list of all user emails excluding blank ones
+        tas = self.get_assigned_tas()
+        emails = []
+        # Gets a list of all the emails of the TA's that are assigned to a specific instructor
+        for ta in tas:
+            emails.append(ta.account.user.email)
+        send_mail(subject=header, message=content, recipient_list=emails)
+        return True
 
 
 def get_all_tas() -> list[Ta]:
@@ -119,6 +140,3 @@ def get_all_admins() -> list[Admin]:
     """
 
     pass
-
-
-
