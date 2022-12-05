@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+{% extends "base.html"%}
+{% block content %}
+
+<html lang="en">
+<form action="" method="post">
+    {% csrf_token %}
+    <table>
+        {{ course_form.as_table }}
+    </table>
+    <input type="submit" value="Submit"/>
+</form>
+
+{% endblock %}
+</html>

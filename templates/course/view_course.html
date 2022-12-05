@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+{% extends "base.html"%}
+{% block content %}
+
+<html lang="en">
+<p1><h1>{{object.name}}</h1> <br>
+    <b>Subject: </b> {{object.subject}}, <br>
+    <b>Section: </b> {{object.section}} <br>
+    <b>Instructor(s): </b>
+    {% for instructor in object.instructor.all %}
+    {{ instructor.user.first_name|default:'Unnamed Instructor' }} <br>
+    {% endfor %}
+    <b>Course Number: </b> {{object.course_number}} <br>
+</p1>
+
+{% endblock %}
+</html>

@@ -144,6 +144,7 @@ class DeleteAccount(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
     def form_valid(self, form):
         self.get_object().user.delete()
         return super().form_valid(form)
+
     def test_func(self):
         return is_admin(self.request.user.account)
 
@@ -158,3 +159,58 @@ class HomeView(View):
         return render(request, self.template_name)
 
     pass
+
+
+class CreateCourse(View):
+    template_name = 'course/create_course.html'
+    model = Course
+
+    def get(self, request):
+        course = CourseModelForm()
+        return render(request, self.template_name, {'course_form': course})
+
+    def get_account(self) -> Account:
+        try:
+            account_id = int(self.request.session.get('account_id_to_change'))
+        except TypeError:
+            raise PermissionDenied()
+        account = Account.objects.get(id=account_id)
+        return account
+
+    def post(self, request):
+        course = CourseModelForm(request.POST)
+
+        if course.is_valid():
+            course.save()
+            return redirect('course-view', course.instance.id)
+        else:
+            return render(request,
+                          self.template_name, {'course_form': course})
+
+
+class UpdateCourse(View):
+    template_name = 'course/update_course.html'
+
+    def get(self, request, pk):
+        course_model = TA_Scheduler.models.Course.objects.get(pk=pk)
+        course = CourseModelForm(instance=course_model)
+        return render(request, self.template_name, {'course_form': course})
+
+    def post(self, request, pk):
+        course_model = TA_Scheduler.models.Course.objects.get(pk=pk)
+        course = CourseModelForm(request.POST, instance=course_model)
+
+        if course.is_valid():
+            course.save()
+            return redirect('course-view', pk=pk)
+        else:
+            return render(request, self.template_name, {'course_form': course})
+
+
+class ViewCourse(UserPassesTestMixin, LoginRequiredMixin, DetailView):
+    model = Course
+
+    def test_func(self):
+        self.request.session['account_id_to_change'] = self.get_object().id
+        # self.request.session['prev_page'] = reverse('course-view', args=[self.request.user.id])
+        return True

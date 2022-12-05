@@ -48,5 +48,13 @@ urlpatterns = [
 
     # homepage
     path('accounts/profile/', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
-         name='home-page')
+         name='home-page'),
+
+    # course
+    path('course/create/', TA_Scheduler.views.CreateCourse.as_view(template_name='course/create_course.html'),
+         name='course-create'),
+    path('course/<int:pk>/update/', TA_Scheduler.views.UpdateCourse.as_view(template_name='course/update_course.html'),
+         name='course-update'),
+    path('course/<int:pk>/view/', TA_Scheduler.views.ViewCourse.as_view(template_name='course/view_course.html'),
+         name='course-view'),
 ]
