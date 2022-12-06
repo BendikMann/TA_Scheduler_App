@@ -28,9 +28,9 @@ urlpatterns = [
     path('accounts/<int:pk>/update/',
          TA_Scheduler.views.UpdateAccount.as_view(template_name='account/update_account.html'),
          name='account-update'),
-    path('accounts/<int:pk>/view/',
-         TA_Scheduler.views.ViewAccount.as_view(template_name='account/view_account.html'),
-         name='account-view'),
+    # path('accounts/<int:pk>/view/',
+    #      TA_Scheduler.views.ViewAccount.as_view(template_name='account/view_account.html'),
+    #      name='account-view'),
     path('account/<int:pk>/delete/',
          TA_Scheduler.views.DeleteAccount.as_view(template_name='account/delete_account.html'),
          name='account-delete'),
@@ -50,6 +50,16 @@ urlpatterns = [
     path('accounts/profile/', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
          name='home-page'),
 
+    path('', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
+         name='home-page'),
+
+    path('', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
+         name='home-page'),
+
+    path('accounts/<int:pk>/view/',
+         TA_Scheduler.views.ViewAccount.as_view(template_name='account/view_account.html'),
+         name='account-view')
+
     # course
     path('course/create/', TA_Scheduler.views.CreateCourse.as_view(template_name='course/create_course.html'),
          name='course-create'),
@@ -57,4 +67,5 @@ urlpatterns = [
          name='course-update'),
     path('course/<int:pk>/view/', TA_Scheduler.views.ViewCourse.as_view(template_name='course/view_course.html'),
          name='course-view'),
+
 ]
