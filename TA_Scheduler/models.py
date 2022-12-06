@@ -10,6 +10,7 @@ from phonenumber_field.modelfields import PhoneNumberField
 import phonenumbers
 from localflavor.us import us_states
 
+
 # This model uses an extension of django which makes validation and form creation easier.
 # See: https://github.com/django/django-localflavor
 class UsAddress(models.Model):
@@ -65,6 +66,7 @@ class UsAddress(models.Model):
                f"{self.city}, {self.state} {self.zip_code}\n" \
                f"USA"
 
+
 # This clever way of extending User was found here:
 #   https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
 class Account(models.Model):
@@ -111,15 +113,17 @@ class Account(models.Model):
         pass
 
 
-
 class UserModelForm(ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
+
+
 class AccountModelForm(ModelForm):
     class Meta:
         model = Account
         fields = ['phone_number']
+
 
 class Course(models.Model):
     # instructor foreign key
@@ -164,6 +168,7 @@ class Lab(models.Model):
         return f"{self.section} TA: {self.ta.user.first_name} {self.ta.user.last_name} Course: {self.course.course_number}\n"
 
         pass
+
 
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)
