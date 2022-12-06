@@ -13,7 +13,7 @@ from TA_Scheduler.models import Account
 class TestModels(TestCase):
 
     def setUp(self):
-        UsAddress.objects.create(state="WI", city="Milwaukee", street_address="3200 N Cramer St.", zip_code="53211")
+        UsAddress.objects.create(state="WI", city="Milwaukee", street_address="3200 N Cramer St", zip_code="53211")
         User.objects.create(username="a", password="password", email="lebron@gmail.com", first_name="Lebron", last_name="James")
 
     def test_update_state_default(self):
@@ -58,13 +58,13 @@ class TestModels(TestCase):
 
     def test_update_street_address_default(self):
         us_address = UsAddress.objects.get()
-        self.assertEqual(True, us_address.update_street_address("221B Baker St."), "update_street_address didnt return true when it was changed")
-        self.assertEqual("221B Baker St.", us_address.street_address, "update_street_address didnt change street address")
+        self.assertEqual(True, us_address.update_street_address("221B Baker St"), "update_street_address didnt return true when it was changed")
+        self.assertEqual("221B Baker St", us_address.street_address, "update_street_address didnt change street address")
 
     def test_update_street_address_same(self):
         us_address = UsAddress.objects.get()
-        self.assertEqual(True, us_address.update_street_address("3200 N Cramer St."), "update_street_address didnt return true when it was changed to the same address")
-        self.assertEqual("3200 N Cramer St.", us_address.street_address, "update_street_address changed street address when it shouldnt have")
+        self.assertEqual(True, us_address.update_street_address("3200 N Cramer St"), "update_street_address didnt return true when it was changed to the same address")
+        self.assertEqual("3200 N Cramer St", us_address.street_address, "update_street_address changed street address when it shouldnt have")
 
     def test_update_street_address_invalid(self):
         us_address = UsAddress.objects.get()
@@ -73,7 +73,12 @@ class TestModels(TestCase):
         12345678901234567890123456789012345678901234567890
         123456789012345678901234567890
         """), "passing update_street_address an invalid string fails to return False")
-        self.assertEqual("3200 N Cramer St.", us_address.street_address, "Passing update_street_address an invalid string changes the street_address")
+        self.assertEqual("3200 N Cramer St", us_address.street_address, "Passing update_street_address an invalid string changes the street_address")
+
+    def test_update_street_address_non_alpha_numeric(self):
+        us_address = UsAddress.objects.get()
+        self.assertEqual(False, us_address.update_street_address("@@"), "update_street_address didnt return false when a non-numeric string was passed")
+        self.assertEqual("3200 N Cramer St", us_address.street_address, "update_street_address changed street address when it was supposed to remain the same")
 
     def test_update_zip_code_default(self):
         us_address = UsAddress.objects.get()
@@ -111,6 +116,11 @@ class TestModels(TestCase):
         """), "passing update_first_name an invalid string fails to return False")
         self.assertEqual("Lebron", account.user.first_name, "Passing update_first_name an invalid string changes the first name")
 
+    def test_update_first_name_non_alpha_numeric(self):
+        account = Account.objects.get()
+        self.assertEqual(False, account.update_first_name("@@"), "update_first_name didnt return false when a non-numeric string was passed")
+        self.assertEqual("Lebron", account.user.first_name, "update_first_name changed first name when it was supposed to remain the same")
+
     def test_update_last_name_default(self):
         account = Account.objects.get()
         self.assertEqual(True, account.update_last_name("bruh"), "update_last_name failed to return true when last name was changed")
@@ -129,6 +139,11 @@ class TestModels(TestCase):
         12345678901234567890123456789012345678901234567890
         """), "passing update_last_name an invalid string fails to return False")
         self.assertEqual("James", account.user.last_name, "Passing update_last_name an invalid string changes the last name")
+
+    def test_update_last_name_non_alpha_numeric(self):
+        account = Account.objects.get()
+        self.assertEqual(False, account.update_last_name("@@"), "update_last_name didnt return false when a non-numeric string was passed")
+        self.assertEqual("James", account.user.last_name, "update_last_name changed last name when it was supposed to remain the same")
 
     def test_update_phone_number_default(self):
         account = Account.objects.get()

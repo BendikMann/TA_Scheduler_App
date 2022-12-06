@@ -1,0 +1,10 @@
+{% extends "base.html"%}
+{% block content %}
+
+<h1>Are you sure you want to delete {{object.user.first_name}}?</h1>
+<p> This will also delete the related user and account! This is not reversible.</p>
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Delete"/>
+</form>
+{% endblock %}
