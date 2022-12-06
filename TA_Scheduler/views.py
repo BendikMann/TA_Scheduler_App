@@ -162,3 +162,48 @@ class HomeView(LoginRequiredMixin, UserPassesTestMixin , View):
         return render(request, self.template_name, {"users": get_all_users()})
 
     pass
+
+
+class CreateCourse(View):
+    template_name = 'course/create_course.html'
+    model = Course
+
+    def get(self, request):
+        course = CourseModelForm()
+        return render(request, self.template_name, {'course_form': course})
+
+    def post(self, request):
+        course = CourseModelForm(request.POST)
+
+        if course.is_valid():
+            course.save()
+            return redirect('course-view', course.instance.id)
+        else:
+            return render(request,
+                          self.template_name, {'course_form': course})
+
+
+class UpdateCourse(View):
+    template_name = 'course/update_course.html'
+
+    def get(self, request, pk):
+        course_model = TA_Scheduler.models.Course.objects.get(pk=pk)
+        course = CourseModelForm(instance=course_model)
+        return render(request, self.template_name, {'course_form': course})
+
+    def post(self, request, pk):
+        course_model = TA_Scheduler.models.Course.objects.get(pk=pk)
+        course = CourseModelForm(request.POST, instance=course_model)
+
+        if course.is_valid():
+            course.save()
+            return redirect('course-view', pk=pk)
+        else:
+            return render(request, self.template_name, {'course_form': course})
+
+
+class ViewCourse(UserPassesTestMixin, LoginRequiredMixin, DetailView):
+    model = Course
+
+    def test_func(self):
+        return True

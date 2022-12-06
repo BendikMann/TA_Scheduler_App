@@ -149,6 +149,12 @@ class Course(models.Model):
                f"Name: {self.name}\n"
 
 
+class CourseModelForm(ModelForm):
+    class Meta:
+        model = Course
+        fields = ['instructor', 'course_number', 'subject', 'section', 'name']
+
+
 class Lab(models.Model):
     section = models.CharField(max_length=5)
     ta = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)

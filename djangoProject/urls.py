@@ -60,6 +60,12 @@ urlpatterns = [
          TA_Scheduler.views.ViewAccount.as_view(template_name='account/view_account.html'),
          name='account-view')
 
-
+    # course
+    path('course/create/', TA_Scheduler.views.CreateCourse.as_view(template_name='course/create_course.html'),
+         name='course-create'),
+    path('course/<int:pk>/update/', TA_Scheduler.views.UpdateCourse.as_view(template_name='course/update_course.html'),
+         name='course-update'),
+    path('course/<int:pk>/view/', TA_Scheduler.views.ViewCourse.as_view(template_name='course/view_course.html'),
+         name='course-view'),
 
 ]
