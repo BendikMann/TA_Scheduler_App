@@ -1,6 +1,9 @@
 {% extends "base.html"%}
+
+
 {% block content %}
 
+{% if user.is_authenticated %}
 <div>
     <div class="container-fluid text-center mb-5 ali">
         <h1>Home Page</h1>
@@ -10,36 +13,29 @@
 <div class="d-grid p-2" style="background-color: lightgrey">
     <div class="container col-lg-8 flex-row d-flex">
         <h3 class="mx-auto">Users</h3>
-        <button type="button" class="mx-auto btn-primary">Add a User</button>
+        <a href="/accounts/register/" class="card-link mx-auto btn-primary btn">And a User</a>
+
     </div>
 </div>
 
 <div>
-    <div class="container col-lg-10 text-center d-flex justify-content-lg-center">
+    <div class="container flex-wrap col-lg-10 text-center d-flex justify-content-lg-center">
+        {% for user in users %}
+
         <div class="card m-3" style="width: 18rem;">
             <div class="card-body">
                 <button type="button" class="btn-close float-end" aria-label="Close"></button>
-                <h5 class="card-title">Stephen Curry</h5>
-                <a href="#" class="card-link">User Detail</a>
+                <h5 class="card-title">{{user.user.first_name}}</h5>
+                {% url 'account-view' pk=user.id as account_view %}
+
+                <a href="{{ account_view }}" class="card-link"> User Detail</a>
+
 
             </div>
         </div>
+        {% endfor %}
 
-        <div class="card m-3 p-1" style="width: 18rem;">
-            <div class="card-body">
-                <button type="button" class="btn-close float-end" aria-label="Close"></button>
-                <h5 class="card-title">Alex Hergott<i></i></h5>
-                <a href="#" class="card-link">User Detail</a>
-            </div>
-        </div>
 
-        <div class="card m-3 p-1" style="width: 18rem;">
-            <div class="card-body">
-                <button type="button" class="btn-close float-end" aria-label="Close"></button>
-                <h5 class="card-title">LeBron James<i></i></h5>
-                <a href="#" class="card-link">User Detail</a>
-            </div>
-        </div>
     </div>
 </div>
 </div>
@@ -47,7 +43,7 @@
 <div class="d-grid p-2" style="background-color: lightgrey">
     <div class="container col-lg-8 flex-row d-flex">
         <h3 class="mx-lg-auto">Courses</h3>
-        <button class="mx-lg-auto btn-primary">Add a Course</button>
+        <a href="#" class="card-link mx-auto btn-primary btn"> Add a Course</a>
     </div>
 </div>
 
@@ -79,6 +75,12 @@
         </div>
     </div>
 </div>
+{% else %}
+<p> nope</p>
+
+
+{% endif %}
+
 
 {% endblock %}
 

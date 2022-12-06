@@ -14,7 +14,7 @@ from django.views.generic import DetailView
 
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from TA_Scheduler.models import *
-from TA_Scheduler.user import is_admin
+from TA_Scheduler.user import *
 
 
 # Create your views here.
@@ -144,6 +144,7 @@ class DeleteAccount(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
     def form_valid(self, form):
         self.get_object().user.delete()
         return super().form_valid(form)
+
     def test_func(self):
         return is_admin(self.request.user.account)
 
@@ -151,10 +152,13 @@ class DeleteAccount(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         return reverse_lazy('home-page')
 
 
-class HomeView(View):
+class HomeView(LoginRequiredMixin, UserPassesTestMixin , View):
     template_name = 'adminHomepage.html'
 
+    def test_func(self):
+        return is_admin(self.request.user.account)
+
     def get(self, request):
-        return render(request, self.template_name)
+        return render(request, self.template_name, {"users": get_all_users()})
 
     pass
