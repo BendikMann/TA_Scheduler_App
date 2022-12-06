@@ -3,7 +3,6 @@ from typing import Union
 from django.contrib.auth.models import User, Group
 
 from TA_Scheduler.models import Account, Course, Lab, UsAddress
-from TA_Scheduler.account_util import is_admin, is_instructor, is_ta
 from django.core.mail import send_mail
 
 
