@@ -53,12 +53,11 @@ urlpatterns = [
     path('', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
          name='home-page'),
 
-    path('', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
-         name='home-page'),
-
     path('accounts/<int:pk>/view/',
          TA_Scheduler.views.ViewAccount.as_view(template_name='account/view_account.html'),
-         name='account-view')
+         name='account-view'),
+
+    path('Announcement/', TA_Scheduler.views.Announcement.as_view(template_name='announcement.html')),
 
     # course
     path('course/create/', TA_Scheduler.views.CreateCourse.as_view(template_name='course/create_course.html'),
