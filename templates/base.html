@@ -26,7 +26,9 @@
         {% if user.id is not None %}
         {% url 'account-view' user.id as account_view %}
         {% url 'logout' as logout_view %}
+        {% url 'home-page' as home_page %}
         <a href='{{ account_view }}' class="btn btn-primary">Account</a>
+        <a href='{{ home_page }}' class="btn btn-primary">Home Page</a>
         <a href='{{ logout_view }}' class="btn btn-primary">Logout</a>
         {% else %}
         {% url 'login' as login_view %}
