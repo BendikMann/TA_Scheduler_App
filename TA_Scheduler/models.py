@@ -7,6 +7,7 @@ from django.dispatch import receiver
 from django.forms import ModelForm
 from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
+import phonenumbers
 from localflavor.us import us_states
 
 # This model uses an extension of django which makes validation and form creation easier.
@@ -28,14 +29,36 @@ class UsAddress(models.Model):
             self.save()
         return state_exists_in_us_states
 
-    def update_city(self, postal_code: str) -> bool:
-        pass
+    def update_city(self, city: str) -> bool:
+        if len(city) <= 128 and city.replace(" ", "").isalpha():
+            self.city = city
+            self.save()
+            return True
+        return False
 
     def update_street_address(self, street_address: str) -> bool:
-        pass
+        if len(street_address) <= 128 and street_address.replace(" ", "").isalnum():
+            self.street_address = street_address
+            self.save()
+            return True
+        return False
 
     def update_zip_code(self, zip_code: str) -> bool:
-        pass
+        if (len(zip_code) == 5) or (len(zip_code) == 9):
+            # splits the zip code by a - to check for zip+4 (54444-5555)
+            zip_code_split = zip_code.split("-")
+            # checks if the zip code is split into either [54444] or [54444, 5555] else return false
+            if len(zip_code_split) == 1:
+                if len(zip_code_split[0]) == 5 and zip_code_split[0].isnumeric():
+                    self.zip_code = zip_code
+                    self.save()
+                    return True
+            elif len(zip_code_split) == 2:
+                if len(zip_code_split[0]) == 5 and zip_code_split[0].isnumeric() and zip_code_split[1].isnumeric():
+                    self.zip_code = zip_code
+                    self.save()
+                    return True
+        return False
 
     def __str__(self):
         return f"{self.street_address}\n" \
@@ -52,16 +75,32 @@ class Account(models.Model):
     phone_number = PhoneNumberField(blank=True)
 
     def update_first_name(self, first_name: str) -> bool:
-        pass
+        # checks if the name is a valid size and if it only contains letters
+        if len(first_name) <= 150 and first_name.replace(" ", "").isalpha():
+            self.user.first_name = first_name
+            self.save()
+            return True
+        return False
 
     def update_last_name(self, last_name: str) -> bool:
-        pass
+        # checks if the name is a valid size and if it only contains letters
+        if len(last_name) <= 150 and last_name.replace(" ", "").isalpha():
+            self.user.last_name = last_name
+            self.save()
+            return True
+        return False
 
     def update_phone_number(self, phone_number: str) -> bool:
-        pass
+        parsed_phone_number = phonenumbers.parse(phone_number)
+        if phonenumbers.is_valid_number(parsed_phone_number):
+            self.phone_number = phone_number
+            self.save()
+            return True
+        return False
 
     def get_public_info(self) -> namedtuple("public_info", ["first_name", "last_name"]):
-        pass
+        public_info = namedtuple("public_info", ["first_name", "last_name"])
+        return public_info(self.user.first_name, self.user.last_name)
 
     def __str__(self):
         return f"User: {self.user.first_name} {self.user.last_name} {self.user.username} Group: {self.user.groups.first()}\n" \

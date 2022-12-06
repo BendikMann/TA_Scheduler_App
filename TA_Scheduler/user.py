@@ -1,7 +1,11 @@
+import abc
 from typing import Union
+from django.contrib.auth.models import User, Group
 
 from TA_Scheduler.models import Account, Course, Lab, UsAddress
-from django.contrib.auth.models import Group
+from TA_Scheduler.account_util import is_admin, is_instructor, is_ta
+from django.core.mail import send_mail
+
 
 
 class Admin:
@@ -22,15 +26,10 @@ class Admin:
         self.account = account
 
     def send_email(self, header: str, content: str) -> bool:
-        """
-        Sends an email to all Accounts with header: header and content content.
-        :param header:
-        :param content:
-        :return: True if the email was succesfully sent, false otherwise.
-        """
-        pass
-
-    pass
+        # Gets a list of all user emails excluding blank ones
+        emails = list(User.objects.filter(is_active=True).exclude(email='').values_list('email', flat=True))
+        send_mail(subject=header, message=content, recipient_list=emails)
+        return True
 
 
 class Ta:
@@ -108,13 +107,14 @@ class Instructor:
         pass
 
     def send_email(self, header: str, content: str) -> bool:
-        """
-        Sends an email to all Ta's of the instructor with header: header and content: content.
-        :param header:
-        :param content:
-        :return: True if the email was successfully sent, false otherwise.
-        """
-        pass
+        # Gets a list of all user emails excluding blank ones
+        tas = self.get_assigned_tas()
+        emails = []
+        # Gets a list of all the emails of the TA's that are assigned to a specific instructor
+        for ta in tas:
+            emails.append(ta.account.user.email)
+        send_mail(subject=header, message=content, recipient_list=emails)
+        return True
 
 
 def get_all_instructors() -> list[Instructor]:
