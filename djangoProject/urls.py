@@ -53,9 +53,6 @@ urlpatterns = [
     path('', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
          name='home-page'),
 
-    path('', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
-         name='home-page'),
-
     path('accounts/<int:pk>/view/',
          TA_Scheduler.views.ViewAccount.as_view(template_name='account/view_account.html'),
          name='account-view')

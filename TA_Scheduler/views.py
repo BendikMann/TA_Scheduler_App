@@ -1,12 +1,8 @@
 from django.core.exceptions import PermissionDenied
 
 import TA_Scheduler.models
-import django.contrib.auth.models
-from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.db import transaction
 from django.shortcuts import render, redirect
 from django.urls import reverse, reverse_lazy
 from django.views import View
@@ -152,14 +148,14 @@ class DeleteAccount(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         return reverse_lazy('home-page')
 
 
-class HomeView(LoginRequiredMixin, UserPassesTestMixin , View):
+class HomeView(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'adminHomepage.html'
 
     def test_func(self):
         return is_admin(self.request.user.account)
 
     def get(self, request):
-        return render(request, self.template_name, {"users": get_all_users()})
+        return render(request, self.template_name, {"users": get_all_users(), "courses": Course.objects.all()})
 
     pass
 
