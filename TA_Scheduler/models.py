@@ -1,7 +1,9 @@
+import enum
 from collections import namedtuple
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.forms import ModelForm
@@ -9,6 +11,8 @@ from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
 import phonenumbers
 from localflavor.us import us_states
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 
 # This model uses an extension of django which makes validation and form creation easier.
 # See: https://github.com/django/django-localflavor
@@ -65,6 +69,7 @@ class UsAddress(models.Model):
                f"{self.city}, {self.state} {self.zip_code}\n" \
                f"USA"
 
+
 # This clever way of extending User was found here:
 #   https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
 class Account(models.Model):
@@ -102,6 +107,9 @@ class Account(models.Model):
         public_info = namedtuple("public_info", ["first_name", "last_name"])
         return public_info(self.user.first_name, self.user.last_name)
 
+    def is_admin(self):
+        return self.user.groups.filter(name='Admin').exists()
+
     def __str__(self):
         return f"User: {self.user.first_name} {self.user.last_name} {self.user.username} Group: {self.user.groups.first()}\n" \
                f"Email: {self.user.email}\n" \
@@ -111,19 +119,23 @@ class Account(models.Model):
         pass
 
 
-
 class UserModelForm(ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
+
+
 class AccountModelForm(ModelForm):
     class Meta:
         model = Account
         fields = ['phone_number']
 
+
 class Course(models.Model):
-    # instructor foreign key
-    instructor = models.ManyToManyField(Account)
+    # This includes
+    assigned_people = models.ManyToManyField(Account, limit_choices_to={'is_admin': False})
+
+    # TODO Make term names (Spring semester is different then fall semsester)
 
     # represented as a string because some courses might have a letter after their course numbers (i.e. 422G)
     course_number = models.CharField(max_length=5)
@@ -131,39 +143,46 @@ class Course(models.Model):
     # course subject (i.e. COMPSCI)
     subject = models.CharField(max_length=10)
 
-    section = models.CharField(max_length=5)
-
     # course name (i.e Compsci 361 has a name of Introduction to Software Engineering)
     name = models.CharField(max_length=30)
 
+    # course description (because it's trivial to include)
+    description = models.TextField(null=True)
+
     def __str__(self):
         # Turns out there is a quite a bit that we need to process.
-        instructors = ''
-        for instructor in self.instructor.all():
-            instructors += f"{instructor.user.first_name} {instructor.user.last_name}"
 
-        return f"Instructors: {instructors}\n" \
-               f"Number: {self.course_number} \n" \
+        return f"Number: {self.course_number} \n" \
                f"Subject: {self.subject} \n" \
-               f"Section: {self.section}\n" \
                f"Name: {self.name}\n"
 
 
 class CourseModelForm(ModelForm):
     class Meta:
         model = Course
-        fields = ['instructor', 'course_number', 'subject', 'section', 'name']
+        fields = ['assigned_people', 'course_number', 'subject', 'name']
 
 
-class Lab(models.Model):
-    section = models.CharField(max_length=5)
-    ta = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
-    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True)
+class Section(models.Model):
+    LECTURE = 'LEC'
+    DISCUSSION = 'DIS'
+    LAB = 'LAB'
 
-    def __str__(self):
-        return f"{self.section} TA: {self.ta.user.first_name} {self.ta.user.last_name} Course: {self.course.course_number}\n"
+    SECTION_CHOICES = [
+        (LECTURE, 'Lecture'),
+        (DISCUSSION, 'Discussion'),
+        (LAB, 'Lab'),
+    ]
 
-        pass
+    class_id = models.CharField(max_length=6)
+    section = models.CharField(max_length=4)
+    type = models.CharField(max_length=3, choices=SECTION_CHOICES, default=LAB)
+    # TODO: meeting schedule
+
+    # we need to do validation to make sure that end date is not before start date.
+    start_date = models.DateField()
+    end_date = models.DateField()
+
 
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)

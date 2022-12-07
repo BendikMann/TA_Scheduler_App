@@ -9,47 +9,41 @@ from django.contrib.auth.hashers import make_password
 # Use these to make 'mock' objects for the database that are robust.
 
 
-class LabFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Lab
-
-    section = factory.Faker('random_letters', length=5)
-
-    @factory.post_generation
-    def ta_set(self, create, extracted, **kwargs):
-        if not create:
-            return
-        # get the list of instructors and add an arbitrary amount of instructors to each course.
-        tas = models.Account.objects.filter(user__groups__name="TA").all()
-        if len(tas) > 0:
-            self.ta = course=random.choice(tas)
-    @factory.post_generation
-    def course_set(self, create, extracted, **kwargs):
-        if not create:
-            return
-
-        courses = models.Course.objects.all()
-        if len(courses) > 0:
-            self.course = random.choice(courses)
-
-
 class CourseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Course
 
     course_number = factory.Faker('numerify', text='#####')
-    subject = factory.Faker('random_letters', length=10)
-    section = factory.Faker('random_letters', length=5)
+    #TODO: Make believable course names.
+    subject = factory.Faker('bothify', text='????????')
     name = factory.Faker('bs')
+    description = factory.Faker("paragraph", nb_sentences=5)
 
     @factory.post_generation
-    def course_instructor_set(self, create, extracted, **kwargs):
+    def course_people_sections_set(self, create, extracted, **kwargs):
         if not create:
             return
         # get the list of instructors and add an arbitrary amount of instructors to each course.
-        instructors = models.Account.objects.filter(user__groups__name="Instructor")
-        for instructor in random.choices(instructors, k=random.randint(0, len(instructors))):
-            self.instructor.add(instructor)
+        instructors = models.Account.objects.filter(user__groups__name='Instructor')
+        for instructor in random.choices(instructors, k=min(3, len(instructors))):
+            self.assigned_people.add(instructor)
+
+        ta = models.Account.objects.filter(user__groups__name='TA')
+        for ta in random.choices(ta, k=min(7, len(ta))):
+            self.assigned_people.add(ta)
+
+class SectionFactory(factory.django.DjangoModelFactory):
+    class Meta:
+        model = models.Section
+
+    class_id = factory.Faker('numerify', text='#####')
+    section = factory.Faker('bothify', text='###?')
+    type = random.choice(models.Section.SECTION_CHOICES)
+    start_date = factory.Faker('past_datetime')
+    # warning, this could enable bug that happen either
+    # if start date is in the future or end date is in the past.
+    end_date = factory.Faker('future_datetime')
+
 
 
 class UsAddressFactory(factory.django.DjangoModelFactory):
@@ -58,7 +52,7 @@ class UsAddressFactory(factory.django.DjangoModelFactory):
     zip_code = factory.Faker('postcode')
     street_address = factory.Faker('street_address')
     city = factory.Faker('city')
-    state = random.choice(us_states.US_STATES)[0]
+    state = random.choice(us_states.US_STATES)
 
 
 @factory.django.mute_signals(post_save)
@@ -81,7 +75,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         last_name = factory.Faker('last_name')
         email = factory.Faker('email')
         username = factory.Sequence(lambda n: f"GenericUsername{n}")
-        password = factory.LazyFunction(lambda : make_password("password"))
+        password = factory.LazyFunction(lambda: make_password("password"))
         account = factory.RelatedFactory(_AccountFactory, factory_related_name='user')
 
         @factory.post_generation
@@ -89,7 +83,7 @@ class UserFactory(factory.django.DjangoModelFactory):
             if not create:
                 return
 
-            group: Group = random.choices(Group.objects.all())[0]
+            group: Group = random.choice(Group.objects.all())
             group.user_set.add(self)
 
 
