@@ -63,7 +63,7 @@ class SectionFactory(factory.django.DjangoModelFactory):
 
     class_id = factory.Faker('numerify', text='#####')
     section = factory.Faker('bothify', text='###?')
-    type = random.choice(models.SectionChoices.SECTION_CHOICES)
+    type = random.choice(models.SectionChoices.SECTION_CHOICES)[0]
     start_date = factory.Faker('past_datetime')
     # warning, this could enable bug that happen either
     # if start date is in the future or end date is in the past.

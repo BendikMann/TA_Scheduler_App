@@ -22,6 +22,7 @@ class CourseChoices:
         (YEAR2024, '2024')
     ]
 
+
 class SectionChoices:
     LECTURE = 'LEC'
     DISCUSSION = 'DIS'

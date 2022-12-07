@@ -134,7 +134,7 @@ class AccountModelForm(ModelForm):
 
 
 class Course(models.Model):
-    assigned_people = models.ManyToManyField(Account, limit_choices_to={'is_admin': False})
+    assigned_people = models.ManyToManyField(Account)
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -166,7 +166,7 @@ class Course(models.Model):
 class CourseModelForm(ModelForm):
     class Meta:
         model = Course
-        fields = ['assigned_people', 'course_number', 'subject', 'name']
+        fields = ['course_number', 'subject', 'name', 'term_type', 'term_year', 'description', 'assigned_people']
 
 
 class Section(models.Model):
