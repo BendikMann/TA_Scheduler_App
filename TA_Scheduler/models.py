@@ -1,7 +1,9 @@
+import enum
 from collections import namedtuple
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.forms import ModelForm
@@ -9,6 +11,11 @@ from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
 import phonenumbers
 from localflavor.us import us_states
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+from TA_Scheduler.model_choice_data import CourseChoices, SectionChoices
+
 
 # This model uses an extension of django which makes validation and form creation easier.
 # See: https://github.com/django/django-localflavor
@@ -65,6 +72,7 @@ class UsAddress(models.Model):
                f"{self.city}, {self.state} {self.zip_code}\n" \
                f"USA"
 
+
 # This clever way of extending User was found here:
 #   https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
 class Account(models.Model):
@@ -102,28 +110,36 @@ class Account(models.Model):
         public_info = namedtuple("public_info", ["first_name", "last_name"])
         return public_info(self.user.first_name, self.user.last_name)
 
+    def is_admin(self):
+        return self.user.groups.filter(name='Admin').exists()
+
     def __str__(self):
         return f"User: {self.user.first_name} {self.user.last_name} {self.user.username} Group: {self.user.groups.first()}\n" \
-               f"Email: {self.user.email}\n" \
-               f"Phone Number: {self.phone_number} \n" \
+               f"Email: {self.user.email} Phone Number: {self.phone_number} \n" \
                f"{self.address}"
 
         pass
-
 
 
 class UserModelForm(ModelForm):
     class Meta:
         model = User
         fields = ['first_name', 'last_name', 'email']
+
+
 class AccountModelForm(ModelForm):
     class Meta:
         model = Account
         fields = ['phone_number']
 
+
 class Course(models.Model):
-    # instructor foreign key
-    instructor = models.ManyToManyField(Account)
+    assigned_people = models.ManyToManyField(Account, limit_choices_to={'is_admin': False})
+
+    term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
+                                 default=CourseChoices.FALL)
+
+    term_year = models.CharField(max_length=4, choices=CourseChoices.TERM_YEAR, default=CourseChoices.YEAR2022)
 
     # represented as a string because some courses might have a letter after their course numbers (i.e. 422G)
     course_number = models.CharField(max_length=5)
@@ -131,39 +147,51 @@ class Course(models.Model):
     # course subject (i.e. COMPSCI)
     subject = models.CharField(max_length=10)
 
-    section = models.CharField(max_length=5)
-
     # course name (i.e Compsci 361 has a name of Introduction to Software Engineering)
     name = models.CharField(max_length=30)
 
+    # course description (because it's trivial to include)
+    description = models.TextField(null=True)
+
     def __str__(self):
         # Turns out there is a quite a bit that we need to process.
-        instructors = ''
-        for instructor in self.instructor.all():
-            instructors += f"{instructor.user.first_name} {instructor.user.last_name}"
-
-        return f"Instructors: {instructors}\n" \
-               f"Number: {self.course_number} \n" \
-               f"Subject: {self.subject} \n" \
-               f"Section: {self.section}\n" \
-               f"Name: {self.name}\n"
-
+        self.assigned_people.filter(user__groups__name='TA')
+        return f"{self.subject}-{self.course_number} {self.term_type} {self.term_year}\n" \
+               f"{self.description} \n" \
+               f"Assigned People:\n\n\n" \
+               f"{*self.assigned_people.all(),}" \
+               f"Sections: \n\n\n" \
+               f"{*self.section_set.all(),}"
 
 class CourseModelForm(ModelForm):
     class Meta:
         model = Course
-        fields = ['instructor', 'course_number', 'subject', 'section', 'name']
+        fields = ['assigned_people', 'course_number', 'subject', 'name']
 
 
-class Lab(models.Model):
-    section = models.CharField(max_length=5)
-    ta = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
-    course = models.ForeignKey(Course, on_delete=models.SET_NULL, null=True)
+class Section(models.Model):
+
+    # A section MUST have a course assigned to it.
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+
+    # A Section may have a user undefined for an arbitrary amount of time.
+    assigned_user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
+
+    class_id = models.CharField(max_length=6)
+
+    section = models.CharField(max_length=4)
+
+    type = models.CharField(max_length=3, choices=SectionChoices.SECTION_CHOICES, default=SectionChoices.LAB)
+    # TODO: meeting schedule
+
+    # we need to do validation to make sure that end date is not before start date.
+    start_date = models.DateField()
+    end_date = models.DateField()
 
     def __str__(self):
-        return f"{self.section} TA: {self.ta.user.first_name} {self.ta.user.last_name} Course: {self.course.course_number}\n"
-
-        pass
+        return f" {self.class_id} {self.section} {self.type} " \
+               f"{ '' if self.assigned_user is None else self.assigned_user.user.first_name} " \
+               f"{ '' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
 
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)

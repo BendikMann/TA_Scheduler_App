@@ -7,5 +7,4 @@ from django.contrib import admin
 
 admin.site.register(Account)
 admin.site.register(UsAddress)
-admin.site.register(Lab)
 admin.site.register(Course)

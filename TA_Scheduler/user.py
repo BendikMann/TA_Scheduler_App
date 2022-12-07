@@ -1,8 +1,7 @@
 import abc
 from typing import Union
 from django.contrib.auth.models import User, Group
-
-from TA_Scheduler.models import Account, Course, Lab, UsAddress
+from TA_Scheduler.models import Account, Course, UsAddress
 from django.core.mail import send_mail
 
 
@@ -59,18 +58,6 @@ class Ta:
         :param instructor:  True if the ta is or has been removed from the ta. False otherwise.
         :return:
         """
-        pass
-
-    def assign_lab_section(self, lab_section: Lab) -> bool:
-        pass
-
-    def remove_lab_section(self, lab_section: Lab) -> bool:
-        pass
-
-    def get_courses(self) -> list[Course]:
-        pass
-
-    def get_lab_sections(self) -> list[Lab]:
         pass
 
 

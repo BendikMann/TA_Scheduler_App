@@ -1,6 +1,6 @@
 from django.test import TestCase
 from TA_Scheduler.course_util import *
-from TA_Scheduler.account_util import *
+from TA_Scheduler.user import *
 
 
 class TestCourse(TestCase):
