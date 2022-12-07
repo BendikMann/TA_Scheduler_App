@@ -1,3 +1,4 @@
+import django.db.utils
 from django.contrib.auth.models import Group
 from django.test import TestCase
 
@@ -29,9 +30,11 @@ class TestFactories(TestCase):
         Factories.CourseFactory.create()
         self.assertEqual(100, len(models.Account.objects.all()))
         self.assertEqual(3, len(models.Course.objects.all()))
+
+        # sections should also be created now, but there is a non-zero chance that none are.
         print(models.Course.objects.all())  # Look here to see if data was linked, it's hard to test.
 
     def test_section_factory(self):
-        Factories.SectionFactory.create()
-        print(models.Account.objects.first())
-        self.assertEqual(1, len(models.Account.objects.all()), msg="User Factory should create an account")
+        with self.assertRaises(django.db.utils.IntegrityError, msg="You should not be able to create orphaned instances of section!"):
+            Factories.SectionFactory.create()
+

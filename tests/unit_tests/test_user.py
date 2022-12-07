@@ -1,10 +1,12 @@
 from django.test import TestCase
-
-from TA_Scheduler import models
-from TA_Scheduler.user import Admin
 from Factories import *
 from TA_Scheduler import user
-
+import random
+import Factories
+from faker import Faker
+from TA_Scheduler.models import Account
+from django.contrib.auth.models import Group
+from TA_Scheduler.user import Admin, Instructor, Ta
 
 def init_dummy_database():
     """
@@ -17,17 +19,8 @@ def init_dummy_database():
     for i in range(0, 10):
         CourseFactory()
 
-    for i in range(0, 20):
-        LabFactory()
 
-    pass
 
-import random
-import Factories
-from faker import Faker
-from TA_Scheduler.models import Account
-from django.contrib.auth.models import Group
-from TA_Scheduler.user import Admin, Instructor, Ta
 
 class UserInitTests(TestCase):
 
@@ -215,9 +208,6 @@ class Test_Get_All_Tas(TestCase):
         for i in range(0, 10):
             CourseFactory()
 
-        for i in range(0, 20):
-            LabFactory()
-
     def test_actually_returns_valid(self):
         self.assertIsInstance(user.get_all_tas(), list,
                               msg=f"Get all should return list, returned {type(user.get_all_tas())}")
@@ -255,8 +245,6 @@ class Test_Get_All_Instructors(TestCase):
         for i in range(0, 10):
             CourseFactory()
 
-        for i in range(0, 20):
-            LabFactory()
 
     def test_actually_returns_valid(self):
         self.assertIsInstance(user.get_all_instructors(), list,
@@ -292,9 +280,6 @@ class Test_Get_All_Admins(TestCase):
 
         for i in range(0, 10):
             CourseFactory()
-
-        for i in range(0, 20):
-            LabFactory()
 
     def test_actually_returns_valid(self):
         self.assertIsInstance(user.get_all_admins(), list,
