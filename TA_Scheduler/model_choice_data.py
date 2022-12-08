@@ -31,5 +31,5 @@ class SectionChoices:
     SECTION_CHOICES = [
         (LECTURE, 'Lecture'),
         (DISCUSSION, 'Discussion'),
-        (LAB, 'Lab'),
+        (LAB, 'Lab')
     ]
