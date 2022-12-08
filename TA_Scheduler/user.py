@@ -1,6 +1,7 @@
 import abc
 from typing import Union
 from django.contrib.auth.models import User, Group
+
 from TA_Scheduler.models import Account, Course, UsAddress
 from django.core.mail import send_mail
 
@@ -43,23 +44,6 @@ class Ta:
 
         self.account = account
 
-    def assign_instructor(self, instructor: "Instructor") -> bool:
-        """
-        Assigns this ta to the specified instructor.
-        :param instructor:
-        :return: True if the instructor is or has had the ta assigned to the ta. False otherwise
-        """
-
-        pass
-
-    def remove_instructor(self, instructor: "Instructor") -> bool:
-        """
-        Removes the assignment of this ta to the specified instructor.
-        :param instructor:  True if the ta is or has been removed from the ta. False otherwise.
-        :return:
-        """
-        pass
-
 
 class Instructor:
     def __init__(self, account: Account):
@@ -74,23 +58,6 @@ class Instructor:
 
         self.account = account
 
-    def assign_course(self, course: Course) -> bool:
-        pass
-
-    def remove_course(self, course: Course) -> bool:
-        pass
-
-    def get_courses(self) -> list[Course]:
-        pass
-
-    def assign_ta(self, ta: Ta) -> bool:
-        pass
-
-    def remove_ta(self, ta: Ta) -> bool:
-        pass
-
-    def get_assigned_tas(self) -> list[Ta]:
-        pass
 
     def send_email(self, header: str, content: str) -> bool:
         # Gets a list of all user emails excluding blank ones
@@ -220,31 +187,3 @@ def make_ta(account: Account) -> Union[Ta, None]:
 
     return Ta(account)
 
-
-def create_account(username: str,
-                   first_name: str,
-                   last_name: str,
-                   email: str,
-                   password: str,
-                   address: UsAddress,
-                   phone_number: str) -> Union[Account, None]:
-    """
-    Attempts to create an account with the given parameters.
-    :param username:
-    :param first_name:
-    :param last_name:
-    :param email:
-    :param password:
-    :param address:
-    :param phone_number:
-    :return: The Account created on success, None otherwise.
-    """
-    pass
-
-
-def delete_account(account: Account):
-    """
-    :param account: Account to delete
-    :return: True if the account was successfully deleted, false otherwise.
-    """
-    pass
