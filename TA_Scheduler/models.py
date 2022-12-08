@@ -82,34 +82,6 @@ class Account(models.Model):
     # See: https://django-phonenumber-field.readthedocs.io/en/latest/index.html
     phone_number = PhoneNumberField(blank=True)
 
-    def update_first_name(self, first_name: str) -> bool:
-        # checks if the name is a valid size and if it only contains letters
-        if len(first_name) <= 150 and first_name.replace(" ", "").isalpha():
-            self.user.first_name = first_name
-            self.save()
-            return True
-        return False
-
-    def update_last_name(self, last_name: str) -> bool:
-        # checks if the name is a valid size and if it only contains letters
-        if len(last_name) <= 150 and last_name.replace(" ", "").isalpha():
-            self.user.last_name = last_name
-            self.save()
-            return True
-        return False
-
-    def update_phone_number(self, phone_number: str) -> bool:
-        parsed_phone_number = phonenumbers.parse(phone_number)
-        if phonenumbers.is_valid_number(parsed_phone_number):
-            self.phone_number = phone_number
-            self.save()
-            return True
-        return False
-
-    def get_public_info(self) -> namedtuple("public_info", ["first_name", "last_name"]):
-        public_info = namedtuple("public_info", ["first_name", "last_name"])
-        return public_info(self.user.first_name, self.user.last_name)
-
     def is_admin(self):
         return self.user.groups.filter(name='Admin').exists()
 
@@ -134,7 +106,7 @@ class AccountModelForm(ModelForm):
 
 
 class Course(models.Model):
-    assigned_people = models.ManyToManyField(Account, limit_choices_to={'is_admin': False})
+    assigned_people = models.ManyToManyField(Account, blank=True)
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -163,14 +135,19 @@ class Course(models.Model):
                f"Sections: \n\n\n" \
                f"{*self.section_set.all(),}"
 
+
 class CourseModelForm(ModelForm):
     class Meta:
         model = Course
-        fields = ['assigned_people', 'course_number', 'subject', 'name']
+        fields = ['assigned_people', 'term_type', 'term_year', 'course_number', 'subject', 'name', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super(CourseModelForm, self).__init__(*args, **kwargs)
+        # filtering the instructor field to only include accounts with the group of TA or Instructor
+        self.fields['assigned_people'].queryset = Account.objects.filter(user__groups__name__in=['Instructor', 'TA'])
 
 
 class Section(models.Model):
-
     # A section MUST have a course assigned to it.
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
@@ -182,16 +159,21 @@ class Section(models.Model):
     section = models.CharField(max_length=4)
 
     type = models.CharField(max_length=3, choices=SectionChoices.SECTION_CHOICES, default=SectionChoices.LAB)
-    # TODO: meeting schedule
 
-    # we need to do validation to make sure that end date is not before start date.
-    start_date = models.DateField()
-    end_date = models.DateField()
+    # TODO: meeting schedule
+    meet_monday = models.BooleanField(default=False)
+    meet_tuesday = models.BooleanField(default=False)
+    meet_wednesday = models.BooleanField(default=False)
+    meet_thursday = models.BooleanField(default=False)
+    meet_friday = models.BooleanField(default=False)
+    meet_start = models.TimeField(null=True)
+    meet_end = models.TimeField(null=True)
 
     def __str__(self):
         return f" {self.class_id} {self.section} {self.type} " \
-               f"{ '' if self.assigned_user is None else self.assigned_user.user.first_name} " \
-               f"{ '' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
+               f"{'' if self.assigned_user is None else self.assigned_user.user.first_name} " \
+               f"{'' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
+
 
 
 # Whenever we create a user, also create a account attached to it.
