@@ -193,6 +193,7 @@ class Section(models.Model):
                f"{ '' if self.assigned_user is None else self.assigned_user.user.first_name} " \
                f"{ '' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
 
+
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
