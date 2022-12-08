@@ -106,7 +106,7 @@ class AccountModelForm(ModelForm):
 
 
 class Course(models.Model):
-    assigned_people = models.ManyToManyField(Account)
+    assigned_people = models.ManyToManyField(Account, blank=True)
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -135,14 +135,19 @@ class Course(models.Model):
                f"Sections: \n\n\n" \
                f"{*self.section_set.all(),}"
 
+
 class CourseModelForm(ModelForm):
     class Meta:
         model = Course
-        fields = ['course_number', 'subject', 'name', 'term_type', 'term_year', 'description', 'assigned_people']
+        fields = ['assigned_people', 'term_type', 'term_year', 'course_number', 'subject', 'name', 'description']
+
+    def __init__(self, *args, **kwargs):
+        super(CourseModelForm, self).__init__(*args, **kwargs)
+        # filtering the instructor field to only include accounts with the group of TA or Instructor
+        self.fields['assigned_people'].queryset = Account.objects.filter(user__groups__name__in=['Instructor', 'TA'])
 
 
 class Section(models.Model):
-
     # A section MUST have a course assigned to it.
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
@@ -166,8 +171,9 @@ class Section(models.Model):
 
     def __str__(self):
         return f" {self.class_id} {self.section} {self.type} " \
-               f"{ '' if self.assigned_user is None else self.assigned_user.user.first_name} " \
-               f"{ '' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
+               f"{'' if self.assigned_user is None else self.assigned_user.user.first_name} " \
+               f"{'' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
+
 
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)
