@@ -134,7 +134,7 @@ class AccountModelForm(ModelForm):
 
 
 class Course(models.Model):
-    assigned_people = models.ManyToManyField(Account, blank=True)  # , limit_choices_to={'is_admin': False})
+    assigned_people = models.ManyToManyField(Account, blank=True)
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
