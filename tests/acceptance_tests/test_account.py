@@ -170,3 +170,49 @@ class TestAddressCreation(TestCase):
         client = Client()
         create_account = client.get(f'/accounts/register', follow=True)
         self.assertRedirects(create_account, '/accounts/login/')
+
+    def test_delete_account_default(self):
+        # cant hit button
+        client = Client()
+        client.login(username='test1', password='test1')
+
+        # Create a new user and get its id
+        create_account = client.post(f'/accounts/register/',
+                                     {'username': 'test4', 'password1': 'MegaSuperPassw00rd',
+                                      'password2': 'MegaSuperPassw00rd'}, follow=True)
+        account_id = create_account.context['object'].user.id
+
+        resp = client.post(f'/account/{account_id}/delete', follow=True)
+
+        resp.context['view'].form_valid(f'/account/{account_id}/delete/')
+
+        response = client.get(f'/accounts/{account_id}/view', follow=True)
+        self.assertEqual(response.status_code, 404, msg="Deleted user's account page still exists!")
+
+    def test_delete_account_not_logged_in(self):
+        # attribute error
+        client = Client()
+        with self.assertRaises(AttributeError, msg="AttributeError not thrown when user is not logged in!"):
+            client.get(f'/account/1/delete', follow=True)
+
+    def test_delete_account_not_admin(self):
+        client = Client()
+        client.login(username='test2', password='test2')
+        response = client.get(f'/account/1/delete', follow=True)
+        self.assertEqual(response.status_code, 403, msg="A user that wasnt an admin was able to view an account "
+                                                        "delete page!")
+
+    def test_delete_account_cancel(self):
+        # cant hit button
+        client = Client()
+        client.login(username='test1', password='test1')
+
+        create_account = client.post(f'/accounts/register/',
+                                     {'username': 'test4', 'password1': 'MegaSuperPassw00rd',
+                                      'password2': 'MegaSuperPassw00rd'}, follow=True)
+        account_id = create_account.context['object'].user.id
+
+        response = client.get(f'/account/{account_id}/delete', follow=True)
+        response = client.get({f'/accounts/{account_id}/view'})
+
+        self.assertNotEqual(response.status_code, 404, "User was deleted even though the operation was canceled!")
