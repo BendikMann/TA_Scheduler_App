@@ -46,10 +46,9 @@
         <p>No email set: </p>
         <a href='{{ account_update }}' class="btn btn-primary">Set Email</a>
     {% endif %}
-{% endif %}
 <hr>
 
-{% if request.user|has_group:"Instructor" or request.user|has_group:"TA" %}
+{% elif request.user|has_group:"Instructor" or request.user|has_group:"TA" %}
     {% if object.user.email %}
         <p>Email: {{object.user.email}}</p>
     {% else %}}
