@@ -5,7 +5,7 @@ from TA_Scheduler.user import make_admin, make_instructor, make_ta
 from TA_Scheduler.models import Account
 
 
-class TestLogIn(TestCase):
+class TestLogin(TestCase):
     def setUp(self):
         UserFactory()
         self.Admin = User.objects.create_user('admin1', password='admin1')
