@@ -49,6 +49,14 @@
 {% endif %}
 <hr>
 
+{% if request.user|has_group:"Instructor" or request.user|has_group:"TA" %}
+    {% if object.user.email %}
+        <p>Email: {{object.user.email}}</p>
+    {% else %}}
+        <p>No Email Set: </p>
+    {% endif %}
+{% endif %}
+
 {% if request.user|has_group:'Admin' %}
     {% url 'account-delete' pk=object.id as account_delete %}
     <a href='{{ account_delete }}' class="btn btn-primary">Delete this Account</a>
