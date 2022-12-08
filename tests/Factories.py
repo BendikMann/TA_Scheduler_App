@@ -1,4 +1,5 @@
 import random
+from datetime import datetime, timedelta
 
 import factory.django
 import factory.fuzzy
@@ -76,10 +77,16 @@ class _SectionFactory(factory.django.DjangoModelFactory):
     class_id = factory.Faker('numerify', text='#####')
     section = factory.Faker('bothify', text='###?')
     type = factory.fuzzy.FuzzyChoice([i[0] for i in model_choice_data.SectionChoices.SECTION_CHOICES])
-    start_date = factory.Faker('past_datetime')
-    # warning, this could enable bug that happen either
-    # if start date is in the future or end date is in the past.
-    end_date = factory.Faker('future_datetime')
+    meet_monday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_tuesday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_wednesday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_thursday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_friday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_start = factory.Faker('date_time')
+    @factory.post_generation
+    def make_meeting_times(self, created, extracted, **kwargs):
+        self.meet_end = self.meet_start + timedelta(minutes=random.choice([50, 60, 80, 120]))
+
 
 
 class UsAddressFactory(factory.django.DjangoModelFactory):
@@ -110,7 +117,7 @@ class UserFactory(factory.django.DjangoModelFactory):
         first_name = factory.Faker('first_name')
         last_name = factory.Faker('last_name')
         email = factory.Faker('email')
-        username = factory.Sequence(lambda n: f"GenericUsername{n}")
+        username = factory.Sequence(lambda n: f"GenericUsername{n}{random.randint(0, 1_000_00)}")
         password = factory.LazyFunction(lambda: make_password("password"))
         account = factory.RelatedFactory(_AccountFactory, factory_related_name='user')
 
