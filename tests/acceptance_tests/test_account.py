@@ -27,6 +27,9 @@ class TestLogin(TestCase):
         self.assertEqual(resp.status_code, 200, "Get accounts view did not return status code 200 (OK) after "
                                                 "successful admin login")
 
+        self.assertTemplateUsed(resp, 'account/view_account.html', "Get accounts view did not return the correct "
+                                                                   "template successful admin login")
+
     def test_AdminWrongPassword(self):
         client = Client()
         for i in self.wrong_passwords:
@@ -35,6 +38,10 @@ class TestLogin(TestCase):
             self.assertNotEqual(resp.status_code, 200, "Get accounts view returned status code 200 (OK) after "
                                                        "using wrong admin password")
 
+            self.assertTemplateNotUsed(resp, 'account/view_account.html', "Get accounts view returned the successful "
+                                                                          "login template after an unsuccessful admin"
+                                                                          " login")
+
     def test_AdminWrongUsername(self):
         client = Client()
         for i in self.wrong_passwords:
@@ -42,6 +49,10 @@ class TestLogin(TestCase):
             resp = client.get(f'/accounts/{self.Admin.account.id}/view/')
             self.assertNotEqual(resp.status_code, 200, "Get accounts view returned status code 200 (OK) after "
                                                        "using wrong admin username")
+
+            self.assertTemplateNotUsed(resp, 'account/view_account.html', "Get accounts view returned the successful "
+                                                                          "login template after an unsuccessful admin"
+                                                                          " login")
 
     def test_InstructorCorrectInfo(self):
         client = Client()
@@ -52,6 +63,9 @@ class TestLogin(TestCase):
         self.assertEqual(resp.status_code, 200, "Get accounts view did not return status code 200 (OK) after "
                                                 "successful instructor login")
 
+        self.assertTemplateUsed(resp, 'account/view_account.html', "Get accounts view did not return the correct "
+                                                                   "template successful instructor login")
+
     def test_InstructorWrongPassword(self):
         client = Client()
         for i in self.wrong_passwords:
@@ -59,6 +73,10 @@ class TestLogin(TestCase):
             resp = client.get(f'/accounts/{self.Instructor.account.id}/view/')
             self.assertNotEqual(resp.status_code, 200, "Get accounts view returned status code 200 (OK) after "
                                                        "using wrong instructor password")
+
+            self.assertTemplateNotUsed(resp, 'account/view_account.html', "Get accounts view returned the successful "
+                                                                          "login template after an unsuccessful "
+                                                                          "instructor login")
 
     def test_InstructorWrongUsername(self):
         client = Client()
@@ -68,6 +86,10 @@ class TestLogin(TestCase):
             self.assertNotEqual(resp.status_code, 200, "Get accounts view returned status code 200 (OK) after "
                                                        "using wrong instructor username")
 
+            self.assertTemplateNotUsed(resp, 'account/view_account.html', "Get accounts view returned the successful "
+                                                                          "login template after an unsuccessful "
+                                                                          "instructor login")
+
     def test_TaCorrectInfo(self):
         client = Client()
         self.assertTrue(client.login(username=self.Ta.username, password='ta1'), "Successful ta login doesn't return "
@@ -75,6 +97,9 @@ class TestLogin(TestCase):
         resp = client.get(f'/accounts/{self.Ta.account.id}/view/')
         self.assertEqual(resp.status_code, 200, "Get accounts view did not return status code 200 (OK) after "
                                                 "successful ta login")
+
+        self.assertTemplateUsed(resp, 'account/view_account.html', "Get accounts view did not return the correct "
+                                                                   "template successful ta login")
 
     def test_TaWrongPassword(self):
         client = Client()
@@ -84,6 +109,10 @@ class TestLogin(TestCase):
             self.assertNotEqual(resp.status_code, 200, "Get accounts view returned status code 200 (OK) after "
                                                        "using wrong ta password")
 
+            self.assertTemplateNotUsed(resp, 'account/view_account.html', "Get accounts view returned the successful "
+                                                                          "login template after an unsuccessful ta "
+                                                                          "login")
+
     def test_TaWrongUsername(self):
         client = Client()
         for i in self.wrong_passwords:
@@ -91,6 +120,10 @@ class TestLogin(TestCase):
             resp = client.get(f'/accounts/{self.Instructor.account.id}/view/')
             self.assertNotEqual(resp.status_code, 200, "Get accounts view returned status code 200 (OK) after "
                                                        "using wrong ta username")
+
+            self.assertTemplateNotUsed(resp, 'account/view_account.html', "Get accounts view returned the successful "
+                                                                          "login template after an unsuccessful ta "
+                                                                          "login")
 
 
 class TestAddressCreation(TestCase):
