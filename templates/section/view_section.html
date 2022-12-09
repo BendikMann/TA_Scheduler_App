@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+{% extends "base.html"%}
+{% block content %}
+
+<html lang="en">
+<p><h1>{{object.course}}</h1> <br>
+    {% url 'section-update' pk=object.id as section_update %}
+    <a href='{{ section_update }}' class="btn btn-primary">Edit Section</a><br>
+
+
+{% if request.user|has_group:'Admin' %}
+    {% url 'section-delete' pk=object.id as section_delete %}
+    <a href='{{ section_delete }}' class="btn btn-primary">Delete this Section</a>
+{% endif %}
+
+{% endblock %}
+</html>

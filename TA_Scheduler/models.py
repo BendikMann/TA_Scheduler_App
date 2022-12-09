@@ -175,6 +175,19 @@ class Section(models.Model):
                f"{'' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
 
 
+class SectionModelForm(ModelForm):
+    class Meta:
+        model = Section
+        fields = ['assigned_user', 'class_id', 'section', 'type']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # getting the course instance
+        course = self.data.get('course')
+        # filtering to show only Accounts which are a part of the associated course
+        self.fields['assigned_user'].queryset = Account.objects.filter(course__id=course)
+
+
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created, **kwargs):
