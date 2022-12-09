@@ -1,10 +1,10 @@
-import abc
 from typing import Union
-from django.contrib.auth.models import User, Group
-
-from TA_Scheduler.models import Account, Course, UsAddress
 from django.core.mail import send_mail
+from typing import Union
 
+from django.contrib.auth.models import Group
+from TA_Scheduler.models import User
+from django.core.mail import send_mail
 
 
 class Admin:
@@ -12,11 +12,11 @@ class Admin:
     Wraps the User with the assumption it is an admin.
     """
 
-    def __init__(self, account: Account):
+    def __init__(self, account: User):
         """
         :param account: Account to wrap as an admin. Must be an admin, otherwise raise exception.
         """
-        if not (isinstance(account, Account)):
+        if not (isinstance(account, User)):
             raise TypeError('Instance supplied to Admin constructor is not an account')
 
         if not is_admin(account):
@@ -32,11 +32,11 @@ class Admin:
 
 
 class Ta:
-    def __init__(self, account: Account):
+    def __init__(self, account: User):
         """
         :param account: Account to wrap as an TA. Must be a TA, otherwise raise exception.
         """
-        if not (isinstance(account, Account)):
+        if not (isinstance(account, User)):
             raise TypeError('Instance supplied to Ta constructor is not an account')
 
         if not is_ta(account):
@@ -46,11 +46,11 @@ class Ta:
 
 
 class Instructor:
-    def __init__(self, account: Account):
+    def __init__(self, account: User):
         """
         :param account: Account to wrap as an admin. Must be an admin, otherwise raise exception.
         """
-        if not (isinstance(account, Account)):
+        if not (isinstance(account, User)):
             raise TypeError('Instance supplied to Instructor constructor is not an account')
 
         if not is_instructor(account):
@@ -76,7 +76,7 @@ def get_all_instructors() -> list[Instructor]:
     :return: All instructors in the Instructor group.
     """
 
-    return list(Account.objects.all().filter(user__groups__name='Instructor'))
+    return list(User.objects.all().filter(groups__name='Instructor'))
 
 
 def get_all_admins() -> list[Admin]:
@@ -85,11 +85,11 @@ def get_all_admins() -> list[Admin]:
     :return: All Admins in the admin group.
     """
 
-    return list(Account.objects.all().filter(user__groups__name='Admin'))
+    return list(User.objects.all().filter(groups__name='Admin'))
 
 
-def get_all_users() -> list[Account]:
-    accounts = list(Account.objects.all())
+def get_all_users() -> list[User]:
+    accounts = list(User.objects.all())
     return accounts
 
 
@@ -98,92 +98,92 @@ def get_all_tas() -> list[Ta]:
 
     :return: All users in the Ta group.
     """
-    return list(Account.objects.all().filter(user__groups__name='TA'))
+    return list(User.objects.all().filter(groups__name='TA'))
 
 
-def is_admin(account: Account) -> bool:
+def is_admin(account: User) -> bool:
     """
 
     :param account:
     :return: True if account is in admin group, False if account is not in admin group
     """
-    if not (isinstance(account, Account)):
+    if not (isinstance(account, User)):
         raise TypeError('Instance supplied to is_admin is not an account')
 
-    return account.user.groups.filter(name='Admin').exists()
+    return account.groups.filter(name='Admin').exists()
 
 
-def is_instructor(account: Account) -> bool:
+def is_instructor(account: User) -> bool:
     """
 
     :param account: The account to check.
     :return: True if account is in instructor group, False if account is not in instructor group
     """
-    if not (isinstance(account, Account)):
+    if not (isinstance(account, User)):
         raise TypeError('Instance supplied to is_instructor is not an account')
 
-    return account.user.groups.filter(name='Instructor').exists()
+    return account.groups.filter(name='Instructor').exists()
 
 
-def is_ta(account: Account) -> bool:
+def is_ta(account: User) -> bool:
     """
 
     :param account: The account to check
     :return: True if the account is in TA group, False if account is not in TA group
     """
-    if not (isinstance(account, Account)):
+    if not (isinstance(account, User)):
         raise TypeError('Instance supplied to is_ta is not an account')
 
-    return account.user.groups.filter(name='TA').exists()
+    return account.groups.filter(name='TA').exists()
 
 
-def make_admin(account: Account) -> Union[Admin, None]:
+def make_admin(account: User) -> Union[Admin, None]:
     """
     Makes the specified Account an Admin.
     :param account: The Account Model to make admin.
     :return: The Admin instance if account was made admin or was already Admin, None otherwise.
     """
-    if not (isinstance(account, Account)):
+    if not (isinstance(account, User)):
         raise TypeError('Instance supplied to make_admin is not an account')
 
     if not is_admin(account):
-        account.user.groups.add(Group.objects.get(name="Admin"))
+        account.groups.add(Group.objects.get(name="Admin"))
 
     return Admin(account)
 
 
-def make_instructor(account: Account) -> Union[Instructor, None]:
+def make_instructor(user: User) -> Union[Instructor, None]:
     """
     Makes the specified Account an Instructor
-    :param account: The Account Model to make instructor
+    :param user: The Account Model to make instructor
     :return: The Instructor instance if account was made instructor or was already instructor, None otherwise.
     """
-    if not (isinstance(account, Account)):
+    if not (isinstance(user, User)):
         raise TypeError('Instance supplied to make_instructor is not an account')
 
-    if is_ta(account):
+    if is_ta(user):
         return None
 
-    if not is_instructor(account):
-        account.user.groups.add(Group.objects.get(name="Instructor"))
+    if not is_instructor(user):
+        user.groups.add(Group.objects.get(name="Instructor"))
 
-    return Instructor(account)
+    return Instructor(user)
 
 
-def make_ta(account: Account) -> Union[Ta, None]:
+def make_ta(user: User) -> Union[Ta, None]:
     """
     Makes the specified Account a TA
-    :param account: The Account Model to make TA
+    :param user: The Account Model to make TA
     :return: The TA instance if account was made TA or was already TA, None otherwise.
     """
-    if not (isinstance(account, Account)):
+    if not (isinstance(user, User)):
         raise TypeError('Instance supplied to make_ta is not an account')
 
-    if is_instructor(account):
+    if is_instructor(user):
         return None
 
-    if not is_ta(account):
-        account.user.groups.add(Group.objects.get(name="TA"))
+    if not is_ta(user):
+        user.groups.add(Group.objects.get(name="TA"))
 
-    return Ta(account)
+    return Ta(user)
 

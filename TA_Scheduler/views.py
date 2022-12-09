@@ -9,6 +9,8 @@ from django.views import View
 from django.views.generic import DetailView
 
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
+
+from TA_Scheduler.forms import NewUserCreationForm
 from TA_Scheduler.models import *
 from TA_Scheduler.user import *
 
@@ -20,19 +22,19 @@ class CreateAddress(LoginRequiredMixin, UserPassesTestMixin, CreateView):
     model = UsAddress
     fields = '__all__'
 
-    def get_account(self) -> Account:
+    def get_account(self) -> User:
         try:
             account_id = int(self.request.session.get('account_id_to_change'))
         except TypeError:
             raise PermissionDenied()
-        account = Account.objects.get(id=account_id)
-        return account
+        user = User.objects.get(id=id)
+        return user
 
     def test_func(self):
         # User to create address for does not have an address and the one creating the address is an admin or the user
         # who does not have an address.
         return (self.get_account().address is None) & \
-               (is_admin(self.request.user.account) | (self.get_account() == self.request.user.account))
+               (is_admin(self.request.user) | (self.get_account() == self.request.user))
 
     def get_success_url(self):
         return reverse_lazy('account-view', args=[self.get_account().id])
@@ -75,13 +77,13 @@ class CreateAccount(UserPassesTestMixin, View):
     template_name = 'account/create_account.html'
 
     def get(self, request):
-        user = UserCreationForm()
+        user = NewUserCreationForm()
 
         return render(request,
                       self.template_name, {'user_form': user})
 
     def post(self, request):
-        user = UserCreationForm(request.POST)
+        user = NewUserCreationForm(request.POST)
 
         if user.is_valid():
             # we have to process the forms now.
@@ -93,7 +95,7 @@ class CreateAccount(UserPassesTestMixin, View):
                           self.template_name, {'user_form': user})
 
     def test_func(self):
-        return self.request.user.is_anonymous or is_admin(self.request.user.account)
+        return self.request.user.is_anonymous or is_admin(self.request.user)
 
 
 class UpdateAccount(View):
@@ -103,30 +105,27 @@ class UpdateAccount(View):
         user_model = TA_Scheduler.models.User.objects.get(pk=pk)
 
         user = UserModelForm(instance=user_model)
-        account = AccountModelForm(instance=user_model.account)
 
         return render(request,
-                      self.template_name, {'user_form': user, 'account_form': account})
+                      self.template_name, {'user_form': user})
 
     def post(self, request, pk):
         user_model = TA_Scheduler.models.User.objects.get(pk=pk)
 
         user = UserModelForm(request.POST, instance=user_model)
-        account = AccountModelForm(request.POST, instance=user_model.account)
 
-        if user.is_valid() and account.is_valid():
+        if user.is_valid():
             # we have to process the forms now.
             user.save()
-            account.save()
             # no m2m relationships should be effected here.
             return redirect('account-view', pk=pk)
         else:
             return render(request,
-                          self.template_name, {'user_form': user, 'account_form': account})
+                          self.template_name, {'user_form': user})
 
 
 class ViewAccount(UserPassesTestMixin, LoginRequiredMixin, DetailView):
-    model = Account
+    model = User
 
     def test_func(self):
         # we use this to know what account we need to create an address for.
@@ -135,14 +134,14 @@ class ViewAccount(UserPassesTestMixin, LoginRequiredMixin, DetailView):
 
 
 class DeleteAccount(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
-    model = Account
+    model = User
 
     def form_valid(self, form):
         self.get_object().user.delete()
         return super().form_valid(form)
 
     def test_func(self):
-        return is_admin(self.request.user.account)
+        return is_admin(self.request.user)
 
     def get_success_url(self):
         return reverse_lazy('home-page')
@@ -152,7 +151,7 @@ class HomeView(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'adminHomepage.html'
 
     def test_func(self):
-        return is_admin(self.request.user.account)
+        return is_admin(self.request.user)
 
     def get(self, request):
         return render(request, self.template_name, {"users": get_all_users(), "courses": Course.objects.all()})
@@ -198,8 +197,6 @@ class UpdateCourse(View):
             return render(request, self.template_name, {'course_form': course})
 
 
-class ViewCourse(UserPassesTestMixin, LoginRequiredMixin, DetailView):
+class ViewCourse(UserPassesTestMixin, DetailView):
     model = Course
 
-    def test_func(self):
-        return True

@@ -1,7 +1,9 @@
 import enum
 from collections import namedtuple
 
-from django.contrib.auth.models import User
+from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
+from django.contrib.auth.models import PermissionsMixin
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
@@ -25,101 +27,102 @@ class UsAddress(models.Model):
     street_address = models.CharField(max_length=128)
     zip_code = USZipCodeField(default='53201')
 
-    def update_state(self, state: str) -> bool:
-        # simple sanitization
-        state = state.strip().upper()
-
-        # make a list of all states that match our state input.
-        state_exists_in_us_states = len([(x, y) for x, y in us_states.US_STATES if state in x]) > 0
-        if state_exists_in_us_states:  # if we have more than zero states in that list, it must be valid.
-            self.state = state
-            self.save()
-        return state_exists_in_us_states
-
-    def update_city(self, city: str) -> bool:
-        if len(city) <= 128 and city.replace(" ", "").isalpha():
-            self.city = city
-            self.save()
-            return True
-        return False
-
-    def update_street_address(self, street_address: str) -> bool:
-        if len(street_address) <= 128 and street_address.replace(" ", "").isalnum():
-            self.street_address = street_address
-            self.save()
-            return True
-        return False
-
-    def update_zip_code(self, zip_code: str) -> bool:
-        if (len(zip_code) == 5) or (len(zip_code) == 9):
-            # splits the zip code by a - to check for zip+4 (54444-5555)
-            zip_code_split = zip_code.split("-")
-            # checks if the zip code is split into either [54444] or [54444, 5555] else return false
-            if len(zip_code_split) == 1:
-                if len(zip_code_split[0]) == 5 and zip_code_split[0].isnumeric():
-                    self.zip_code = zip_code
-                    self.save()
-                    return True
-            elif len(zip_code_split) == 2:
-                if len(zip_code_split[0]) == 5 and zip_code_split[0].isnumeric() and zip_code_split[1].isnumeric():
-                    self.zip_code = zip_code
-                    self.save()
-                    return True
-        return False
-
     def __str__(self):
         return f"{self.street_address}\n" \
                f"{self.city}, {self.state} {self.zip_code}\n" \
                f"USA"
 
 
-# This clever way of extending User was found here:
-#   https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
-class Account(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    address = models.OneToOneField(UsAddress, null=True, on_delete=models.CASCADE)
-    # This is an extension of django which makes validation and form creation easier.
-    # See: https://django-phonenumber-field.readthedocs.io/en/latest/index.html
+class CustomUserManager(BaseUserManager):
+    """
+
+    """
+    def create_user(self, email, first_name, last_name, password=None, **other_fields):
+        """
+        Creates and saves a User with the given email and password.
+        """
+
+        # TODO: Unit tests and validation!
+        if not email:
+            raise ValueError('Users must have an email address')
+
+        user = self.model(
+            email=self.normalize_email(email),
+            first_name=first_name,
+            last_name=last_name,
+            **other_fields
+        )
+
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, first_name, last_name, password=None, **other_fields):
+        """
+        Creates and saves a superuser with the given email and password.
+        """
+
+        user = self.create_user(
+            email=email,
+            password=password,
+            first_name=first_name,
+            last_name=last_name,
+            ** other_fields,
+
+        )
+        user.is_superuser = True  # All perms
+        user.is_staff = True  # Admin portal
+        user.save()
+
+        return user
+
+
+class User(AbstractBaseUser, PermissionsMixin):
+    email = models.EmailField(verbose_name='email address',
+                              unique=True,
+                              max_length=255)
+
+    first_name = models.CharField(max_length=50)
+    last_name = models.CharField(max_length=50)
     phone_number = PhoneNumberField(blank=True)
+    address = models.OneToOneField(UsAddress, null=True, on_delete=models.CASCADE)
 
-    def update_first_name(self, first_name: str) -> bool:
-        # checks if the name is a valid size and if it only contains letters
-        if len(first_name) <= 150 and first_name.replace(" ", "").isalpha():
-            self.user.first_name = first_name
-            self.save()
-            return True
-        return False
+    is_staff = models.BooleanField(
+        _("staff status"),
+        default=False,
+        help_text=_("Designates whether the user can log into this admin site."),
+    )
+    is_active = models.BooleanField(
+        _("active"),
+        default=True,
+        help_text=_(
+            "Designates whether this user should be treated as active. "
+            "Unselect this instead of deleting accounts."
+        ),
+    )
 
-    def update_last_name(self, last_name: str) -> bool:
-        # checks if the name is a valid size and if it only contains letters
-        if len(last_name) <= 150 and last_name.replace(" ", "").isalpha():
-            self.user.last_name = last_name
-            self.save()
-            return True
-        return False
+    USERNAME_FIELD = 'email'
+    EMAIL_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name']
 
-    def update_phone_number(self, phone_number: str) -> bool:
-        parsed_phone_number = phonenumbers.parse(phone_number)
-        if phonenumbers.is_valid_number(parsed_phone_number):
-            self.phone_number = phone_number
-            self.save()
-            return True
-        return False
+    objects = CustomUserManager()
 
-    def get_public_info(self) -> namedtuple("public_info", ["first_name", "last_name"]):
-        public_info = namedtuple("public_info", ["first_name", "last_name"])
-        return public_info(self.user.first_name, self.user.last_name)
+    def get_full_name(self):
+        # The user is identified by their email address
+        return f"{self.first_name} {self.last_name}"
 
-    def is_admin(self):
-        return self.user.groups.filter(name='Admin').exists()
+    def get_short_name(self):
+        # The user is identified by their email address
+        return self.first_name
 
     def __str__(self):
-        return f"User: {self.user.first_name} {self.user.last_name} {self.user.username} Group: {self.user.groups.first()}\n" \
-               f"Email: {self.user.email} Phone Number: {self.phone_number} \n" \
+        return f"User: {self.first_name} {self.last_name} Group: {self.groups.first()}\n" \
+               f"Email: {self.email} Phone Number: {self.phone_number} \n" \
                f"{self.address}"
 
-        pass
 
+# This clever way of extending User was found here:
+#   https://simpleisbetterthancomplex.com/tutorial/2016/07/22/how-to-extend-django-user-model.html
 
 class UserModelForm(ModelForm):
     class Meta:
@@ -127,14 +130,8 @@ class UserModelForm(ModelForm):
         fields = ['first_name', 'last_name', 'email']
 
 
-class AccountModelForm(ModelForm):
-    class Meta:
-        model = Account
-        fields = ['phone_number']
-
-
 class Course(models.Model):
-    assigned_people = models.ManyToManyField(Account, limit_choices_to={'is_admin': False})
+    assigned_people = models.ManyToManyField(User)
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -155,13 +152,14 @@ class Course(models.Model):
 
     def __str__(self):
         # Turns out there is a quite a bit that we need to process.
-        self.assigned_people.filter(user__groups__name='TA')
+        self.assigned_people.filter(groups__name='TA')
         return f"{self.subject}-{self.course_number} {self.term_type} {self.term_year}\n" \
                f"{self.description} \n" \
                f"Assigned People:\n\n\n" \
                f"{*self.assigned_people.all(),}" \
                f"Sections: \n\n\n" \
                f"{*self.section_set.all(),}"
+
 
 class CourseModelForm(ModelForm):
     class Meta:
@@ -170,12 +168,11 @@ class CourseModelForm(ModelForm):
 
 
 class Section(models.Model):
-
     # A section MUST have a course assigned to it.
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     # A Section may have a user undefined for an arbitrary amount of time.
-    assigned_user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
+    assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
 
     class_id = models.CharField(max_length=6)
 
@@ -190,17 +187,5 @@ class Section(models.Model):
 
     def __str__(self):
         return f" {self.class_id} {self.section} {self.type} " \
-               f"{ '' if self.assigned_user is None else self.assigned_user.user.first_name} " \
-               f"{ '' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
-
-# Whenever we create a user, also create a account attached to it.
-@receiver(post_save, sender=User)
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Account.objects.create(user=instance)
-
-
-# Whenever we save a User, also update the account attached to it.
-@receiver(post_save, sender=User)
-def save_user_profile(sender, instance, **kwargs):
-    instance.account.save()
+               f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
+               f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"

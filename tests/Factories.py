@@ -35,26 +35,25 @@ class CourseFactory(factory.django.DjangoModelFactory):
 
 
         # get the list of instructors and add an arbitrary amount of instructors to each course.
-        instructors = models.Account.objects.filter(user__groups__name='Instructor')
+        instructors = models.User.objects.filter(groups__name='Instructor')
         instr_num = random.randint(0, min(3, len(instructors)))
 
         for instructor in random.choices(instructors, k=instr_num):
             self.assigned_people.add(instructor)
 
         # get the list of tas and add an arbitrary number of TA's too.
-        ta = models.Account.objects.filter(user__groups__name='TA')
+        ta = models.User.objects.filter(groups__name='TA')
         ta_num = random.randint(0, min(7, len(ta)))
         for ta in random.choices(ta, k=ta_num):
             self.assigned_people.add(ta)
 
         #of the sections that are labs, add 0 or 1 tas to them.
         ta_sections = self.section_set.filter(course__section__type=model_choice_data.SectionChoices.LAB)
-        tas = self.assigned_people.filter(user__groups__name='TA')
+        tas = self.assigned_people.filter(groups__name='TA')
 
         for ta_section in ta_sections:
             if random.randint(0, 1) == 1:
                 ta_section.assigned_user = random.choice(tas)
-
 
 
 class SectionFactory(factory.django.DjangoModelFactory):
@@ -80,17 +79,6 @@ class UsAddressFactory(factory.django.DjangoModelFactory):
     state = random.choice(us_states.US_STATES)
 
 
-@factory.django.mute_signals(post_save)
-class _AccountFactory(factory.django.DjangoModelFactory):
-    class Meta:
-        model = models.Account
-
-    phone_number = factory.Faker('phone_number')
-    address = factory.SubFactory(UsAddressFactory)
-    pass
-
-
-@factory.django.mute_signals(post_save)
 class UserFactory(factory.django.DjangoModelFactory):
     with factory.django.mute_signals(post_save):
         class Meta:
@@ -99,10 +87,9 @@ class UserFactory(factory.django.DjangoModelFactory):
         first_name = factory.Faker('first_name')
         last_name = factory.Faker('last_name')
         email = factory.Faker('email')
-        username = factory.Sequence(lambda n: f"GenericUsername{n}")
         password = factory.LazyFunction(lambda: make_password("password"))
-        account = factory.RelatedFactory(_AccountFactory, factory_related_name='user')
-
+        address = factory.SubFactory(UsAddressFactory)
+        phone_number = factory.Faker('phone_number')
         @factory.post_generation
         def groups_set(self, create, extracted, **kwargs):
             if not create:

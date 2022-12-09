@@ -14,8 +14,8 @@ class TestFactories(TestCase):
 
     def test_user_factory(self):
         Factories.UserFactory.create()
-        print(models.Account.objects.first())
-        self.assertEqual(1, len(models.Account.objects.all()), msg="User Factory should create an account")
+        print(models.User.objects.first())
+        self.assertEqual(1, len(models.User.objects.all()), msg="User Factory should create an account")
 
     def test_course_factory(self):
         Factories.CourseFactory.create()
@@ -28,7 +28,7 @@ class TestFactories(TestCase):
         Factories.CourseFactory.create()
         Factories.CourseFactory.create()
         Factories.CourseFactory.create()
-        self.assertEqual(100, len(models.Account.objects.all()))
+        self.assertEqual(100, len(models.User.objects.all()))
         self.assertEqual(3, len(models.Course.objects.all()))
 
         # sections should also be created now, but there is a non-zero chance that none are.
