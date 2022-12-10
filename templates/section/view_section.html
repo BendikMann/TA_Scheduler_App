@@ -3,10 +3,32 @@
 {% block content %}
 
 <html lang="en">
-<p><h1>{{object.course}}</h1> <br>
+<p><h1>{{object.course.name}}</h1> <br>
     {% url 'section-update' pk=object.id as section_update %}
     <a href='{{ section_update }}' class="btn btn-primary">Edit Section</a><br>
 
+    <b>Assigned user: </b> {{object.assigned_user.user.first_name}} {{object.assigned_user.user.last_name}} <br>
+    <b>Class id: </b> {{object.class_id}} <br>
+    <b>Section: </b> {{object.section}} <br>
+    <b>Type: </b> {{object.type}} <br>
+
+    <b>Time: </b> {{object.meet_start}} - {{object.meet_end}} <br>
+    <b>Days: </b>
+        {% if object.meet_monday %}
+            Monday,
+        {% endif %}
+        {% if object.meet_tuesday %}
+            Tuesday,
+        {% endif %}
+        {% if object.meet_wednesday %}
+            Wednesday,
+        {% endif %}
+        {% if object.meet_thursday %}
+            Thursday,
+        {% endif %}
+        {% if object.meet_friday %}
+            Friday
+        {% endif %} <br>
 
 {% if request.user|has_group:'Admin' %}
     {% url 'section-delete' pk=object.id as section_delete %}

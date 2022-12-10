@@ -123,7 +123,7 @@ class Course(models.Model):
     name = models.CharField(max_length=30)
 
     # course description (because it's trivial to include)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         # Turns out there is a quite a bit that we need to process.
@@ -152,7 +152,7 @@ class Section(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     # A Section may have a user undefined for an arbitrary amount of time.
-    assigned_user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True)
+    assigned_user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True)
 
     class_id = models.CharField(max_length=6)
 
@@ -178,12 +178,11 @@ class Section(models.Model):
 class SectionModelForm(ModelForm):
     class Meta:
         model = Section
-        fields = ['assigned_user', 'class_id', 'section', 'type']
+        fields = ['assigned_user', 'class_id', 'section', 'type', 'meet_start', 'meet_end', 'meet_monday',
+                  'meet_tuesday', 'meet_wednesday', 'meet_thursday', 'meet_friday']
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, course, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # getting the course instance
-        course = self.data.get('course')
         # filtering to show only Accounts which are a part of the associated course
         self.fields['assigned_user'].queryset = Account.objects.filter(course__id=course)
 

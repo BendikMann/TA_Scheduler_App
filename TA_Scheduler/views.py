@@ -231,33 +231,38 @@ class DeleteCourse(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
 
 
 class CreateSection(View):
-    template_name = 'section/create_section.html'
+    template_name = 'section/create_section.html'  # has no use, fix up later
     model = Section
 
-    def get_course(self) -> Course:
-        try:
-            course_id = int(self.request.session.get('course_id'))
-        except TypeError:
-            raise PermissionDenied()
-        course = Course.objects.get(id=course_id)
-        return course
+    # def get_course(self) -> Course:
+    #     try:
+    #         course_id = int(self.request.session.get('course_id'))
+    #     except TypeError:
+    #         raise PermissionDenied()
+    #     course = Course.objects.get(id=course_id)
+    #     return course
 
-    def get(self, request):
-        section = SectionModelForm()  # course=self.get_course())
+    def get(self, request, pk):
+        course = Course.objects.get(id=pk)
+        section = SectionModelForm(initial={'course': course}, course=pk)
         return render(request, self.template_name, {'section_form': section})
 
-    def post(self, request):
-        section = SectionModelForm(request.POST)
+    def post(self, request, pk):
+        course = Course.objects.get(id=pk)
+        section = SectionModelForm(pk, request.POST)
 
         if section.is_valid():
+            section = section.save(commit=False)
+            section.course = course
             section.save()
-            return redirect('section-view', section.instance.id)
+            return redirect('section-view', section.id)
         else:
             return render(request,
                           self.template_name, {'section_form': section})
 
-    # def get_success_url(self):
-    #     return reverse_lazy('course-view', args=[self.get_course().id])
+    def get_success_url(self):
+        return reverse_lazy('home-page')
+        # return reverse_lazy('course-view', args=[self.get_course().id])
 
 
 class ViewSection(UserPassesTestMixin, LoginRequiredMixin, DetailView):
@@ -272,12 +277,12 @@ class UpdateSection(View):
 
     def get(self, request, pk):
         section_model = TA_Scheduler.models.Section.objects.get(pk=pk)
-        section = SectionModelForm(instance=section_model)
+        section = SectionModelForm(section_model.course.id, instance=section_model)
         return render(request, self.template_name, {'section_form': section})
 
     def post(self, request, pk):
         section_model = TA_Scheduler.models.Section.objects.get(pk=pk)
-        section = SectionModelForm(request.POST, instance=section_model)
+        section = SectionModelForm(section_model.course.id, request.POST, instance=section_model)
 
         if section.is_valid():
             section.save()
@@ -297,4 +302,4 @@ class DeleteSection(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         return is_admin(self.request.user.account)
 
     def get_success_url(self):
-        return reverse_lazy('course-view')
+        return reverse_lazy('course-view', args=(self.object.course.id,))

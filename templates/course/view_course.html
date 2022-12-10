@@ -18,13 +18,15 @@
 
     <b>Sections: </b>
     {% for section in sections %}
-    <br> {{ section.class_id }} - {{section.section}} - {{section.type}}
+        {% url 'section-view' pk=section.id as section_view %}
+        <a href="{{ section_view }}"> <br>
+            {{ section.class_id }} - {{section.section}} - {{section.type}}</a>
     {% endfor %} <br>
-    {% url 'section-create' as section_create %}
+    {% url 'section-create' pk=course.id as section_create %}
     <a href='{{ section_create }}' class="btn btn-primary">Create Section</a> <br> <br>
 
 {% if request.user|has_group:'Admin' %}
-    {% url 'course-delete' pk=object.id as course_delete %}
+    {% url 'course-delete' pk=course.id as course_delete %}
     <a href='{{ course_delete }}' class="btn btn-primary">Delete this Course</a>
 {% endif %}
 
