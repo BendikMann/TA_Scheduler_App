@@ -231,16 +231,8 @@ class DeleteCourse(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
 
 
 class CreateSection(View):
-    template_name = 'section/create_section.html'  # has no use, fix up later
+    template_name = 'section/create_section.html'
     model = Section
-
-    # def get_course(self) -> Course:
-    #     try:
-    #         course_id = int(self.request.session.get('course_id'))
-    #     except TypeError:
-    #         raise PermissionDenied()
-    #     course = Course.objects.get(id=course_id)
-    #     return course
 
     def get(self, request, pk):
         course = Course.objects.get(id=pk)
@@ -262,7 +254,6 @@ class CreateSection(View):
 
     def get_success_url(self):
         return reverse_lazy('home-page')
-        # return reverse_lazy('course-view', args=[self.get_course().id])
 
 
 class ViewSection(UserPassesTestMixin, LoginRequiredMixin, DetailView):
@@ -302,4 +293,4 @@ class DeleteSection(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         return is_admin(self.request.user.account)
 
     def get_success_url(self):
-        return reverse_lazy('course-view', args=(self.object.course.id,))
+        return reverse_lazy('course-view', args=self.object.course.id)
