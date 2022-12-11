@@ -6,7 +6,6 @@ from django.contrib.auth.models import Group
 from TA_Scheduler.models import User
 from django.core.mail import send_mail
 
-
 class Admin:
     """
     Wraps the User with the assumption it is an admin.
@@ -57,7 +56,6 @@ class Instructor:
             raise ValueError('Account supplied to Instructor constructor is not in the Instructor group')
 
         self.account = account
-
 
     def send_email(self, header: str, content: str) -> bool:
         # Gets a list of all user emails excluding blank ones

@@ -7,4 +7,5 @@ from django.contrib import admin
 admin.site.register(User)
 admin.site.register(UsAddress)
 admin.site.register(Course)
+admin.site.register(Section)
 

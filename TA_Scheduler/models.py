@@ -115,6 +115,10 @@ class User(AbstractBaseUser, PermissionsMixin):
         # The user is identified by their email address
         return self.first_name
 
+    def is_admin(self):
+        return self.user.groups.filter(name='Admin').exists()
+
+
     def __str__(self):
         return f"User: {self.first_name} {self.last_name} Group: {self.groups.first()}\n" \
                f"Email: {self.email} Phone Number: {self.phone_number} \n" \
@@ -132,6 +136,7 @@ class UserModelForm(ModelForm):
 
 class Course(models.Model):
     assigned_people = models.ManyToManyField(User)
+
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -164,8 +169,12 @@ class Course(models.Model):
 class CourseModelForm(ModelForm):
     class Meta:
         model = Course
-        fields = ['assigned_people', 'course_number', 'subject', 'name']
+        fields = ['assigned_people', 'term_type', 'term_year', 'course_number', 'subject', 'name', 'description']
 
+    def __init__(self, *args, **kwargs):
+        super(CourseModelForm, self).__init__(*args, **kwargs)
+        # filtering the instructor field to only include accounts with the group of TA or Instructor
+        self.fields['assigned_people'].queryset = Account.objects.filter(user__groups__name__in=['Instructor', 'TA'])
 
 class Section(models.Model):
     # A section MUST have a course assigned to it.
@@ -179,13 +188,18 @@ class Section(models.Model):
     section = models.CharField(max_length=4)
 
     type = models.CharField(max_length=3, choices=SectionChoices.SECTION_CHOICES, default=SectionChoices.LAB)
-    # TODO: meeting schedule
 
-    # we need to do validation to make sure that end date is not before start date.
-    start_date = models.DateField()
-    end_date = models.DateField()
+    # TODO: meeting schedule
+    meet_monday = models.BooleanField(default=False)
+    meet_tuesday = models.BooleanField(default=False)
+    meet_wednesday = models.BooleanField(default=False)
+    meet_thursday = models.BooleanField(default=False)
+    meet_friday = models.BooleanField(default=False)
+    meet_start = models.TimeField(null=True)
+    meet_end = models.TimeField(null=True)
 
     def __str__(self):
         return f" {self.class_id} {self.section} {self.type} " \
                f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
+

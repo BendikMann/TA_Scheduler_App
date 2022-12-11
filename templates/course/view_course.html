@@ -4,13 +4,14 @@
 
 <html lang="en">
 <p1><h1>{{object.name}}</h1> <br>
-    <b>Subject: </b> {{object.subject}}, <br>
-    <b>Section: </b> {{object.section}} <br>
-    <b>Instructor(s): </b>
-    {% for instructor in object.instructor.all %}
-    {{ instructor.user.first_name|default:'Unnamed Instructor' }} <br>
-    {% endfor %}
+    <b>Subject: </b> {{object.subject}} <br>
+    <b>Term: </b> {{object.term_type}}, {{object.term_year}}<br>
+    <b>Assigned people: </b>
+    {% for person in object.assigned_people.all %}
+    <br> {{ person.user.first_name|default:'Unnamed Instructor' }}
+    {% endfor %} <br>
     <b>Course Number: </b> {{object.course_number}} <br>
+    <b>Description: </b> {{object.description}} <br>
 </p1>
 
 {% endblock %}

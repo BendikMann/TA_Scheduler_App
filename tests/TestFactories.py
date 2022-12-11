@@ -33,8 +33,14 @@ class TestFactories(TestCase):
 
         # sections should also be created now, but there is a non-zero chance that none are.
         print(models.Course.objects.all())  # Look here to see if data was linked, it's hard to test.
+        print(models.Section.objects.all())
 
     def test_section_factory(self):
         with self.assertRaises(django.db.utils.IntegrityError, msg="You should not be able to create orphaned instances of section!"):
-            Factories.SectionFactory.create()
+            Factories._SectionFactory.create()
 
+    def test_section_factory_not_orphaned(self):
+        course = Factories.CourseFactory.create()
+        Factories._SectionFactory.create(course=course)
+        self.assertEqual(1, len(models.Course.objects.all()))
+        # course will create an arbitrary amount of sections.

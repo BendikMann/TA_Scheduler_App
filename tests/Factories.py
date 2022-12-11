@@ -1,6 +1,8 @@
 import random
+from datetime import datetime, timedelta
 
 import factory.django
+import factory.fuzzy
 from django.db.models.signals import post_save
 from localflavor.us import us_states
 from django.contrib.auth.models import Group
@@ -9,14 +11,25 @@ from django.contrib.auth.hashers import make_password
 
 
 # Use these to make 'mock' objects for the database that are robust.
+Section_Types = [model_choice_data.SectionChoices.LAB,
+                 model_choice_data.SectionChoices.LECTURE,
+                 model_choice_data.SectionChoices.DISCUSSION]
 
+Course_Name = [model_choice_data.CourseChoices.YEAR2022,
+               model_choice_data.CourseChoices.YEAR2023,
+               model_choice_data.CourseChoices.YEAR2024]
+
+Course_Type = [model_choice_data.CourseChoices.FALL,
+               model_choice_data.CourseChoices.WINTERIM,
+               model_choice_data.CourseChoices.SPRING,
+               model_choice_data.CourseChoices.SUMMER]
 
 class CourseFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Course
 
-    term_type = random.choice(model_choice_data.CourseChoices.TERM_NAMES)
-    term_year = random.choice(model_choice_data.CourseChoices.TERM_YEAR)
+    term_type = factory.fuzzy.FuzzyChoice([i[0] for i in model_choice_data.CourseChoices.TERM_NAMES])
+    term_year = factory.fuzzy.FuzzyChoice([i[0] for i in model_choice_data.CourseChoices.TERM_YEAR])
 
     course_number = factory.Faker('numerify', text='#####')
     # TODO: Make believable course subjects
@@ -31,7 +44,7 @@ class CourseFactory(factory.django.DjangoModelFactory):
 
         #create a random number of sections from 0 to 20.
         for i in range(0, random.randint(0, 20)):
-            SectionFactory(course=self)
+            _SectionFactory(course=self)
 
 
         # get the list of instructors and add an arbitrary amount of instructors to each course.
@@ -52,21 +65,28 @@ class CourseFactory(factory.django.DjangoModelFactory):
         tas = self.assigned_people.filter(groups__name='TA')
 
         for ta_section in ta_sections:
-            if random.randint(0, 1) == 1:
+            if random.randint(0, 1) == 1 and len(tas) != 0:
                 ta_section.assigned_user = random.choice(tas)
 
 
-class SectionFactory(factory.django.DjangoModelFactory):
+
+class _SectionFactory(factory.django.DjangoModelFactory):
     class Meta:
         model = models.Section
 
     class_id = factory.Faker('numerify', text='#####')
     section = factory.Faker('bothify', text='###?')
-    type = random.choice(models.SectionChoices.SECTION_CHOICES)
-    start_date = factory.Faker('past_datetime')
-    # warning, this could enable bug that happen either
-    # if start date is in the future or end date is in the past.
-    end_date = factory.Faker('future_datetime')
+    type = factory.fuzzy.FuzzyChoice([i[0] for i in model_choice_data.SectionChoices.SECTION_CHOICES])
+    meet_monday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_tuesday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_wednesday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_thursday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_friday = factory.fuzzy.FuzzyChoice([True, False])
+    meet_start = factory.Faker('date_time')
+    @factory.post_generation
+    def make_meeting_times(self, created, extracted, **kwargs):
+        self.meet_end = self.meet_start + timedelta(minutes=random.choice([50, 60, 80, 120]))
+
 
 
 class UsAddressFactory(factory.django.DjangoModelFactory):
@@ -76,8 +96,7 @@ class UsAddressFactory(factory.django.DjangoModelFactory):
     zip_code = factory.Faker('postcode')
     street_address = factory.Faker('street_address')
     city = factory.Faker('city')
-    state = random.choice(us_states.US_STATES)
-
+    state = factory.fuzzy.FuzzyChoice([i[0] for i in us_states.US_STATES])
 
 class UserFactory(factory.django.DjangoModelFactory):
     with factory.django.mute_signals(post_save):
