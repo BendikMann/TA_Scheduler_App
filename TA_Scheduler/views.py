@@ -230,7 +230,7 @@ class DeleteCourse(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         return reverse_lazy('home-page')
 
 
-class CreateSection(View):
+class CreateSection(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'section/create_section.html'
     model = Section
 
@@ -249,21 +249,23 @@ class CreateSection(View):
             section.save()
             return redirect('section-view', section.id)
         else:
-            return render(request,
-                          self.template_name, {'section_form': section})
+            return render(request, self.template_name, {'section_form': section})
 
     def get_success_url(self):
         return reverse_lazy('home-page')
 
+    def test_func(self):
+        return is_admin(self.request.user.account)
 
-class ViewSection(UserPassesTestMixin, LoginRequiredMixin, DetailView):
+
+class ViewSection(LoginRequiredMixin, DetailView):
     model = Section
 
     def test_func(self):
         return True
 
 
-class UpdateSection(View):
+class UpdateSection(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'section/update_section.html'
 
     def get(self, request, pk):
@@ -280,6 +282,9 @@ class UpdateSection(View):
             return redirect('section-view', pk=pk)
         else:
             return render(request, self.template_name, {'section_form': section})
+
+    def test_func(self):
+        return is_admin(self.request.user.account)
 
 
 class DeleteSection(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
