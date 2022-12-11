@@ -40,7 +40,7 @@ urlpatterns = [
          TA_Scheduler.views.CreateAddress.as_view(template_name='address/create_address.html'),
          name='address-create'),
     path('address/<int:pk>/update/',
-         TA_Scheduler.views.UpdateAddress.as_view(template_name='account/update_account.html'),
+         TA_Scheduler.views.UpdateAddress.as_view(template_name='address/update_address.html'),
          name='address-update'),
     path('address/<int:pk>/view/',
          TA_Scheduler.views.ViewAddress.as_view(template_name='address/view_address.html'),
