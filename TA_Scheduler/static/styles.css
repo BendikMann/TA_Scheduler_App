@@ -11,3 +11,11 @@
           margin-bottom: 50px !important;
       }
 
+      .container2 {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+      }
+

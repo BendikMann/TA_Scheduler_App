@@ -6,7 +6,7 @@ from django.db import models
 from django.db.models import Q
 from django.db.models.signals import post_save
 from django.dispatch import receiver
-from django.forms import ModelForm
+from django import forms
 from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
 import phonenumbers
@@ -93,16 +93,26 @@ class Account(models.Model):
         pass
 
 
-class UserModelForm(ModelForm):
+class UserModelForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ('first_name', 'last_name', 'email')
+
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'myfieldclass'}),
+            'last_name': forms.TextInput(attrs={'class': 'myfieldclass'}),
+        }
 
 
-class AccountModelForm(ModelForm):
+class AccountModelForm(forms.ModelForm):
     class Meta:
         model = Account
-        fields = ['phone_number']
+        fields = ('phone_number', 'address')
+
+        widgets = {
+            'phone_number': forms.TextInput(attrs={'class': 'myfieldclass'}),
+            'address': forms.TextInput(attrs={'class': 'myfieldclass'}),
+        }
 
 
 class Course(models.Model):
@@ -136,7 +146,7 @@ class Course(models.Model):
                f"{*self.section_set.all(),}"
 
 
-class CourseModelForm(ModelForm):
+class CourseModelForm(forms.ModelForm):
     class Meta:
         model = Course
         fields = ['assigned_people', 'term_type', 'term_year', 'course_number', 'subject', 'name', 'description']
@@ -173,7 +183,6 @@ class Section(models.Model):
         return f" {self.class_id} {self.section} {self.type} " \
                f"{'' if self.assigned_user is None else self.assigned_user.user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
-
 
 
 # Whenever we create a user, also create a account attached to it.
