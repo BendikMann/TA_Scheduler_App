@@ -4,7 +4,7 @@ from TA_Scheduler import user
 import random
 import Factories
 from faker import Faker
-from TA_Scheduler.models import Account
+from TA_Scheduler.models import User
 from django.contrib.auth.models import Group
 from TA_Scheduler.user import Admin, Instructor, Ta
 
@@ -29,35 +29,35 @@ class UserInitTests(TestCase):
         self.random_string = self.fake.word()
         self.random_integer = random.randint(0, 999999)
 
-        self.blank_account = Factories.UserFactory.create().account
-        self.blank_account.user.groups.clear()
+        self.blank_account = Factories.UserFactory.create()
+        self.blank_account.groups.clear()
 
-        self.admin_account = Factories.UserFactory.create().account
-        self.admin_account.user.groups.clear()
-        self.admin_account.user.groups.add(Group.objects.get(name="Admin"))
+        self.admin_account = Factories.UserFactory.create()
+        self.admin_account.groups.clear()
+        self.admin_account.groups.add(Group.objects.get(name="Admin"))
 
-        self.instructor_account = Factories.UserFactory.create().account
-        self.instructor_account.user.groups.clear()
-        self.instructor_account.user.groups.add(Group.objects.get(name="Instructor"))
+        self.instructor_account = Factories.UserFactory.create()
+        self.instructor_account.groups.clear()
+        self.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.ta_account = Factories.UserFactory.create().account
-        self.ta_account.user.groups.clear()
-        self.ta_account.user.groups.add(Group.objects.get(name="TA"))
+        self.ta_account = Factories.UserFactory.create()
+        self.ta_account.groups.clear()
+        self.ta_account.groups.add(Group.objects.get(name="TA"))
 
-        self.admin_instructor_account: Account = Factories.UserFactory.create().account
-        self.admin_instructor_account.user.groups.clear()
-        self.admin_instructor_account.user.groups.add(Group.objects.get(name="Admin"))
-        self.admin_instructor_account.user.groups.add(Group.objects.get(name="Instructor"))
+        self.admin_instructor_account: User = Factories.UserFactory.create()
+        self.admin_instructor_account.groups.clear()
+        self.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
+        self.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.ta_instructor_account: Account = Factories.UserFactory.create().account
-        self.ta_instructor_account.user.groups.clear()
-        self.ta_instructor_account.user.groups.add(Group.objects.get(name="TA"))
-        self.ta_instructor_account.user.groups.add(Group.objects.get(name="Instructor"))
+        self.ta_instructor_account: User = Factories.UserFactory.create()
+        self.ta_instructor_account.groups.clear()
+        self.ta_instructor_account.groups.add(Group.objects.get(name="TA"))
+        self.ta_instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.admin_ta_account: Account = Factories.UserFactory.create().account
-        self.admin_ta_account.user.groups.clear()
-        self.admin_ta_account.user.groups.add(Group.objects.get(name="Admin"))
-        self.admin_ta_account.user.groups.add(Group.objects.get(name="TA"))
+        self.admin_ta_account: User = Factories.UserFactory.create()
+        self.admin_ta_account.groups.clear()
+        self.admin_ta_account.groups.add(Group.objects.get(name="Admin"))
+        self.admin_ta_account.groups.add(Group.objects.get(name="TA"))
 
     def test_admin_init(self):
         try:
@@ -213,7 +213,7 @@ class Test_Get_All_Tas(TestCase):
                               msg=f"Get all should return list, returned {type(user.get_all_tas())}")
 
     def test_count_correct(self):
-        tas = models.Account.objects.filter(user__groups__name="TA")
+        tas = models.objects.filter(groups__name="TA")
 
         list_tas: list[user.Ta] = user.get_all_tas()
 
@@ -222,7 +222,7 @@ class Test_Get_All_Tas(TestCase):
                          msg=f"All tas should include all tas in the db. Actual: {len(tas)} Is {len(list_tas)}")
 
     def test_exhaustive(self):
-        tas = list(models.Account.objects.filter(user__groups__name="TA").all())
+        tas = list(models.objects.filter(groups__name="TA").all())
         tas = sorted(tas, key=lambda x: x.user.username)
         list_tas: list[user.Ta] = user.get_all_tas()
         list_tas = sorted(tas, key=lambda x: x.user.username)
@@ -251,7 +251,7 @@ class Test_Get_All_Instructors(TestCase):
                               msg=f"Get all should return list, returned {type(user.get_all_instructors())}")
 
     def test_count_correct(self):
-        instructors = models.Account.objects.filter(user__groups__name="Instructor")
+        instructors = models.User.objects.filter(user__groups__name="Instructor")
 
         list_instructors: list = user.get_all_instructors()
 
@@ -260,13 +260,14 @@ class Test_Get_All_Instructors(TestCase):
                          msg=f"All tas should include all tas in the db. Actual: {len(instructors)} Is {len(list_instructors)}")
 
     def test_exhaustive(self):
-        tas = list(models.Account.objects.filter(user__groups__name="Instructor").all())
+        tas = list(models.User.objects.filter(user__groups__name="Instructor").all())
         tas = sorted(tas, key=lambda x: x.user.username)
         list_tas: list = user.get_all_instructors()
         list_tas = sorted(tas, key=lambda x: x.user.username)
 
         for i in range(0, min(len(tas), len(list_tas))):
             self.assertEqual(tas[i], list_tas[i], msg="All elements in the list should be the same as the db.")
+
 
 class Test_Get_All_Admins(TestCase):
     @classmethod
@@ -286,7 +287,7 @@ class Test_Get_All_Admins(TestCase):
                               msg=f"Get all should return list, returned {type(user.get_all_admins())}")
 
     def test_count_correct(self):
-        admins = models.Account.objects.filter(user__groups__name="Admin")
+        admins = models.User.objects.filter(groups__name="Admin")
 
         list_admins: list = user.get_all_admins()
 
@@ -295,7 +296,7 @@ class Test_Get_All_Admins(TestCase):
                          msg=f"All tas should include all tas in the db. Actual: {len(admins)} Is {len(list_admins)}")
 
     def test_exhaustive(self):
-        tas = list(models.Account.objects.filter(user__groups__name="Admin").all())
+        tas = list(models.User.objects.filter(groups__name="Admin").all())
         tas = sorted(tas, key=lambda x: x.user.username)
         list_tas: list = user.get_all_admins()
         list_tas = sorted(tas, key=lambda x: x.user.username)
