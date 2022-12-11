@@ -155,7 +155,9 @@ class HomeView(LoginRequiredMixin, UserPassesTestMixin, View):
         return is_admin(self.request.user.account)
 
     def get(self, request):
-        return render(request, self.template_name, {"users": get_all_users(), "courses": Course.objects.all()})
+
+        courses = Course.objects.all()
+        return render(request, self.template_name, {"users": get_all_users(), "courses": courses})
 
     pass
 

@@ -3,6 +3,7 @@ from TA_Scheduler.models import *
 
 app_name: str = "Ta_Scheduler"
 
+
 # you are probably looking here because you don't remember how to setup migrations
 # after clearing the database.
 # 1) delete all migrations and the db itself.
@@ -31,5 +32,3 @@ def init_groups(apps, schema_migration):
     AdminGroup.save()
     InstructorGroup.save()
     TAGroup.save()
-
-
