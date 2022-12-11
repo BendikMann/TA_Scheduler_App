@@ -27,7 +27,7 @@ class CreateAddress(LoginRequiredMixin, UserPassesTestMixin, CreateView):
             account_id = int(self.request.session.get('account_id_to_change'))
         except TypeError:
             raise PermissionDenied()
-        user = User.objects.get(id=id)
+        user = User.objects.get(id=account_id)
         return user
 
     def test_func(self):
@@ -57,7 +57,7 @@ class UpdateAddress(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return True
 
     def get_success_url(self):
-        return reverse_lazy('account-view', args=[self.get_object().account.id])
+        return reverse_lazy('account-view', args=[self.get_object().id])
 
 
 class ViewAddress(UserPassesTestMixin, LoginRequiredMixin, DetailView):
