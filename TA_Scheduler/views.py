@@ -296,6 +296,7 @@ class DeleteSection(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
 
     def test_func(self):
         return is_admin(self.request.user.account)
+        # return True
 
     def get_success_url(self):
-        return reverse_lazy('course-view', args=self.object.course.id)
+        return reverse_lazy('course-view', args=(self.object.course.id,))
