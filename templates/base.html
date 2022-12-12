@@ -18,25 +18,25 @@
 </head>
 
 <body>
- <nav class="mt-4">
+ <ul class="nav">
         {% if user.id is not None %}
         {% url 'account-view' user.id as account_view %}
         {% url 'logout' as logout_view %}
         {% url 'home-page' as home_page %}
 
-        <a href='{{ logout_view }}' class="btn btn-primary float-end mx-2">Logout</a>
-        <a href='{{ account_view }}' class="btn btn-primary float-end mx-2">Account</a>
+        <li><a href='{{ logout_view }}'>Logout</a></li>
+        <li><a href='{{ account_view }}'>Account</a></li>
         {% if request.path != '/'%}
-            <a href='{{ home_page }}' class="btn btn-primary float-end mx-2" >Home Page</a>
+            <li><a href='{{ home_page }}'>Home Page</a></li>
         {% endif %}
 
         {% else %}
         {% url 'login' as login_view %}
-        <a href='{{ login_view }}' class="btn btn-primary float-end mx-2">Login</a>
+        <li><a href='{{ login_view }}' >Login</a></li>
         {% endif %}
 
         {{ DEBUG }}
-    </nav>
+    </ul>
 
 <div class="container">
 
