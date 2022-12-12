@@ -186,6 +186,21 @@ class SectionModelForm(ModelForm):
         # filtering to show only Accounts which are a part of the associated course
         self.fields['assigned_user'].queryset = Account.objects.filter(course__id=course)
 
+    def clean(self):
+        cleaned_data = super().clean()
+        assigned_user = cleaned_data.get("assigned_user")
+        section_type = cleaned_data.get("type")
+
+        # checking the users group and preventing them from being assigned to sections they couldn't be a part of
+        if assigned_user and assigned_user.user.groups.filter(name="Instructor").exists() and section_type == "LAB":
+            raise ValidationError("Instructors cannot be assigned to lab sections.")
+        if assigned_user and assigned_user.user.groups.filter(name="Instructor").exists() and section_type == "DIS":
+            raise ValidationError("Instructors cannot be assigned to discussion sections.")
+        if assigned_user and assigned_user.user.groups.filter(name="TA").exists() and section_type == "LEC":
+            raise ValidationError("TAs cannot be assigned to lecture sections.")
+
+        return cleaned_data
+
 
 # Whenever we create a user, also create a account attached to it.
 @receiver(post_save, sender=User)
