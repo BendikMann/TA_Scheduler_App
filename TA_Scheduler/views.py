@@ -137,7 +137,7 @@ class DeleteAccount(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
     model = User
 
     def form_valid(self, form):
-        self.get_object().user.delete()
+        self.get_object().is_active
         return super().form_valid(form)
 
     def test_func(self):
