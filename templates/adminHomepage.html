@@ -4,69 +4,91 @@
 {% block content %}
 
 {% if user.is_authenticated %}
-<div>
-    <div class="container-fluid text-center mb-5 ali">
-        <h1>Home Page</h1>
-    </div>
+
+<h1 class="header">Home Page</h1>
+<div class="d-flex flex-row mt-4 mb-3">
+    <h3 class="me-3">Users:</h3>
+    <a href="/accounts/register/" class="card-link btn-primary btn">And a User</a>
 </div>
 
-<div class="d-grid p-2" style="background-color: lightgrey">
-    <div class="container col-lg-8 flex-row d-flex">
-        <h3 class="mx-auto">Users</h3>
-        <a href="/accounts/register/" class="card-link mx-auto btn-primary btn">Add a User</a>
+<table class="table table-striped homepage-table">
+    <thead class="homepage-table-header">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Email</th>
+        <th scope="col">First</th>
+        <th scope="col">Last</th>
+        <th scope="col">Phone Number</th>
+        <th scope="col">User Type</th>
+        <th scope="col">Detail</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+    <tr>
+        <th scope="row">{{user.id}}</th>
 
-    </div>
+        <td>{{user.email}}</td>
+        <td>{{user.first_name}}</td>
+        <td>{{user.last_name}}</td>
+        <td>{{user.phone_number}}</td>
+        <td>
+           {% if user|has_group:"Admin" %}
+                Admin
+            {% endif %}
+            {%if user|has_group:"Instructor" %}}
+                Instructor
+            {% endif %}
+            {% if user|has_group:"TA" %}}
+                TA
+            {% endif %}
+        </td>
+
+        {% url 'account-view' pk=user.id as account_view %}
+        <td><a href="{{ account_view }}" class="card-link"> User Detail</a></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="d-flex flex-row mt-4 mb-3">
+    <h3 class="me-3">Courses:</h3>
+    {% url 'course-create' as course_create %}
+    <a href="{{ course_create }}" class="card-link btn-primary btn"> Add a Course</a>
 </div>
 
-<div>
-    <div class="container flex-wrap col-lg-12 text-center d-flex justify-content-lg-center">
-        {% for user in users %}
 
-        <div class="card m-3" style="width: 16rem;">
-            <div class="card-body">
+<table class="table mb-4 table-striped homepage-table">
+    <thead class="homepage-table-header">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Course Number</th>
+        <th scope="col">Subject</th>
+        <th scope="col">Term Type</th>
+        <th scope="col">Term Year</th>
+        <th scope="col">Detail</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for course in courses %}
+    <tr>
+        <th scope="row">{{course.id}}</th>
+        <td>{{course.name}}</td>
+        <td>{{course.course_number}}</td>
+        <td>{{course.subject}}</td>
+        <td>{{course.term_type}}</td>
+        <td>{{course.term_year}}</td>
+        {% url 'course-view' pk=course.id as course_view %}
+        <td><a href="{{ course_view }}" class="card-link"> Course Detail</a></td>
+    </tr>
 
-                <h5 class="card-title">{{user.user.first_name}}</h5>
-                {% url 'account-view' pk=user.id as account_view %}
-
-                <a href="{{ account_view }}" class="card-link"> User Detail</a>
-
-
-            </div>
-        </div>
-        {% endfor %}
+    {% endfor %}
+    </tbody>
+</table>
 
 
-    </div>
-</div>
-</div>
-
-<div class="d-grid p-2" style="background-color: lightgrey">
-    <div class="container col-lg-8 flex-row d-flex">
-        <h3 class="mx-lg-auto">Courses</h3>
-        {% url 'course-create' as course_create %}
-        <a href="{{ course_create }}" class="card-link mx-auto btn-primary btn"> Add a Course</a>
-    </div>
-</div>
-
-
-<div>
-    <div class="container flex-wrap  col-lg-10 text-center d-flex justify-content-lg-center">
-
-        {% for course in courses %}
-
-        <div class="card m-3" style="width: 18rem;">
-            <div class="card-body">
-
-                <h5 class="card-title">{{course.name}}</h5>
-                {% url 'course-view' pk=course.id as course_view %}
-
-                <a href="{{ course_view }}" class="card-link"> Course Detail</a>
-
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-</div>
 {% else %}
 <p> nope</p>
 

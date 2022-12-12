@@ -2,19 +2,19 @@
 {% block content %}
 
 
-{% if request.user == object.user %}
+{% if request.user == object %}
 <h1>Hiya
-        {{object.user.first_name|default:"pal"}}
+        {{object.first_name|default:"pal"}}
 </h1>
 {%else%}
-<h1> {{object.user.first_name|default:"(No First Name Set)"}} {{object.user.last_name|default:"(No Last Name Set)"}}</h1>
+<h1> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}}</h1>
 {% endif%}
 
 
 <br>
 <!-- Private User information goes here! -->
 <!-- if user is in admin group or this is their account -->
-{% if request.user|has_group:"Admin" or request.user == object.user %}
+{% if request.user|has_group:"Admin" or request.user == object %}
     {% url 'account-update' object.id as account_update %}
     {% if object.address %}
         <p>{{object.address.street_address}} <br>
@@ -39,15 +39,22 @@
         <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
     {% endif %}
     <hr>
-    {%if object.user.email%}
-        <p>{{object.user.email}}</p>
+    {%if object.email%}
+        <p>{{object.email}}</p>
         <a href='{{ account_update }}' class="btn btn-primary">Edit Email</a>
     {% else %}
         <p>No email set: </p>
         <a href='{{ account_update }}' class="btn btn-primary">Set Email</a>
     {% endif %}
-{% endif %}
 <hr>
+
+{% elif request.user|has_group:"Instructor" or request.user|has_group:"TA" %}
+    {% if object.user.email %}
+        <p>Email: {{object.user.email}}</p>
+    {% else %}}
+        <p>No Email Set: </p>
+    {% endif %}
+{% endif %}
 
 {% if request.user|has_group:'Admin' %}
     {% url 'account-delete' pk=object.id as account_delete %}
