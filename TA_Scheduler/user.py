@@ -26,7 +26,7 @@ class Admin:
     def send_email(self, header: str, content: str) -> bool:
         # Gets a list of all user emails excluding blank ones
         emails = list(User.objects.filter(is_active=True).exclude(email='').values_list('email', flat=True))
-        send_mail(subject=header, message=content, recipient_list=emails)
+        send_mail(subject=header, message=content, from_email='NYStingers@ta-scheduler.rocks', recipient_list=emails)
         return True
 
 
@@ -64,7 +64,7 @@ class Instructor:
         # Gets a list of all the emails of the TA's that are assigned to a specific instructor
         for ta in tas:
             emails.append(ta.account.user.email)
-        send_mail(subject=header, message=content, recipient_list=emails)
+        send_mail(subject=header, message=content, from_email='NYStingers@ta-scheduler.rocks', recipient_list=emails)
         return True
 
 
