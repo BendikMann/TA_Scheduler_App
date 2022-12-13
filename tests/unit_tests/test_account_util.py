@@ -4,7 +4,7 @@ import TA_Scheduler.user
 from TA_Scheduler.models import UsAddress
 from TA_Scheduler.user import *
 from django.contrib.auth.models import Group
-import tests.Factories
+from tests.Factories import *
 
 
 class Test_is_admin(TestCase):
@@ -17,27 +17,27 @@ class Test_is_admin(TestCase):
     @classmethod
     def setUpTestData(cls):
         # make a admin account
-        cls.admin_account: User = Factories.UserFactory.create()
+        cls.admin_account: User = UserFactory.create()
         cls.admin_account.groups.clear()
         cls.admin_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a ta account
-        cls.ta_account: User = Factories.UserFactory.create()
+        cls.ta_account: User = UserFactory.create()
         cls.ta_account.groups.clear()
         cls.ta_account.groups.add(Group.objects.get(name="TA"))
 
         # make a instructor account.
-        cls.instructor_account: User = Factories.UserFactory.create()
+        cls.instructor_account: User = UserFactory.create()
         cls.instructor_account.groups.clear()
         cls.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        cls.admin_instructor_account: User = Factories.UserFactory.create()
+        cls.admin_instructor_account: User = UserFactory.create()
         cls.admin_instructor_account.groups.clear()
         cls.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
         cls.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a none account.
-        cls.account: User = Factories.UserFactory.create()
+        cls.account: User = UserFactory.create()
         cls.account.groups.clear()
 
     def test_type(self):
@@ -70,27 +70,27 @@ class Test_is_ta(TestCase):
     @classmethod
     def setUpTestData(cls):
         # make a admin account
-        cls.admin_account: User = Factories.UserFactory.create()
+        cls.admin_account: User = UserFactory.create()
         cls.admin_account.groups.clear()
         cls.admin_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a ta account
-        cls.ta_account: User = Factories.UserFactory.create()
+        cls.ta_account: User = UserFactory.create()
         cls.ta_account.groups.clear()
         cls.ta_account.groups.add(Group.objects.get(name="TA"))
 
         # make a instructor account.
-        cls.instructor_account: User = Factories.UserFactory.create()
+        cls.instructor_account: User = UserFactory.create()
         cls.instructor_account.groups.clear()
         cls.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        cls.admin_instructor_account: User = Factories.UserFactory.create()
+        cls.admin_instructor_account: User = UserFactory.create()
         cls.admin_instructor_account.groups.clear()
         cls.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
         cls.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a none account.
-        cls.account: User = Factories.UserFactory.create()
+        cls.account: User = UserFactory.create()
         cls.account.groups.clear()
 
     def test_type(self):
@@ -119,27 +119,27 @@ class Test_is_instructor(TestCase):
     @classmethod
     def setUpTestData(cls):
         # make a admin account
-        cls.admin_account: User = Factories.UserFactory.create()
+        cls.admin_account: User = UserFactory.create()
         cls.admin_account.groups.clear()
         cls.admin_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a ta account
-        cls.ta_account: User = Factories.UserFactory.create()
+        cls.ta_account: User = UserFactory.create()
         cls.ta_account.groups.clear()
         cls.ta_account.groups.add(Group.objects.get(name="TA"))
 
         # make a instructor account.
-        cls.instructor_account: User = Factories.UserFactory.create()
+        cls.instructor_account: User = UserFactory.create()
         cls.instructor_account.groups.clear()
         cls.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        cls.admin_instructor_account: User = Factories.UserFactory.create()
+        cls.admin_instructor_account: User = UserFactory.create()
         cls.admin_instructor_account.groups.clear()
         cls.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
         cls.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a none account.
-        cls.account: User = Factories.UserFactory.create()
+        cls.account: User = UserFactory.create()
         cls.account.groups.clear()
 
     def test_type(self):
@@ -168,32 +168,32 @@ class Test_make_admin(TestCase):
     def setUp(self):  # setUp is used here because we will be changing this data.
 
         # make a admin account
-        self.admin_account: User = Factories.UserFactory.create()
+        self.admin_account: User = UserFactory.create()
         self.admin_account.groups.clear()
         self.admin_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a ta account
-        self.ta_account: User = Factories.UserFactory.create()
+        self.ta_account: User = UserFactory.create()
         self.ta_account.groups.clear()
         self.ta_account.groups.add(Group.objects.get(name="TA"))
 
         # make a instructor account.
-        self.instructor_account: User = Factories.UserFactory.create()
+        self.instructor_account: User = UserFactory.create()
         self.instructor_account.groups.clear()
         self.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.admin_instructor_account: User = Factories.UserFactory.create()
+        self.admin_instructor_account: User = UserFactory.create()
         self.admin_instructor_account.groups.clear()
         self.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
         self.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
 
-        self.admin_ta_account: User = Factories.UserFactory.create()
+        self.admin_ta_account: User = UserFactory.create()
         self.admin_ta_account.groups.clear()
         self.admin_ta_account.groups.add(Group.objects.get(name="TA"))
         self.admin_ta_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a none account.
-        self.account: User = Factories.UserFactory.create()
+        self.account: User = UserFactory.create()
         self.account.groups.clear()
 
     def test_on_none_input(self):
@@ -232,32 +232,32 @@ class Test_make_ta(TestCase):
     def setUp(self):  # setUp is used here because we will be changing this data.
 
         # make a admin account
-        self.admin_account: User = Factories.UserFactory.create()
+        self.admin_account: User = UserFactory.create()
         self.admin_account.groups.clear()
         self.admin_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a ta account
-        self.ta_account: User = Factories.UserFactory.create()
+        self.ta_account: User = UserFactory.create()
         self.ta_account.groups.clear()
         self.ta_account.groups.add(Group.objects.get(name="TA"))
 
         # make a instructor account.
-        self.instructor_account: User = Factories.UserFactory.create()
+        self.instructor_account: User = UserFactory.create()
         self.instructor_account.groups.clear()
         self.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.admin_instructor_account: User = Factories.UserFactory.create()
+        self.admin_instructor_account: User = UserFactory.create()
         self.admin_instructor_account.groups.clear()
         self.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
         self.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
 
-        self.admin_ta_account: User = Factories.UserFactory.create()
+        self.admin_ta_account: User = UserFactory.create()
         self.admin_ta_account.groups.clear()
         self.admin_ta_account.groups.add(Group.objects.get(name="TA"))
         self.admin_ta_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a none account.
-        self.account: User = Factories.UserFactory.create()
+        self.account: User = UserFactory.create()
         self.account.groups.clear()
 
     def test_on_none_input(self):
@@ -293,32 +293,32 @@ class Test_make_instructor(TestCase):
     def setUp(self):  # setUp is used here because we will be changing this data.
 
         # make a admin account
-        self.admin_account: User = Factories.UserFactory.create()
+        self.admin_account: User = UserFactory.create()
         self.admin_account.groups.clear()
         self.admin_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a ta account
-        self.ta_account: User = Factories.UserFactory.create()
+        self.ta_account: User = UserFactory.create()
         self.ta_account.groups.clear()
         self.ta_account.groups.add(Group.objects.get(name="TA"))
 
         # make a instructor account.
-        self.instructor_account: User = Factories.UserFactory.create()
+        self.instructor_account: User = UserFactory.create()
         self.instructor_account.groups.clear()
         self.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.admin_instructor_account: User = Factories.UserFactory.create()
+        self.admin_instructor_account: User = UserFactory.create()
         self.admin_instructor_account.groups.clear()
         self.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
         self.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
 
-        self.admin_ta_account: User = Factories.UserFactory.create()
+        self.admin_ta_account: User = UserFactory.create()
         self.admin_ta_account.groups.clear()
         self.admin_ta_account.groups.add(Group.objects.get(name="TA"))
         self.admin_ta_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a none account.
-        self.account: User = Factories.UserFactory.create()
+        self.account: User = UserFactory.create()
         self.account.groups.clear()
 
     def test_on_none_input(self):
