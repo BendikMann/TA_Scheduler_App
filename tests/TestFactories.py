@@ -2,8 +2,8 @@ import django.db.utils
 from django.contrib.auth.models import Group
 from django.test import TestCase
 
-import Factories
-from Factories import *
+import tests.Factories as Factories
+from tests.Factories import *
 
 
 class TestFactories(TestCase):

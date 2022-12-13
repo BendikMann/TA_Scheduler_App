@@ -1,6 +1,6 @@
 
 from django.test import TestCase, Client
-from Factories import *
+from tests.Factories import *
 from TA_Scheduler.models import User
 from TA_Scheduler.user import make_admin, make_instructor, make_ta
 

@@ -4,7 +4,7 @@ import TA_Scheduler.user
 from TA_Scheduler.models import UsAddress
 from TA_Scheduler.user import *
 from django.contrib.auth.models import Group
-import Factories
+import tests.Factories
 
 
 class Test_is_admin(TestCase):

@@ -1,8 +1,7 @@
 from django.test import TestCase
-from Factories import *
+from tests.Factories import *
 from TA_Scheduler import user
 import random
-import Factories
 from faker import Faker
 from TA_Scheduler.models import User
 from django.contrib.auth.models import Group
