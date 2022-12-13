@@ -1,5 +1,6 @@
       .header{
           margin-bottom: 50px;
+          margin-top: 50px;
       }
 
       .homepage-table-header{
@@ -11,3 +12,75 @@
           margin-bottom: 50px !important;
       }
 
+      .container2 {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
+          min-height: 100vh;
+      }
+
+      .form{
+          width: fit-content;
+          margin-left: auto;
+          margin-right: auto;
+          margin-top: 100px;
+
+      }
+      .p-75{
+          padding: 75px;
+      }
+
+      th{
+            vertical-align: top;
+      }
+
+      .form-border{
+              border: 1px solid #282a35!important;
+      }
+
+      .nav {
+          display: block!important;
+          list-style-type: none;
+          margin: 0;
+          padding: 0;
+          overflow: hidden;
+          background-color: #282a35;;
+          position: fixed;
+          top: 0;
+          width: 100%
+      }
+
+      li a:hover {
+        background-color: #0d6efd;;
+          color: wheat;
+      }
+
+
+
+      li a {
+          display: block;
+          color: wheat;
+
+          padding: 14px 16px;
+          text-decoration: none;
+          float: right;
+      }
+
+      li h3{
+          display: block;
+          color: wheat;
+
+          padding: 4px 16px;
+          text-decoration: none;
+          float: left;
+      }
+
+      #id_state{
+          width: 190px;
+      }
+
+      .account-view-container{
+          background-color: #282a35;
+          color: wheat;
+      }

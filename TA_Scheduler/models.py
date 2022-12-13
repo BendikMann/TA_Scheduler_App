@@ -176,6 +176,7 @@ class CourseModelForm(ModelForm):
         self.fields['assigned_people'].queryset = User.objects.filter(groups__name__in=['Instructor', 'TA'])
 
 
+
 class Section(models.Model):
     # A section MUST have a course assigned to it.
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -204,7 +205,6 @@ class Section(models.Model):
 
                f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
-
 
 class SectionModelForm(ModelForm):
     class Meta:

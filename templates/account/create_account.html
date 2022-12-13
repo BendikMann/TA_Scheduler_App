@@ -1,10 +1,15 @@
 {% extends "base.html"%}
 {% block content %}
-<form action="" method="post">
+
+
+    <form class="form-border p-75 create-account-form" action="" method="post">
         {% csrf_token %}
-    <table>
-        {{ user_form.as_table }}
-    </table>
-    <input type="submit" value="Submit" class="btn btn-primary"/>
-</form>
+        <h3 class="mb-4">Register Account</h3>
+        <table class="create-account-table">
+         {{ user_form.as_table }}
+        </table>
+        <input type="submit" value="Submit" class="btn btn-primary float-end"/>
+    </form>
+
+
 {% endblock %}
