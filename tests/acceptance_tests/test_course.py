@@ -10,15 +10,15 @@ class TestCourseCreate(TestCase):
         UserFactory()
 
         self.Admin = User.objects.create_user(email='admin1@test.com', first_name='admin1', last_name='admin1', password='admin1')
-        self.Admin.groups.clear
+        self.Admin.groups.clear()
         make_admin(self.Admin)
 
         self.Instructor = User.objects.create_user(email='instructor1@test.com', first_name='instructor1', last_name='instructor1', password='instructor1')
-        self.Instructor.groups.clear
+        self.Instructor.groups.clear()
         make_instructor(self.Instructor)
 
         self.TA = User.objects.create_user(email='ta1@test.com', first_name='ta1', last_name='ta1', password='ta1')
-        self.TA.groups.clear
+        self.TA.groups.clear()
         make_ta(self.TA)
 
     def test_course_create_default(self):

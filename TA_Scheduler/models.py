@@ -182,7 +182,7 @@ class Section(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     # A Section may have a user undefined for an arbitrary amount of time.
-    assigned_user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True)
+    assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
 
 
     class_id = models.CharField(max_length=6)
@@ -202,7 +202,6 @@ class Section(models.Model):
 
     def __str__(self):
         return f" {self.class_id} {self.section} {self.type} " \
-
                f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
 
@@ -215,7 +214,7 @@ class SectionModelForm(ModelForm):
     def __init__(self, course, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # filtering to show only Accounts which are a part of the associated course
-        self.fields['assigned_user'].queryset = Account.objects.filter(course__id=course)
+        self.fields['assigned_user'].queryset = User.objects.filter(course__id=course)
 
     def clean(self):
         cleaned_data = super().clean()
