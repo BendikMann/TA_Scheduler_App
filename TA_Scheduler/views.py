@@ -225,7 +225,7 @@ class DeleteCourse(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         return super().form_valid(form)
 
     def test_func(self):
-        return is_admin(self.request.user.account)
+        return is_admin(self.request.user)
 
     def get_success_url(self):
         return reverse_lazy('home-page')
@@ -256,7 +256,7 @@ class CreateSection(LoginRequiredMixin, UserPassesTestMixin, View):
         return reverse_lazy('home-page')
 
     def test_func(self):
-        return is_admin(self.request.user.account)
+        return is_admin(self.request.user)
 
 
 class ViewSection(LoginRequiredMixin, DetailView):
@@ -285,7 +285,7 @@ class UpdateSection(LoginRequiredMixin, UserPassesTestMixin, View):
             return render(request, self.template_name, {'section_form': section})
 
     def test_func(self):
-        return is_admin(self.request.user.account)
+        return is_admin(self.request.user)
 
 
 class DeleteSection(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
@@ -296,7 +296,7 @@ class DeleteSection(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
         return super().form_valid(form)
 
     def test_func(self):
-        return is_admin(self.request.user.account)
+        return is_admin(self.request.user)
         # return True
 
     def get_success_url(self):
