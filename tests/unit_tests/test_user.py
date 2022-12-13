@@ -1,5 +1,6 @@
 from django.test import TestCase
 from tests.Factories import *
+from tests import Factories
 from TA_Scheduler import user
 import random
 from faker import Faker
