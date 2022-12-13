@@ -1,6 +1,5 @@
 from django.test import TestCase
 from tests.Factories import *
-from tests import Factories
 from TA_Scheduler import user
 import random
 from faker import Faker
@@ -30,32 +29,32 @@ class UserInitTests(TestCase):
         self.random_string = self.fake.word()
         self.random_integer = random.randint(0, 999999)
 
-        self.blank_account = Factories.UserFactory.create()
+        self.blank_account = UserFactory.create()
         self.blank_account.groups.clear()
 
-        self.admin_account = Factories.UserFactory.create()
+        self.admin_account = UserFactory.create()
         self.admin_account.groups.clear()
         self.admin_account.groups.add(Group.objects.get(name="Admin"))
 
-        self.instructor_account = Factories.UserFactory.create()
+        self.instructor_account = UserFactory.create()
         self.instructor_account.groups.clear()
         self.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.ta_account = Factories.UserFactory.create()
+        self.ta_account = UserFactory.create()
         self.ta_account.groups.clear()
         self.ta_account.groups.add(Group.objects.get(name="TA"))
 
-        self.admin_instructor_account: User = Factories.UserFactory.create()
+        self.admin_instructor_account: User = UserFactory.create()
         self.admin_instructor_account.groups.clear()
         self.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
         self.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.ta_instructor_account: User = Factories.UserFactory.create()
+        self.ta_instructor_account: User = UserFactory.create()
         self.ta_instructor_account.groups.clear()
         self.ta_instructor_account.groups.add(Group.objects.get(name="TA"))
         self.ta_instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        self.admin_ta_account: User = Factories.UserFactory.create()
+        self.admin_ta_account: User = UserFactory.create()
         self.admin_ta_account.groups.clear()
         self.admin_ta_account.groups.add(Group.objects.get(name="Admin"))
         self.admin_ta_account.groups.add(Group.objects.get(name="TA"))
