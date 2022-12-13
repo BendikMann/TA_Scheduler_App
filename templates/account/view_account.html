@@ -13,45 +13,6 @@
 <!-- Private User information goes here! -->
 <!-- if user is in admin group or this is their account -->
 {% if request.user|has_group:"Admin" or request.user == object %}
-{% url 'account-update' object.id as account_update %}
-
-<div class="container account-view-container form-border w-50">
-    <div class="row m-5">
-        <div class="col">
-            {% if object.address %}
-                <p>{{object.address.street_address}} <br> {{object.address.city}}, {{object.address.state}} {{object.address.zip_code}} <br> USA
-                </p>
-            {% else %}
-                    <p>No address set</p>
-            {% endif %}
-        </div>
-        <div class="col">
-            {%if object.address%}
-                {% url 'address-update' pk=object.address.id as address_update %}
-                <a href='{{ address_update }}' class="btn btn-primary">Edit Address</a>
-            {% else %}
-                {% url 'address-create' as address_create %}
-                <a href='{{ address_create }}' class="btn btn-primary">Set Address</a>
-            {% endif %}
-
-        </div>
-    </div>
-
-    <div class="row m-5">
-        <div class="col">
-            {%if object.phone_number%}
-                <p>{{object.phone_number}}</p>
-            {% else %}
-                <p>No phone number set: </p>
-
-            {% endif %}
-        </div>
-        <div class="col">
-            {%if object.phone_number%}
-                <a href='{{ account_update }}' class="btn btn-primary">Edit Phone Number</a>
-            {% else %}
-                <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
-            {% endif %}
 
         </div>
 

@@ -117,7 +117,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.first_name
 
     def is_admin(self):
-        return self.user.groups.filter(name='Admin').exists()
+        return self.groups.filter(name='Admin').exists()
 
     def __str__(self):
         return f"User: {self.first_name} {self.last_name} Group: {self.groups.first()}\n" \
@@ -131,7 +131,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 class UserModelForm(ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['first_name', 'last_name', 'email', 'phone_number']
 
 
 class Course(models.Model):
@@ -152,7 +152,7 @@ class Course(models.Model):
     name = models.CharField(max_length=30)
 
     # course description (because it's trivial to include)
-    description = models.TextField(null=True)
+    description = models.TextField(null=True, blank=True)
 
     def __str__(self):
         # Turns out there is a quite a bit that we need to process.
@@ -173,7 +173,8 @@ class CourseModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(CourseModelForm, self).__init__(*args, **kwargs)
         # filtering the instructor field to only include accounts with the group of TA or Instructor
-        self.fields['assigned_people'].queryset = Account.objects.filter(user__groups__name__in=['Instructor', 'TA'])
+        self.fields['assigned_people'].queryset = User.objects.filter(groups__name__in=['Instructor', 'TA'])
+
 
 
 class Section(models.Model):
@@ -181,7 +182,8 @@ class Section(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     # A Section may have a user undefined for an arbitrary amount of time.
-    assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    assigned_user = models.ForeignKey(Account, on_delete=models.SET_NULL, null=True, blank=True)
+
 
     class_id = models.CharField(max_length=6)
 
@@ -200,5 +202,32 @@ class Section(models.Model):
 
     def __str__(self):
         return f" {self.class_id} {self.section} {self.type} " \
+
                f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
+
+class SectionModelForm(ModelForm):
+    class Meta:
+        model = Section
+        fields = ['assigned_user', 'class_id', 'section', 'type', 'meet_start', 'meet_end', 'meet_monday',
+                  'meet_tuesday', 'meet_wednesday', 'meet_thursday', 'meet_friday']
+
+    def __init__(self, course, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # filtering to show only Accounts which are a part of the associated course
+        self.fields['assigned_user'].queryset = Account.objects.filter(course__id=course)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        assigned_user = cleaned_data.get("assigned_user")
+        section_type = cleaned_data.get("type")
+
+        # checking the users group and preventing them from being assigned to sections they couldn't be a part of
+        if assigned_user and assigned_user.user.groups.filter(name="Instructor").exists() and section_type == "LAB":
+            raise ValidationError("Instructors cannot be assigned to lab sections.")
+        if assigned_user and assigned_user.user.groups.filter(name="Instructor").exists() and section_type == "DIS":
+            raise ValidationError("Instructors cannot be assigned to discussion sections.")
+        if assigned_user and assigned_user.user.groups.filter(name="TA").exists() and section_type == "LEC":
+            raise ValidationError("TAs cannot be assigned to lecture sections.")
+
+        return cleaned_data
