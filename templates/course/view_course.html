@@ -8,11 +8,18 @@
     <b>Term: </b> {{object.term_type}}, {{object.term_year}}<br>
     <b>Assigned people: </b>
     {% for person in object.assigned_people.all %}
-    <br> {{ person.user.first_name|default:'Unnamed Instructor' }}
+    <br> {{ person.first_name|default:'Unnamed Instructor' }}
     {% endfor %} <br>
     <b>Course Number: </b> {{object.course_number}} <br>
     <b>Description: </b> {{object.description}} <br>
+    <b> Sections</b> <br>
+    {% for section in object.section_set.all %}
+        {{section.section}} {{section.type}} {{section.class_id}} {{section.assigned_user}}<a href='#' class="btn btn-primary">Edit Section</a> <br/>
+    {% endfor %}
 </p1>
+    {% url 'course-update' pk=object.id as course_update %}
+    <a href='{{ course_update }}' class="btn btn-primary">Edit Course</a>
+
 
 {% endblock %}
 </html>

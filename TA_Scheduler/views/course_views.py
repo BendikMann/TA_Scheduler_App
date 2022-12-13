@@ -52,5 +52,4 @@ class UpdateCourse(LoginRequiredMixin, UserPassesTestMixin, View):
 
 
 class ViewCourse(LoginRequiredMixin, DetailView):
-
     model = Course
