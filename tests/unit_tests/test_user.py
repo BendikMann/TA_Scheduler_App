@@ -8,6 +8,7 @@ from TA_Scheduler.models import User
 from django.contrib.auth.models import Group
 from TA_Scheduler.user import Admin, Instructor, Ta
 
+
 def init_dummy_database():
     """
     Creates a db with 50 users, 10 courses and 20 labs.
