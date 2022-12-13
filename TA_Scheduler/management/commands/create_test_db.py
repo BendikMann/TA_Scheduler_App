@@ -20,6 +20,6 @@ class Command(BaseCommand):
         for course in range(0, course_count):
             Factories.CourseFactory()
 
-        self.stdout.write(f"User now has {TA_Scheduler.models.Account.objects.count()} entries")
+        self.stdout.write(f"User now has {TA_Scheduler.models.User.objects.count()} entries")
         self.stdout.write(f"Course now has {TA_Scheduler.models.Course.objects.count()} entries")
         self.stdout.write(f"Section now has {TA_Scheduler.models.Section.objects.count()} entries")

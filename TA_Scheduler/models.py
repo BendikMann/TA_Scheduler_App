@@ -37,6 +37,7 @@ class CustomUserManager(BaseUserManager):
     """
 
     """
+
     def create_user(self, email, first_name, last_name, password=None, **other_fields):
         """
         Creates and saves a User with the given email and password.
@@ -67,7 +68,7 @@ class CustomUserManager(BaseUserManager):
             password=password,
             first_name=first_name,
             last_name=last_name,
-            ** other_fields,
+            **other_fields,
 
         )
         user.is_superuser = True  # All perms
@@ -116,8 +117,7 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.first_name
 
     def is_admin(self):
-        return self.user.groups.filter(name='Admin').exists()
-
+        return self.groups.filter(name='Admin').exists()
 
     def __str__(self):
         return f"User: {self.first_name} {self.last_name} Group: {self.groups.first()}\n" \
@@ -131,12 +131,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 class UserModelForm(ModelForm):
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'email']
+        fields = ['first_name', 'last_name', 'email', 'phone_number']
 
 
 class Course(models.Model):
     assigned_people = models.ManyToManyField(User)
-
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -174,7 +173,8 @@ class CourseModelForm(ModelForm):
     def __init__(self, *args, **kwargs):
         super(CourseModelForm, self).__init__(*args, **kwargs)
         # filtering the instructor field to only include accounts with the group of TA or Instructor
-        self.fields['assigned_people'].queryset = Account.objects.filter(user__groups__name__in=['Instructor', 'TA'])
+        self.fields['assigned_people'].queryset = User.objects.filter(groups__name__in=['Instructor', 'TA'])
+
 
 class Section(models.Model):
     # A section MUST have a course assigned to it.
@@ -201,8 +201,9 @@ class Section(models.Model):
 
     def __str__(self):
         return f" {self.class_id} {self.section} {self.type} " \
-               f"{'' if self.assigned_user is None else self.assigned_user.user.first_name} " \
-               f"{'' if self.assigned_user is None else self.assigned_user.user.last_name}\n"
+
+               f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
+               f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
 
 
 class SectionModelForm(ModelForm):
@@ -230,6 +231,3 @@ class SectionModelForm(ModelForm):
             raise ValidationError("TAs cannot be assigned to lecture sections.")
 
         return cleaned_data
-
-
-
