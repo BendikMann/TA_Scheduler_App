@@ -213,7 +213,7 @@ class Test_Get_All_Tas(TestCase):
                               msg=f"Get all should return list, returned {type(user.get_all_tas())}")
 
     def test_count_correct(self):
-        tas = models.objects.filter(groups__name="TA")
+        tas = models.User.objects.filter(groups__name="TA")
 
         list_tas: list[user.Ta] = user.get_all_tas()
 
@@ -222,10 +222,10 @@ class Test_Get_All_Tas(TestCase):
                          msg=f"All tas should include all tas in the db. Actual: {len(tas)} Is {len(list_tas)}")
 
     def test_exhaustive(self):
-        tas = list(models.objects.filter(groups__name="TA").all())
-        tas = sorted(tas, key=lambda x: x.user.username)
+        tas = list(models.User.objects.filter(groups__name="TA").all())
+        tas = sorted(tas, key=lambda x: x.email)
         list_tas: list[user.Ta] = user.get_all_tas()
-        list_tas = sorted(tas, key=lambda x: x.user.username)
+        list_tas = sorted(tas, key=lambda x: x.email)
 
         for i in range(0, min(len(tas), len(list_tas))):
             self.assertEqual(tas[i], list_tas[i], msg="All elements in the list should be the same as the db.")
@@ -251,7 +251,7 @@ class Test_Get_All_Instructors(TestCase):
                               msg=f"Get all should return list, returned {type(user.get_all_instructors())}")
 
     def test_count_correct(self):
-        instructors = models.User.objects.filter(user__groups__name="Instructor")
+        instructors = models.User.objects.filter(groups__name="Instructor")
 
         list_instructors: list = user.get_all_instructors()
 
@@ -260,10 +260,10 @@ class Test_Get_All_Instructors(TestCase):
                          msg=f"All tas should include all tas in the db. Actual: {len(instructors)} Is {len(list_instructors)}")
 
     def test_exhaustive(self):
-        tas = list(models.User.objects.filter(user__groups__name="Instructor").all())
-        tas = sorted(tas, key=lambda x: x.user.username)
+        tas = list(models.User.objects.filter(groups__name="Instructor").all())
+        tas = sorted(tas, key=lambda x: x.email)
         list_tas: list = user.get_all_instructors()
-        list_tas = sorted(tas, key=lambda x: x.user.username)
+        list_tas = sorted(tas, key=lambda x: x.email)
 
         for i in range(0, min(len(tas), len(list_tas))):
             self.assertEqual(tas[i], list_tas[i], msg="All elements in the list should be the same as the db.")
@@ -297,9 +297,9 @@ class Test_Get_All_Admins(TestCase):
 
     def test_exhaustive(self):
         tas = list(models.User.objects.filter(groups__name="Admin").all())
-        tas = sorted(tas, key=lambda x: x.user.username)
+        tas = sorted(tas, key=lambda x: x.email)
         list_tas: list = user.get_all_admins()
-        list_tas = sorted(tas, key=lambda x: x.user.username)
+        list_tas = sorted(tas, key=lambda x: x.email)
 
         for i in range(0, min(len(tas), len(list_tas))):
             self.assertEqual(tas[i], list_tas[i], msg="All elements in the list should be the same as the db.")

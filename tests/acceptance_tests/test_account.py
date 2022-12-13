@@ -8,13 +8,20 @@ from TA_Scheduler.user import make_admin, make_instructor, make_ta
 
 class TestLogin(TestCase):
     def setUp(self):
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory()
+
         self.Admin = User.objects.create_user(email='admin1@test.com', first_name='admin1', last_name='admin1', password='admin1')
+        self.Admin.groups.clear
         make_admin(self.Admin)
 
         self.Instructor = User.objects.create_user(email='instructor1@test.com', first_name='instructor1', last_name='instructor1', password='instructor1')
+        self.Instructor.groups.clear
         make_instructor(self.Instructor)
 
         self.TA = User.objects.create_user(email='ta1@test.com', first_name='ta1', last_name='ta1', password='ta1')
+        self.TA.groups.clear
         make_ta(self.TA)
 
         self.wrong_passwords = {'apple', 'banana', 'pear', '12345', 'password123', 'hello', 'goodbye'}
@@ -130,6 +137,7 @@ class TestAddressCreation(TestCase):
         UserFactory()
         self.Admin = User.objects.create_user('test1', 'test1', 'test1', password='test1')
         self.Admin.save()
+        self.Admin.groups.clear
         make_admin(self.Admin)
         UserFactory()
         self.ArbitraryUser = User.objects.create_user('test2', 'test2', 'test2', password='test2')
@@ -171,7 +179,12 @@ class TestAddressCreation(TestCase):
 
 class TestUserCreation(TestCase):
     def setUp(self):
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory(password="not_signinable")
+
         self.Admin = User.objects.create_user(email='admin@admin.com', first_name='admin1', last_name='admin1', password='admin1')
+        self.Admin.groups.clear
         make_admin(self.Admin)
         self.User = User.objects.create_user(email='user@user.com', first_name='user', last_name='user', password='user')
 
@@ -302,7 +315,12 @@ class TestUserCreation(TestCase):
 
 class TestAccountDeletion(TestCase):
     def setUp(self):
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory(password="not_signinable")
+
         self.Admin = User.objects.create_user(email='admin1@test.com', first_name='admin1', last_name='admin1', password='admin1')
+        self.Admin.groups.clear
         make_admin(self.Admin)
         self.ArbitraryUser = User.objects.create_user(email='user1@test.com', first_name='user1', last_name='user1', password='user1')
 
@@ -315,17 +333,18 @@ class TestAccountDeletion(TestCase):
 
         response = client.get(f'/accounts/{self.ArbitraryUser.id}/view', follow=True)
         self.assertEqual(response.status_code, 404, msg="Deleted user's account page still exists!")
+        self.assertEqual(response.context['exception'], 'No user found matching the query', msg='No user found wasnt the cause fo the 404!')
 
     def test_delete_account_not_logged_in(self):
         client = Client()
-        resp = client.get(f'/account/1/delete', follow=True)
+        resp = client.get(f'/account/{self.Admin.id}/delete', follow=True)
         self.assertRedirects(resp, '/accounts/login/')
 
     def test_delete_account_not_admin(self):
         client = Client()
         client.login(email='user1@test.com', password='user1')
 
-        response = client.get(f'/account/1/delete', follow=True)
+        response = client.get(f'/account/{self.Admin.id}/delete', follow=True)
         self.assertEqual(response.status_code, 403, msg="A user that wasnt an admin was able to view an account "
                                                         "delete page!")
 
@@ -333,19 +352,24 @@ class TestAccountDeletion(TestCase):
         client = Client()
         client.login(email='admin1@test.com', password='admin1')
 
-        client.post(f'/account/2/delete', follow=True)
-        response = client.get(f'/accounts/2/view/')
+        client.post(f'/account/{self.ArbitraryUser.id}/delete', follow=True)
+        response = client.get(f'/accounts/{self.ArbitraryUser.id}/view/')
 
         self.assertNotEqual(response.status_code, 404, "User was deleted even though the operation was canceled!")
+        self.assertEqual(response.context['object'].id, self.ArbitraryUser.id, msg='The user did not match the user on the page!')
 
 
 class TestEditAccountNoUser(TestCase):
     def setUp(self):
-        UserFactory()
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory(password="not_signinable")
+
+        self.ArbitraryUser = UserFactory.create()
 
     def test_edit_account_info_not_logged_in(self):
         client = Client()
-        response = client.post(f'/accounts/1/update/', follow=True)
+        response = client.get(f'/accounts/{self.ArbitraryUser.id}/update/', follow=True)
         self.assertRedirects(response, '/accounts/login/')
 
     def test_edit_account_info_user_doesnt_exist(self):
@@ -357,14 +381,19 @@ class TestEditAccountNoUser(TestCase):
 
 class TestEditOwnAccountAsAdmin(TestCase):
     def setUp(self):
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory(password="not_signinable")
+
         self.Admin = User.objects.create_user(email='admin1@test.com', first_name='admin1', last_name='admin1', password='admin1')
+        self.Admin.groups.clear
         make_admin(self.Admin)
 
     def test_edit_own_info_as_admin(self):
         client = Client()
         client.login(email='admin1@test.com', password='admin1')
 
-        response = client.post(f'/accounts/1/update/',
+        response = client.post(f'/accounts/{self.Admin.id}/update/',
                                {'first_name': 'test1', 'last_name': 'test1', 'email': 'admin1@test.com',
                                 'phone_number': '+12624242825'}, follow=True)
 
@@ -377,7 +406,12 @@ class TestEditOwnAccountAsAdmin(TestCase):
 class TestEditOtherAccountAsAdmin(TestCase):
 
     def setUp(self):
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory(password="not_signinable")
+
         self.Admin = User.objects.create_user(email='admin1@test.com', first_name='admin1', last_name='admin1', password='admin1')
+        self.Admin.groups.clear
         make_admin(self.Admin)
         self.ArbitraryUser = User.objects.create_user(email='user1@test.com', first_name='user1', last_name='user1', password='user1')
 
@@ -398,7 +432,12 @@ class TestEditOtherAccountAsAdmin(TestCase):
 class TestEditAccountAsInstructor(TestCase):
 
     def setUp(self):
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory(password="not_signinable")
+
         self.Instructor = User.objects.create_user(email='instructor1@test.com', first_name='instructor1', last_name='instructor1' ,password='instructor1')
+        self.Instructor.groups.clear
         make_instructor(self.Instructor)
         self.ArbitraryUser = User.objects.create_user(email='user1@test.com', first_name='user1', last_name='user1'
                                                       ,password='user1')
@@ -430,7 +469,12 @@ class TestEditAccountAsInstructor(TestCase):
 class TestEditAccountAsTA(TestCase):
 
     def setUp(self):
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory(password="not_signinable")
+
         self.TA = User.objects.create_user(email='ta1@test.com', first_name='ta1', last_name='ta1', password='ta1')
+        self.TA.groups.clear
         make_ta(self.TA)
         self.ArbitraryUser = User.objects.create_user(email='user1@test.com', first_name='user1', last_name='user1', password='user1')
 

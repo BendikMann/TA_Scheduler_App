@@ -91,7 +91,7 @@ class Test_is_ta(TestCase):
 
         # make a none account.
         cls.account: User = Factories.UserFactory.create()
-        cls.account.user.groups.clear()
+        cls.account.groups.clear()
 
     def test_type(self):
         self.assertIsInstance(is_ta(self.admin_account), bool, 'is_ta should always return a bool.')
@@ -119,28 +119,28 @@ class Test_is_instructor(TestCase):
     @classmethod
     def setUpTestData(cls):
         # make a admin account
-        cls.admin_account: User = Factories.UserFactory.create().account
+        cls.admin_account: User = Factories.UserFactory.create()
         cls.admin_account.groups.clear()
         cls.admin_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a ta account
-        cls.ta_account: User = Factories.UserFactory.create().account
+        cls.ta_account: User = Factories.UserFactory.create()
         cls.ta_account.groups.clear()
         cls.ta_account.groups.add(Group.objects.get(name="TA"))
 
         # make a instructor account.
-        cls.instructor_account: User = Factories.UserFactory.create().account
+        cls.instructor_account: User = Factories.UserFactory.create()
         cls.instructor_account.groups.clear()
         cls.instructor_account.groups.add(Group.objects.get(name="Instructor"))
 
-        cls.admin_instructor_account: User = Factories.UserFactory.create().account
+        cls.admin_instructor_account: User = Factories.UserFactory.create()
         cls.admin_instructor_account.groups.clear()
         cls.admin_instructor_account.groups.add(Group.objects.get(name="Instructor"))
         cls.admin_instructor_account.groups.add(Group.objects.get(name="Admin"))
 
         # make a none account.
-        cls.account: User = Factories.UserFactory.create().account
-        cls.account.user.groups.clear()
+        cls.account: User = Factories.UserFactory.create()
+        cls.account.groups.clear()
 
     def test_type(self):
         self.assertIsInstance(is_instructor(self.instructor_account), bool,
@@ -327,8 +327,8 @@ class Test_make_instructor(TestCase):
 
     def test_on_user_input(self):
         with self.assertRaises(TypeError,
-                               msg="User type should raise a value error! We want to accept only accounts!"):
-            make_instructor(self.account)
+                               msg="User type should raise a value error! We want to accept only users!"):
+            make_instructor(self)
 
     def arbitrary_positive(self, account: User):
         self.assertIsInstance(make_instructor(account), TA_Scheduler.user.Instructor,
