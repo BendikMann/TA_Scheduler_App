@@ -1,5 +1,6 @@
       .header{
           margin-bottom: 50px;
+          margin-top: 50px;
       }
 
       .homepage-table-header{
@@ -19,7 +20,7 @@
           min-height: 100vh;
       }
 
-      .create-account-form{
+      .form{
           width: fit-content;
           margin-left: auto;
           margin-right: auto;
@@ -64,4 +65,22 @@
           padding: 14px 16px;
           text-decoration: none;
           float: right;
+      }
+
+      li h3{
+          display: block;
+          color: wheat;
+
+          padding: 4px 16px;
+          text-decoration: none;
+          float: left;
+      }
+
+      #id_state{
+          width: 190px;
+      }
+
+      .account-view-container{
+          background-color: #282a35;
+          color: wheat;
       }

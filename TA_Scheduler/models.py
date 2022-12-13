@@ -37,6 +37,7 @@ class CustomUserManager(BaseUserManager):
     """
 
     """
+
     def create_user(self, email, first_name, last_name, password=None, **other_fields):
         """
         Creates and saves a User with the given email and password.
@@ -67,7 +68,7 @@ class CustomUserManager(BaseUserManager):
             password=password,
             first_name=first_name,
             last_name=last_name,
-            ** other_fields,
+            **other_fields,
 
         )
         user.is_superuser = True  # All perms
@@ -118,7 +119,6 @@ class User(AbstractBaseUser, PermissionsMixin):
     def is_admin(self):
         return self.user.groups.filter(name='Admin').exists()
 
-
     def __str__(self):
         return f"User: {self.first_name} {self.last_name} Group: {self.groups.first()}\n" \
                f"Email: {self.email} Phone Number: {self.phone_number} \n" \
@@ -136,7 +136,6 @@ class UserModelForm(ModelForm):
 
 class Course(models.Model):
     assigned_people = models.ManyToManyField(User)
-
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -176,6 +175,7 @@ class CourseModelForm(ModelForm):
         # filtering the instructor field to only include accounts with the group of TA or Instructor
         self.fields['assigned_people'].queryset = Account.objects.filter(user__groups__name__in=['Instructor', 'TA'])
 
+
 class Section(models.Model):
     # A section MUST have a course assigned to it.
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -202,4 +202,3 @@ class Section(models.Model):
         return f" {self.class_id} {self.section} {self.type} " \
                f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
-

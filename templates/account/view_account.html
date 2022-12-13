@@ -1,58 +1,90 @@
 {% extends "base.html"%}
 {% block content %}
 
+<div class="header">
+    {% if request.user == object %}
+    <h1>Hiya {{object.first_name|default:"pal"}}</h1>
+    {%else%}
+    <h1> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}}</h1>
+    {% endif%}
+</div>
 
-{% if request.user == object %}
-<h1>Hiya
-        {{object.first_name|default:"pal"}}
-</h1>
-{%else%}
-<h1> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}}</h1>
-{% endif%}
 
-
-<br>
 <!-- Private User information goes here! -->
 <!-- if user is in admin group or this is their account -->
 {% if request.user|has_group:"Admin" or request.user == object %}
-    {% url 'account-update' object.id as account_update %}
-    {% if object.address %}
-        <p>{{object.address.street_address}} <br>
-            {{object.address.city}}, {{object.address.state}} {{object.address.zip_code}} <br>
-            USA
-        </p>
+{% url 'account-update' object.id as account_update %}
 
-        {% url 'address-update' pk=object.address.id as address_update %}
-        <a href='{{ address_update }}' class="btn btn-primary">Edit Address</a>
-    {% else %}
-        <p>No address set</p>
-        {% url 'address-create' as address_create %}
-        <a href='{{ address_create }}' class="btn btn-primary">Make One</a>
-    {% endif %}
-    <hr>
-    {%if object.phone_number%}
-        <p>{{object.phone_number}}</p>
-        <a href='{{ account_update }}' class="btn btn-primary">Edit Phone Number</a>
+<div class="container account-view-container form-border w-50">
+    <div class="row m-5">
+        <div class="col">
+            {% if object.address %}
+                <p>{{object.address.street_address}} <br> {{object.address.city}}, {{object.address.state}} {{object.address.zip_code}} <br> USA
+                </p>
+            {% else %}
+                    <p>No address set</p>
+            {% endif %}
+        </div>
+        <div class="col">
+            {%if object.address%}
+                {% url 'address-update' pk=object.address.id as address_update %}
+                <a href='{{ address_update }}' class="btn btn-primary">Edit Address</a>
+            {% else %}
+                {% url 'address-create' as address_create %}
+                <a href='{{ address_create }}' class="btn btn-primary">Set Address</a>
+            {% endif %}
 
-    {% else %}
-        <p>No phone number set: </p>
-        <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
-    {% endif %}
-    <hr>
-    {%if object.email%}
-        <p>{{object.email}}</p>
-        <a href='{{ account_update }}' class="btn btn-primary">Edit Email</a>
-    {% else %}
-        <p>No email set: </p>
-        <a href='{{ account_update }}' class="btn btn-primary">Set Email</a>
-    {% endif %}
+        </div>
+    </div>
+
+    <div class="row m-5">
+        <div class="col">
+            {%if object.phone_number%}
+                <p>{{object.phone_number}}</p>
+            {% else %}
+                <p>No phone number set: </p>
+
+            {% endif %}
+        </div>
+        <div class="col">
+            {%if object.phone_number%}
+                <a href='{{ account_update }}' class="btn btn-primary">Edit Phone Number</a>
+            {% else %}
+                <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    <div class="row m-5">
+        <div class="col">
+            {%if object.email%}
+                <p>{{object.email}}</p>
+
+            {% else %}
+                <p>No email set: </p>
+            {% endif %}
+        </div>
+        <div class="col">
+            {%if object.email%}
+                <a href='{{ account_update }}' class="btn btn-primary">Edit Email</a>
+            {% else %}
+                {% url 'address-create' as address_create %}
+                <a href='{{ account_update }}' class="btn btn-primary">Edit Email</a>
+            {% endif %}
+
+        </div>
+    </div>
+
+    <div class="row m-5">
+        <div class="col">
+            {% if request.user|has_group:'Admin' %}
+                {% url 'account-delete' pk=object.id as account_delete %}
+                <a href='{{ account_delete }}' class="btn m-auto btn-danger">Delete this Account</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
 {% endif %}
-<hr>
-
-{% if request.user|has_group:'Admin' %}
-    {% url 'account-delete' pk=object.id as account_delete %}
-    <a href='{{ account_delete }}' class="btn btn-primary">Delete this Account</a>
-{% endif %}
-
-
 {% endblock %}
