@@ -64,5 +64,19 @@ urlpatterns = [
          name='course-update'),
     path('course/<int:pk>/view/', TA_Scheduler.views.ViewCourse.as_view(template_name='course/view_course.html'),
          name='course-view'),
+    path('course/<int:pk>/delete', TA_Scheduler.views.DeleteCourse.as_view(template_name='course/delete_course.html'),
+         name='course-delete'),
+
+    # section
+    path('section/<int:pk>/create/', TA_Scheduler.views.CreateSection.as_view(
+        template_name='section/create_section.html'), name='section-create'),
+    path('section/<int:pk>/update/',
+         TA_Scheduler.views.UpdateSection.as_view(template_name='section/update_section.html'),
+         name='section-update'),
+    path('section/<int:pk>/view/', TA_Scheduler.views.ViewSection.as_view(template_name='section/view_section.html'),
+         name='section-view'),
+    path('section/<int:pk>/delete',
+         TA_Scheduler.views.DeleteSection.as_view(template_name='section/delete_section.html'),
+         name='section-delete'),
 
 ]
