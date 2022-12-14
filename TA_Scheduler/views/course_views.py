@@ -1,7 +1,8 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.views import View
-from django.views.generic import DetailView
+from django.views.generic import DetailView, DeleteView
 
 from TA_Scheduler.models import Course, CourseModelForm
 from TA_Scheduler.user import is_admin
@@ -53,3 +54,17 @@ class UpdateCourse(LoginRequiredMixin, UserPassesTestMixin, View):
 
 class ViewCourse(LoginRequiredMixin, DetailView):
     model = Course
+
+class DeleteCourse(LoginRequiredMixin,UserPassesTestMixin, DeleteView):
+    model = Course
+
+    def form_valid(self, form):
+        self.get_object().delete()
+        return super().form_valid(form)
+
+    def test_func(self):
+        return is_admin(self.request.user)
+        # return True
+
+    def get_success_url(self):
+        return reverse_lazy('home-page')

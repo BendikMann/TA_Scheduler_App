@@ -175,6 +175,7 @@ class CourseModelForm(ModelForm):
         # filtering the instructor field to only include accounts with the group of TA or Instructor
         self.fields['assigned_people'].queryset = User.objects.filter(groups__name__in=['Instructor', 'TA'])
 
+
 class Section(models.Model):
     # A section MUST have a course assigned to it.
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
@@ -200,7 +201,6 @@ class Section(models.Model):
 
     def __str__(self):
         return f" {self.class_id} {self.section} {self.type} " \
-
                f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
 
