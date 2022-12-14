@@ -9,6 +9,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    {% load static %}
+    <link rel="icon" type="image/x-icon" href="{% static 'favicon.ico' %}">
+
 
     {% block title%}
     <title> Scheduler </title>
@@ -23,7 +26,7 @@
         {% url 'account-view' user.id as account_view %}
         {% url 'logout' as logout_view %}
         {% url 'home-page' as home_page %}
-        <li><h3>Schedular</h3></li>
+        <li><h3><img src="{% static 'favicon.ico' %}" alt="A wasp facing the right with a toothy grin." width="64" height="64">Schedular</h3></li>
         <li><a href='{{ logout_view }}'>Logout</a></li>
         <li><a href='{{ account_view }}'>Account</a></li>
         {% if request.path != '/'%}

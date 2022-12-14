@@ -39,9 +39,6 @@ class CreateSection(LoginRequiredMixin, UserPassesTestMixin, View):
 class ViewSection(LoginRequiredMixin, DetailView):
     model = Section
 
-    def test_func(self):
-        return True
-
 
 class UpdateSection(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'section/update_section.html'
@@ -74,7 +71,6 @@ class DeleteSection(LoginRequiredMixin, UserPassesTestMixin,  DeleteView):
 
     def test_func(self):
         return is_admin(self.request.user)
-        # return True
 
     def get_success_url(self):
         return reverse_lazy('course-view', args=self.object.course.id)
