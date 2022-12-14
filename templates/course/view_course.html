@@ -10,17 +10,25 @@
     <b>Subject: </b> {{course.subject}} <br>
     <b>Term: </b> {{course.term_type}}, {{course.term_year}}<br>
     <b>Assigned people: </b>
-
-    {% for person in object.assigned_people.all %}
-    <br> {{ person.first_name|default:'Unnamed Instructor' }}
+    {% for person in course.assigned_people.all %}
+    <br> {{ person.user.first_name|default:'Unnamed Instructor' }}
     {% endfor %} <br>
-    <b>Course Number: </b> {{object.course_number}} <br>
-    <b>Description: </b> {{object.description}} <br>
-    <b> Sections</b> <br>
-    {% for section in object.section_set.all %}
-        {{section.section}} {{section.type}} {{section.class_id}} {{section.assigned_user}}<a href='#' class="btn btn-primary">Edit Section</a> <br/>
-    {% endfor %}
-    {% url 'course-update' pk=object.id as course_update %}
-    <a href='{{ course_update }}' class="btn btn-primary">Edit Course</a>
+    <b>Course Number: </b> {{course.course_number}} <br>
+    <b>Description: </b> {{course.description}} <br> <br>
+
+    <b>Sections: </b>
+    {% for section in sections %}
+        {% url 'section-view' pk=section.id as section_view %}
+        <a href="{{ section_view }}"> <br>
+            {{ section.class_id }} - {{section.section}} - {{section.type}}</a>
+    {% endfor %} <br>
+    {% url 'section-create' pk=course.id as section_create %}
+    <a href='{{ section_create }}' class="btn btn-primary">Create Section</a> <br> <br>
+
+{% if request.user|has_group:'Admin' %}
+    {% url 'course-delete' pk=course.id as course_delete %}
+    <a href='{{ course_delete }}' class="btn btn-primary">Delete this Course</a>
+{% endif %}
+
 {% endblock %}
 </html>
