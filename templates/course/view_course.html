@@ -18,7 +18,8 @@
     <b>Description: </b> {{object.description}} <br>
     <b> Sections</b> <br>
     {% for section in object.section_set.all %}
-        {{section.section}} {{section.type}} {{section.class_id}} {{section.assigned_user}}<a href='#' class="btn btn-primary">Edit Section</a> <br/>
+        {% url 'section-view' pk=section.id as section_view %}
+        {{section.section}} {{section.type}} {{section.class_id}} {{section.assigned_user}}<a href='{{section_view}}' class="btn btn-primary">Edit Section</a> <br/>
     {% endfor %}
     {% url 'course-update' pk=object.id as course_update %}
     <a href='{{ course_update }}' class="btn btn-primary">Edit Course</a>
