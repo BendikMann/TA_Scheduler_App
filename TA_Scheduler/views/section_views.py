@@ -65,7 +65,7 @@ class UpdateSection(LoginRequiredMixin, UserPassesTestMixin, View):
         return is_admin(self.request.user)
 
 
-class DeleteSection(UserPassesTestMixin, LoginRequiredMixin, DeleteView):
+class DeleteSection(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Section
 
     def form_valid(self, form):

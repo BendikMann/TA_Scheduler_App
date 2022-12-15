@@ -96,7 +96,7 @@ class CreateAccount(UserPassesTestMixin, View):
                           self.template_name, {'user_form': user})
 
     def test_func(self):
-        return self.request.user.is_anonymous or is_admin(self.request.user)
+        return is_admin(self.request.user)
 
 
 class UpdateAccount(View):
