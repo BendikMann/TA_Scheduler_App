@@ -50,7 +50,7 @@ class UpdateAddress(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
         return True
 
     def get_success_url(self):
-        return reverse_lazy('account-view', args=[self.get_object().id])
+        return reverse_lazy('account-view', args=[self.get_object().user.id])
 
 
 class ViewAddress(UserPassesTestMixin, LoginRequiredMixin, DetailView):

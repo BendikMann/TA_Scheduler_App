@@ -45,10 +45,10 @@
         {% endif %}
         <br>
         {% if object.address %}
-        {% url 'address-create' as address_create %}
-        <a href='{{ address_create }}' class="btn btn-primary">Edit Address</a>
+        {% url 'address-update' pk=object.address.id as address_update %}
+        <a href='{{ address_update }}' class="btn btn-primary">Edit Address</a>
         {% else %}
-        {% url 'address-update' pk=object.address.id as address_create %}
+        {% url 'address-create' as address_create %}
         <a href='{{ address_create }}' class="btn btn-primary">Add Address</a>
         {% endif %}
 
