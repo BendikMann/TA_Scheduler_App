@@ -3,6 +3,7 @@ from django.test import TestCase, Client
 from tests.Factories import *
 from TA_Scheduler.models import User
 from TA_Scheduler.user import make_admin, make_instructor, make_ta
+from phonenumber_field.modelfields import PhoneNumber
 
 
 class TestLogin(TestCase):
@@ -132,6 +133,50 @@ class TestLogin(TestCase):
             self.assertTemplateNotUsed(resp, 'account/view_account.html', "Get accounts view returned the successful "
                                                                           "login template after an unsuccessful ta "
                                                                           "login")
+
+
+class TestViewPublicContactInfo(TestCase):
+
+    def setUp(self):
+
+        for i in range(0, 10):
+            UserFactory()
+
+        self.userList = list(models.User.objects.all())
+
+    def test_logged_in(self):
+
+        for i in self.userList:
+            client = Client()
+            client.login(email=i.email, password='password')
+
+            for k in self.userList:
+                if k != i:
+                    resp = client.get(f'/accounts/{k.id}/view/')
+
+                    for x in resp.context:
+                        found_phone_num = x['user'].phone_number
+                        found_email = x['user'].email
+
+                        self.assertGreaterEqual(len(found_phone_num), 1, "Phone number not found")
+                        self.assertIsInstance(found_phone_num, PhoneNumber, "Found phone number is not of type "
+                                                                            "PhoneNumber")
+
+                        self.assertGreaterEqual(len(found_email), 1, "Email not found")
+                        self.assertIsInstance(found_email, str, "Found email is not of type String")
+
+    def test_not_logged_in(self):
+
+        for i in self.userList:
+            client = Client()
+
+            for k in self.userList:
+                if k != i:
+                    resp = client.get(f'/accounts/{k.id}/view/', follow=True)
+
+                    self.assertRedirects(resp, f'/accounts/login/?next=/accounts/{k.id}/view/', status_code=302,
+                                         target_status_code=200, msg_prefix="Attempt to view contact info while not "
+                                                                            "logged does not redirect to login screen")
 
 
 class TestAddressCreation(TestCase):
