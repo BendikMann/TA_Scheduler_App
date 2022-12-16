@@ -1,5 +1,3 @@
-import re
-
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from tests.Factories import *
