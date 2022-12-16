@@ -11,7 +11,7 @@
     <b>Term: </b> {{course.term_type}}, {{course.term_year}}<br>
     <b>Assigned people: </b>
 
-    {% for person in object.assigned_people.all %}
+    {% for person in course.assigned_people.all %}
     <br> {{ person.first_name|default:'Unnamed Instructor' }}
     {% endfor %} <br>
     <b>Course Number: </b> {{object.course_number}} <br>

@@ -1,11 +1,14 @@
-from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
+import TA_Scheduler.models
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse, reverse_lazy
 from django.views import View
-from django.views.generic import DeleteView, DetailView
+from django.views.generic import DetailView
 
-from TA_Scheduler.models import Section, SectionModelForm, Course
-from TA_Scheduler.user import is_admin
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+
+from TA_Scheduler.models import *
+from TA_Scheduler.user import *
 
 
 class CreateSection(LoginRequiredMixin, UserPassesTestMixin, View):
@@ -44,12 +47,12 @@ class UpdateSection(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'section/update_section.html'
 
     def get(self, request, pk):
-        section_model = Section.objects.get(pk=pk)
+        section_model = TA_Scheduler.models.Section.objects.get(pk=pk)
         section = SectionModelForm(section_model.course.id, instance=section_model)
         return render(request, self.template_name, {'section_form': section})
 
     def post(self, request, pk):
-        section_model = Section.objects.get(pk=pk)
+        section_model = TA_Scheduler.models.Section.objects.get(pk=pk)
         section = SectionModelForm(section_model.course.id, request.POST, instance=section_model)
 
         if section.is_valid():
@@ -62,7 +65,7 @@ class UpdateSection(LoginRequiredMixin, UserPassesTestMixin, View):
         return is_admin(self.request.user)
 
 
-class DeleteSection(LoginRequiredMixin, UserPassesTestMixin,  DeleteView):
+class DeleteSection(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Section
 
     def form_valid(self, form):
@@ -73,4 +76,4 @@ class DeleteSection(LoginRequiredMixin, UserPassesTestMixin,  DeleteView):
         return is_admin(self.request.user)
 
     def get_success_url(self):
-        return reverse_lazy('course-view', args=self.object.course.id)
+        return reverse_lazy('course-view', args=(self.object.course.id,))
