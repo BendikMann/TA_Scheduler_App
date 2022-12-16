@@ -55,7 +55,8 @@ class UpdateCourse(LoginRequiredMixin, UserPassesTestMixin, View):
 class ViewCourse(LoginRequiredMixin, DetailView):
     model = Course
 
-class DeleteCourse(LoginRequiredMixin,UserPassesTestMixin, DeleteView):
+
+class DeleteCourse(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Course
 
     def form_valid(self, form):

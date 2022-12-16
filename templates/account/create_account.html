@@ -7,6 +7,16 @@
         <h3 class="mb-4">Register Account</h3>
         <table class="create-account-table">
          {{ user_form.as_table }}
+         <tr>
+            <td><label for="group">Group:</label></td>
+            <td>
+                <select name="group" id="group">
+                    <option value="Admin">Admin</option>
+                    <option value="Instructor">Instructor</option>
+                    <option value="TA">TA</option>
+                </select>
+            </td>
+        </tr>
         </table>
         <input type="submit" value="Submit" class="btn btn-primary float-end"/>
     </form>

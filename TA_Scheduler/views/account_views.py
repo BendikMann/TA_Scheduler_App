@@ -1,4 +1,5 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from TA_Scheduler.user import make_admin, make_ta, make_instructor
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
@@ -80,6 +81,14 @@ class CreateAccount(UserPassesTestMixin, View):
         if user.is_valid():
             # we have to process the forms now.
             user.save()
+            # check the selected group and call the appropriate method
+            selected_group = request.POST.get("group")
+            if selected_group == "Admin":
+                make_admin(user.instance)
+            elif selected_group == "Instructor":
+                make_instructor(user.instance)
+            elif selected_group == "TA":
+                make_ta(user.instance)
 
             return redirect('account-view', user.instance.id)
         else:
@@ -87,6 +96,8 @@ class CreateAccount(UserPassesTestMixin, View):
                           self.template_name, {'user_form': user})
 
     def test_func(self):
+        if self.request.user.is_anonymous:
+            return False
         return self.request.user.is_anonymous or is_admin(self.request.user)
 
 
@@ -129,7 +140,7 @@ class DeleteAccount(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = User
 
     def form_valid(self, form):
-        self.get_object().user.delete()
+        self.get_object().delete()
         return super().form_valid(form)
 
     def test_func(self):

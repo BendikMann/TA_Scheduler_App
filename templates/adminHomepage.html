@@ -8,7 +8,7 @@
 <h1 class="header">Home Page</h1>
 <div class="d-flex flex-row mt-4 mb-3">
     <h3 class="me-3">Users:</h3>
-    <a href="/accounts/register/" class="card-link btn-primary btn">And a User</a>
+    <a href="/accounts/register/" class="card-link btn-primary btn">Add a User</a>
 </div>
 
 <table class="table table-striped homepage-table">
@@ -36,10 +36,10 @@
            {% if user|has_group:"Admin" %}
                 Admin
             {% endif %}
-            {%if user|has_group:"Instructor" %}}
+            {%if user|has_group:"Instructor" %}
                 Instructor
             {% endif %}
-            {% if user|has_group:"TA" %}}
+            {% if user|has_group:"TA" %}
                 TA
             {% endif %}
         </td>
