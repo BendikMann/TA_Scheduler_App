@@ -1,3 +1,5 @@
+import re
+
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from tests.Factories import *
@@ -371,7 +373,7 @@ class TestUserCreation(TestCase):
     def test_create_user_not_logged_in(self):
         client = Client()
         create_account = client.get(f'/accounts/register', follow=True)
-        self.assertRedirects(create_account, '/accounts/login/')
+        self.assertRedirects(create_account, '/accounts/login/?next=%2Faccounts%2Fregister%2F', status_code=301, target_status_code=200)
 
 
 class TestAccountDeletion(TestCase):
@@ -402,7 +404,7 @@ class TestAccountDeletion(TestCase):
     def test_delete_account_not_logged_in(self):
         client = Client()
         resp = client.get(f'/account/{self.Admin.id}/delete', follow=True)
-        self.assertRedirects(resp, '/accounts/login/')
+        self.assertRedirects(resp, f'/accounts/login/?next=/account/{self.Admin.id}/delete/', status_code=301, target_status_code=200)
 
     def test_delete_account_not_admin(self):
         client = Client()
@@ -435,7 +437,8 @@ class TestEditAccountNoUser(TestCase):
     def test_edit_account_info_not_logged_in(self):
         client = Client()
         response = client.get(f'/accounts/{self.ArbitraryUser.id}/update/', follow=True)
-        self.assertRedirects(response, '/accounts/login/')
+        self.assertRedirects(response, f'/accounts/login/?next=/accounts/ {self.ArbitraryUser.id}/update/', status_code=301, target_status_code=200)
+
 
     def test_edit_account_info_user_doesnt_exist(self):
         client = Client()
@@ -570,3 +573,45 @@ class TestEditAccountAsTA(TestCase):
                                 'phone_number': '+12624242825'}, follow=True)
 
         self.assertEqual(response.status_code, 403, msg="User wasnt forbidden from changing another users info!")
+
+class TestNotify(TestCase):
+
+    def setup(self):
+        # Creates a dummy db
+        for i in range(0, 10):
+            UserFactory(password="not_signinable")
+
+        self.Admin = User.objects.create_user(email='admin1@test.com', first_name='admin1', last_name='admin1', password='admin1')
+        self.Admin.groups.clear()
+        make_admin(self.Admin)
+
+        self.Instructor = User.objects.create_user(email='instructor1@test.com', first_name='instructor1', last_name='instructor1', password='test')
+        self.Instructor.groups.clear()
+        make_instructor(self.Instructor)
+
+        self.TA = User.objects.create_user(email='ta1@test.com', first_name='ta1', last_name='ta1', password='test')
+        self.TA.groups.clear()
+        make_ta(self.TA)
+
+    def test_notify_as_admin(self):
+        client = Client()
+        client.login(email='admin1@test.com', password='test')
+        response = client.get(f'/announcements/', follow=True)
+        self.assertEqual(response.status_code, 200, msg='Admin wasnt able to access the announcements page!')
+
+    def test_notify_as_instructor(self):
+        client = Client()
+        client.login(email='instructor1@test.com', password='test')
+        response = client.get(f'/announcements/', follow=True)
+        self.assertEqual(response.status_code, 200, msg='Instructor wasnt able to access the announcements page!')
+
+    def test_notify_as_ta(self):
+        client = Client()
+        client.login(email='ta1@test.com', password='test')
+        response = client.get(f'/announcements/', follow=True)
+        self.assertEqual(response.status_code, 403, msg='TA wasnt met with a 403 status code when trying to access the announcements page!')
+
+    def test_notify_not_logged_in(self):
+        client = Client()
+        response = client.get(f'/announcements/', follow=True)
+        self.assertRedirects(response, f'/accounts/login/?next=/announcements/', status_code=301, target_status_code=200)
