@@ -1,7 +1,7 @@
 
 from django.test import TestCase, Client
 from tests.Factories import *
-from TA_Scheduler.models import User
+from TA_Scheduler.models import User, Course
 from TA_Scheduler.user import make_admin, make_instructor, make_ta
 
 
@@ -26,7 +26,8 @@ class TestCourseCreate(TestCase):
         client.login(email='admin1@test.com', password='admin1')
 
         response = client.post(f'/course/create/', {'term_type': 'spr', 'term_year': '2022', 'course_number': '123', 'subject': 'tester', 'name': 'test', 'description': 'test'}, follow=True)
-        course_id = response.context['course'].id
+        course_id = Course.objects.get(course_number='123').id
+
 
         self.assertRedirects(response, f'/course/{course_id}/view/')
 

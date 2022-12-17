@@ -1,20 +1,13 @@
-import enum
-from collections import namedtuple
-
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import PermissionsMixin
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.forms import ModelForm
+import django.forms as forms
+from django.utils.translation import gettext_lazy as _
 from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
-import phonenumbers
-from localflavor.us import us_states
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 
 from TA_Scheduler.model_choice_data import CourseChoices, SectionChoices
 
@@ -164,18 +157,35 @@ class Course(models.Model):
                f"Sections: \n\n\n" \
                f"{*self.section_set.all(),}"
 
+class CourseAssignModelForm(ModelForm):
 
-class CourseModelForm(ModelForm):
+
     class Meta:
         model = Course
-        fields = ['assigned_people', 'term_type', 'term_year', 'course_number', 'subject', 'name', 'description']
+        fields = ['term_type']
+
+    def __init__(self, *args, **kwargs):
+        super(CourseAssignModelForm, self).__init__(*args, **kwargs)
+        # filtering the instructor field to only include accounts with the group of TA or Instructor
+
+
+class CourseModelForm(ModelForm):
+    tas = forms.ModelMultipleChoiceField(queryset=User.objects.all())
+    instructors = forms.ModelMultipleChoiceField(queryset=User.objects.all())
+
+    class Meta:
+        model = Course
+        fields = ['tas', 'instructors', 'term_type', 'term_year', 'course_number', 'subject', 'name', 'description']
 
     def __init__(self, *args, **kwargs):
         super(CourseModelForm, self).__init__(*args, **kwargs)
         # filtering the instructor field to only include accounts with the group of TA or Instructor
-        self.fields['assigned_people'].queryset = User.objects.filter(groups__name__in=['Instructor', 'TA'])
+        self.fields['tas'].queryset = User.objects.filter(groups__name__in=['TA'])
+        self.fields['instructors'].queryset = User.objects.filter(groups__name__in=['Instructor'])
 
-
+        if  self.instance.id is not None:
+            self.fields['tas'].initial = [x.id for x in Course.objects.get(id=self.instance.id).assigned_people.filter(groups__name__in=['TA'])]
+            self.fields['instructors'].initial = [x.id for x in Course.objects.get(id=self.instance.id).assigned_people.filter(groups__name__in=['Instructor'])]
 
 class Section(models.Model):
     # A section MUST have a course assigned to it.
@@ -183,7 +193,6 @@ class Section(models.Model):
 
     # A Section may have a user undefined for an arbitrary amount of time.
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-
 
     class_id = models.CharField(max_length=6)
 
@@ -204,6 +213,7 @@ class Section(models.Model):
         return f" {self.class_id} {self.section} {self.type} " \
                f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
+
 
 class SectionModelForm(ModelForm):
     class Meta:
