@@ -69,6 +69,7 @@ urlpatterns = [
     path('section/<int:pk>/update/',
          TA_Scheduler.views.UpdateSection.as_view(template_name='section/update_section.html'),
          name='section-update'),
+    path('section/<int:pk>/assign/', TA_Scheduler.views.AssignSection.as_view(), name='section-assign'),
     path('section/<int:pk>/view/', TA_Scheduler.views.ViewSection.as_view(template_name='section/view_section.html'),
          name='section-view'),
     path('section/<int:pk>/delete',

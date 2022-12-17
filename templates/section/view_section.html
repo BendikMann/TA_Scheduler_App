@@ -6,7 +6,8 @@
 <p><h1>{{object.course.name}}</h1> <br>
     {% url 'section-update' pk=object.id as section_update %}
     <a href='{{ section_update }}' class="btn btn-primary">Edit Section</a><br>
-
+    {% url 'section-assign' pk=object.id as section_assign %}
+    <a href='{{ section_assign }}' class="btn btn-primary">Assign User</a><br>
     <b>Assigned user: </b>
     {% if object.assigned_user is None %}
     No assigned user

@@ -157,9 +157,8 @@ class Course(models.Model):
                f"Sections: \n\n\n" \
                f"{*self.section_set.all(),}"
 
+
 class CourseAssignModelForm(ModelForm):
-
-
     class Meta:
         model = Course
         fields = ['term_type']
@@ -170,8 +169,8 @@ class CourseAssignModelForm(ModelForm):
 
 
 class CourseModelForm(ModelForm):
-    tas = forms.ModelMultipleChoiceField(queryset=User.objects.all())
-    instructors = forms.ModelMultipleChoiceField(queryset=User.objects.all())
+    tas = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)
+    instructors = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)
 
     class Meta:
         model = Course
@@ -183,9 +182,13 @@ class CourseModelForm(ModelForm):
         self.fields['tas'].queryset = User.objects.filter(groups__name__in=['TA'])
         self.fields['instructors'].queryset = User.objects.filter(groups__name__in=['Instructor'])
 
-        if  self.instance.id is not None:
-            self.fields['tas'].initial = [x.id for x in Course.objects.get(id=self.instance.id).assigned_people.filter(groups__name__in=['TA'])]
-            self.fields['instructors'].initial = [x.id for x in Course.objects.get(id=self.instance.id).assigned_people.filter(groups__name__in=['Instructor'])]
+        if self.instance.id is not None:
+            self.fields['tas'].initial = [x.id for x in Course.objects.get(id=self.instance.id).assigned_people.filter(
+                groups__name__in=['TA'])]
+            self.fields['instructors'].initial = [x.id for x in
+                                                  Course.objects.get(id=self.instance.id).assigned_people.filter(
+                                                      groups__name__in=['Instructor'])]
+
 
 class Section(models.Model):
     # A section MUST have a course assigned to it.
@@ -218,13 +221,27 @@ class Section(models.Model):
 class SectionModelForm(ModelForm):
     class Meta:
         model = Section
-        fields = ['assigned_user', 'class_id', 'section', 'type', 'meet_start', 'meet_end', 'meet_monday',
+        fields = ['class_id', 'section', 'type', 'meet_start', 'meet_end', 'meet_monday',
                   'meet_tuesday', 'meet_wednesday', 'meet_thursday', 'meet_friday']
 
-    def __init__(self, course, *args, **kwargs):
+
+class AssignSectionModelForm(ModelForm):
+    class Meta:
+        model = Section
+        fields = ['assigned_user']
+
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # filtering to show only Accounts which are a part of the associated course
-        self.fields['assigned_user'].queryset = User.objects.filter(course__id=course)
+
+        if self.instance.id is not None:
+            self.fields['assigned_user'].queryset = User.objects.filter(course=self.instance.course)
+
+            if self.instance.type == 'LEC':
+                self.fields['assigned_user'].queryset = self.fields['assigned_user'].queryset.filter(groups__name__in=['Instructor'])
+            else:
+                self.fields['assigned_user'].queryset = self.fields['assigned_user'].queryset.filter(groups__name__in=['TA'])
+
 
     def clean(self):
         cleaned_data = super().clean()
