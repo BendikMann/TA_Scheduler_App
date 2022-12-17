@@ -8,6 +8,11 @@
           color: wheat;
       }
 
+      .course-table-header{
+          background-color: #282a35;
+          color: white;
+      }
+
       .homepage-table{
           margin-bottom: 50px !important;
       }
@@ -75,4 +80,8 @@
       .account-view-container{
           background-color: #282a35;
           color: wheat;
+      }
+
+      .pt-50{
+          padding-top: 50px;
       }
