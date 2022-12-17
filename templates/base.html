@@ -26,7 +26,8 @@
         {% url 'account-view' user.id as account_view %}
         {% url 'logout' as logout_view %}
         {% url 'home-page' as home_page %}
-        <li><h3><img src="{% static 'favicon.ico' %}" alt="A wasp facing the right with a toothy grin." width="64" height="64">Schedular</h3></li>
+        <li class="ms-5 mt-1"><img class="float-start" src="{% static 'favicon.ico' %}" alt="A wasp facing the right with a toothy grin." width="45" height="45"></li>
+        <li><h3>Schedular</h3></li>
         <li><a href='{{ logout_view }}'>Logout</a></li>
         <li><a href='{{ account_view }}'>Account</a></li>
         {% if request.path != '/'%}

@@ -1,6 +1,6 @@
       .header{
           margin-bottom: 50px;
-          margin-top: 50px;
+          margin-top: 55px;
       }
 
       .homepage-table-header{
@@ -10,14 +10,6 @@
 
       .homepage-table{
           margin-bottom: 50px !important;
-      }
-
-      .container2 {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
       }
 
       .form{
@@ -62,7 +54,7 @@
           display: block;
           color: wheat;
 
-          padding: 14px 16px;
+          padding: 16px 16px;
           text-decoration: none;
           float: right;
       }
