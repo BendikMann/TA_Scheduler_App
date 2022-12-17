@@ -1,7 +1,8 @@
+from django.core import mail
 from django.core.exceptions import ObjectDoesNotExist
 from django.test import TestCase, Client
 from tests.Factories import *
-from TA_Scheduler.models import User
+from TA_Scheduler.models import User, Course
 from TA_Scheduler.user import make_admin, make_instructor, make_ta
 from phonenumber_field.modelfields import PhoneNumber
 
@@ -371,7 +372,8 @@ class TestUserCreation(TestCase):
     def test_create_user_not_logged_in(self):
         client = Client()
         create_account = client.get(f'/accounts/register', follow=True)
-        self.assertRedirects(create_account, '/accounts/login/')
+        self.assertRedirects(create_account, '/accounts/login/?next=%2Faccounts%2Fregister%2F', status_code=301,
+                             target_status_code=200)
 
 
 class TestAccountDeletion(TestCase):
@@ -402,7 +404,8 @@ class TestAccountDeletion(TestCase):
     def test_delete_account_not_logged_in(self):
         client = Client()
         resp = client.get(f'/account/{self.Admin.id}/delete', follow=True)
-        self.assertRedirects(resp, '/accounts/login/')
+        self.assertRedirects(resp, f'/accounts/login/?next=/account/{self.Admin.id}/delete/', status_code=301,
+                             target_status_code=200)
 
     def test_delete_account_not_admin(self):
         client = Client()
@@ -435,7 +438,8 @@ class TestEditAccountNoUser(TestCase):
     def test_edit_account_info_not_logged_in(self):
         client = Client()
         response = client.get(f'/accounts/{self.ArbitraryUser.id}/update/', follow=True)
-        self.assertRedirects(response, '/accounts/login/')
+        self.assertRedirects(response, f'/accounts/login/?next=/accounts/ {self.ArbitraryUser.id}/update/',
+                             status_code=301, target_status_code=200)
 
     def test_edit_account_info_user_doesnt_exist(self):
         client = Client()
@@ -570,3 +574,57 @@ class TestEditAccountAsTA(TestCase):
                                 'phone_number': '+12624242825'}, follow=True)
 
         self.assertEqual(response.status_code, 403, msg="User wasnt forbidden from changing another users info!")
+
+
+class TestNotify(TestCase):
+
+    def setUp(self):
+        self.Header = 'tester'
+        self.Body = 'biggest tester alive!'
+
+        self.Admin = UserFactory.create()
+        self.Admin.groups.clear()
+        make_admin(self.Admin)
+
+        self.Instructor = UserFactory.create()
+        self.Instructor.groups.clear()
+        make_instructor(self.Instructor)
+
+        self.TA = UserFactory.create()
+        self.TA.groups.clear()
+        make_ta(self.TA)
+
+        self.myCourse = Course.objects.create()
+        self.myCourse.assigned_people.add(self.TA, self.Instructor)
+
+    def test_notify_as_admin(self):
+        client = Client()
+        client.force_login(self.Admin)
+        response = client.post(f'/announcement/', {'header': self.Header, 'content': self.Body},
+                               follow=True)
+        self.assertEqual(len(mail.outbox), 1, msg='Outbox size wasnt 1!')
+        self.assertEqual(mail.outbox[0].subject, self.Header, msg='The subject of the email was wrong')
+        self.assertEqual(mail.outbox[0].body, self.Body, msg='The body of the email was wrong')
+        self.assertRedirects(response, f'/')
+
+    def test_notify_as_instructor(self):
+        client = Client()
+        client.force_login(self.Instructor)
+        response = client.post(f'/announcement/', {'header': self.Header, 'content': self.Body},
+                               follow=True)
+        self.assertEqual(len(mail.outbox), 1, msg='Outbox size wasnt 1!')
+        self.assertEqual(mail.outbox[0].subject, self.Header, msg='The subject of the email was wrong')
+        self.assertEqual(mail.outbox[0].body, self.Body, msg='The body of the email was wrong')
+        self.assertRedirects(response, f'/instructor')
+
+    def test_notify_as_ta(self):
+        client = Client()
+        client.force_login(self.TA)
+        response = client.get(f'/announcement/', follow=True)
+        self.assertEqual(response.status_code, 403,
+                         msg='TA wasnt met with a 403 status code when trying to access the announcements page!')
+
+    def test_notify_not_logged_in(self):
+        client = Client()
+        response = client.get(f'/announcement/', follow=True)
+        self.assertRedirects(response, f'/accounts/login/?next=/announcement/')
