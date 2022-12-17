@@ -25,11 +25,13 @@
         {% if user.id is not None %}
         {% url 'account-view' user.id as account_view %}
         {% url 'logout' as logout_view %}
+        {% url 'announcement' as announcement_view %}
         {% url 'home-page' as home_page %}
         <li><h3><img src="{% static 'favicon.ico' %}" alt="A wasp facing the right with a toothy grin." width="64" height="64">Schedular</h3></li>
         <li><a href='{{ logout_view }}'>Logout</a></li>
         <li><a href='{{ account_view }}'>Account</a></li>
-        {% if request.path != '/'%}
+        <li><a href='{{ announcement_view }}'>Send Announcement</a></li>
+        {% if request.path != '/home/instructor/' and request.path != '/home/admin/' and request.path != '/home/ta/'%}
             <li><a href='{{ home_page }}'>Home Page</a></li>
         {% endif %}
 
