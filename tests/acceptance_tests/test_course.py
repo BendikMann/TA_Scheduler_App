@@ -25,7 +25,8 @@ class TestCourseCreate(TestCase):
         client = Client()
         client.login(email='admin1@test.com', password='admin1')
 
-        response = client.post(f'/course/create/', {'term_type': 'spr', 'term_year': '2022', 'course_number': '123', 'subject': 'tester', 'name': 'test', 'description': 'test'}, follow=True)
+        response = client.post(f'/course/create/', {'assigned_people': self.Instructor.id, 'term_type': 'spr', 'term_year': '2022', 'course_number': '123', 'subject': 'tester', 'name': 'test', 'description': 'test'}, follow=True)
+
         course_id = response.context['course'].id
 
         self.assertRedirects(response, f'/course/{course_id}/view/')
@@ -43,6 +44,6 @@ class TestCourseCreate(TestCase):
 
         response = client.get(f'/course/create/', follow=True)
 
-        self.assertRedirects(response, f'/accounts/login/')
+        self.assertRedirects(response, f'/accounts/login/?next=/course/create/')
 
 
