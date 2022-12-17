@@ -4,8 +4,10 @@
 
 <html lang="en">
 <p><h1>{{object.course.name}}</h1> <br>
+{% if request.user|has_group:'Admin' %}
     {% url 'section-update' pk=object.id as section_update %}
     <a href='{{ section_update }}' class="btn btn-primary">Edit Section</a><br>
+{% endif %}
 
     <b>Assigned user: </b>
     {% if object.assigned_user is None %}
