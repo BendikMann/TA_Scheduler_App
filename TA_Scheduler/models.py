@@ -221,11 +221,11 @@ class SectionModelForm(ModelForm):
         section_type = cleaned_data.get("type")
 
         # checking the users group and preventing them from being assigned to sections they couldn't be a part of
-        if assigned_user and assigned_user.user.groups.filter(name="Instructor").exists() and section_type == "LAB":
+        if assigned_user and assigned_user.groups.filter(name="Instructor").exists() and section_type == "LAB":
             raise ValidationError("Instructors cannot be assigned to lab sections.")
-        if assigned_user and assigned_user.user.groups.filter(name="Instructor").exists() and section_type == "DIS":
+        if assigned_user and assigned_user.groups.filter(name="Instructor").exists() and section_type == "DIS":
             raise ValidationError("Instructors cannot be assigned to discussion sections.")
-        if assigned_user and assigned_user.user.groups.filter(name="TA").exists() and section_type == "LEC":
+        if assigned_user and assigned_user.groups.filter(name="TA").exists() and section_type == "LEC":
             raise ValidationError("TAs cannot be assigned to lecture sections.")
 
         return cleaned_data
