@@ -87,6 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=50)
     phone_number = PhoneNumberField(blank=True)
     address = models.OneToOneField(UsAddress, null=True, on_delete=models.CASCADE)
+    ta_skills = models.TextField(max_length=200, blank=True)
 
     is_staff = models.BooleanField(
         _("staff status"),
@@ -135,7 +136,7 @@ class UserModelForm(ModelForm):
 
 
 class Course(models.Model):
-    assigned_people = models.ManyToManyField(User)
+    assigned_people = models.ManyToManyField(User, through='CourseRestrictions')
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -176,13 +177,19 @@ class CourseModelForm(ModelForm):
         self.fields['assigned_people'].queryset = User.objects.filter(groups__name__in=['Instructor', 'TA'])
 
 
+class CourseRestrictions(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    max_sections = models.PositiveIntegerField(default=3)
+    current_sections = models.PositiveIntegerField(default=0)
+
+
 class Section(models.Model):
     # A section MUST have a course assigned to it.
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
 
     # A Section may have a user undefined for an arbitrary amount of time.
     assigned_user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
-
 
     class_id = models.CharField(max_length=6)
 
@@ -203,6 +210,7 @@ class Section(models.Model):
         return f" {self.class_id} {self.section} {self.type} " \
                f"{'' if self.assigned_user is None else self.assigned_user.first_name} " \
                f"{'' if self.assigned_user is None else self.assigned_user.last_name}\n"
+
 
 class SectionModelForm(ModelForm):
     class Meta:
