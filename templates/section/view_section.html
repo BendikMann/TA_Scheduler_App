@@ -2,11 +2,12 @@
 {% extends "base.html"%}
 {% block content %}
 
-<div class="container" style="margin-top: 100px;">
-    <div class="col-lg-8 d-flex flex-row mb-1">
-        <h3 class="me-4">{{object.course.subject}} {{object.course.course_number}}</h3>
-        <h3 class="ms-4">{{object.course.name}}</h3>
-    </div>
+<html lang="en">
+<p><h1>{{object.course.name}}</h1> <br>
+{% if request.user|has_group:'Admin' %}
+    {% url 'section-update' pk=object.id as section_update %}
+    <a href='{{ section_update }}' class="btn btn-primary">Edit Section</a><br>
+{% endif %}
 
     <div class="row col-lg-8 flex-wrap rounded p-3" style="background-color: #282a35; color: wheat">
         <div class="col-lg-12">

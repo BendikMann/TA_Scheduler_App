@@ -53,8 +53,11 @@
                 <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
             {% endif %}
 
-        </div>
-
+        {% for section in object.section_set.all %}
+            {% url 'section-view' pk=section.id as section_view %}
+            {{section.section}} {{section.type}} {{section.class_id}}
+            <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
+        {% endfor %}
     </div>
 
     <div class="row m-5">
@@ -84,6 +87,19 @@
                 <a href='{{ account_delete }}' class="btn m-auto btn-danger">Delete this Account</a>
             {% endif %}
         </div>
+    </div>
+</div>
+</div>
+{% else %}
+<div class="row m-5">
+    <div class="col">
+        <p>{{object.email|default:"No Email Set"}}</p>
+
+        {% for section in object.section_set.all %}
+        {% url 'section-view' pk=section.id as section_view %}
+        {{section.section}} {{section.type}} {{section.class_id}}
+        <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
+        {% endfor %}
     </div>
 </div>
 {% endif %}
