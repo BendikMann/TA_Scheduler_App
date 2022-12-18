@@ -154,10 +154,9 @@ class DeleteAccount(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class AddSkillsAccount(LoginRequiredMixin, UserPassesTestMixin, View):
     template_name = 'account/add_skills_account.html'
-    model = User
 
     def test_func(self):
-        return is_ta(self.request.user)  # and self.get_object() == self.request.user
+        return (is_ta(self.request.user) and self.kwargs['pk'] == self.request.user.id) or is_admin(self.request.user)
 
     def get(self, request, pk):
         user_model = User.objects.get(pk=pk)
