@@ -2,31 +2,98 @@
 {% extends "base.html"%}
 {% block content %}
 
-<html lang="en">
-<p><h1>{{course.name}}</h1> <br>
-    {% url 'course-update' pk=course.id as course_update %}
-    <a href='{{ course_update }}' class="btn btn-primary">Edit Course</a><br>
 
-    <b>Subject: </b> {{course.subject}} <br>
-    <b>Term: </b> {{course.term_type}}, {{course.term_year}}<br>
-    <b>Assigned people: </b>
+<div class="container" style="margin-top: 100px">
 
-    {% for person in course.assigned_people.all %}
-    <br> {{ person.first_name|default:'Unnamed Instructor' }}
-    {% endfor %} <br>
-    <b>Course Number: </b> {{object.course_number}} <br>
-    <b>Description: </b> {{object.description}} <br>
-    <b> Sections</b> <br>
+    <div class="row flex-wrap">
 
-    {% for section in object.section_set.all %}
-        {% url 'section-view' pk=section.id as section_view %}
-        {{section.section}} {{section.type}} {{section.class_id}} {{section.assigned_user}}  <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
-    {% endfor %}
+        <div class="col-lg-12 d-flex flex-row">
+            <h1 class="me-4">{{course.subject}} {{object.course_number}}</h1>
+            <h1 class="ms-4"><strong>{{course.name}}</strong></h1>
 
-    {% url 'section-create' pk=course.id as section_create %}
-    <a href='{{ section_create }}' class="btn btn-primary">Create Section</a><br> <br>
+            {% url 'course-update' pk=course.id as course_update %}
+            <a href='{{ course_update }}' class="btn btn-primary ms-4 me-4 mt-2" style="height: fit-content">Edit Course</a>
+            {% url 'course-delete' pk=object.id as course_delete %}
+            <a href='{{ course_delete }}' class="btn ms-4 mt-2 btn-danger" style="height: fit-content">Delete Course</a>
+        </div>
+        <div class="col-lg-6">
+            <p><strong>Term: </strong> {{course.term_type}} {{course.term_year}}</p>
+        </div>
+        <div class="col-lg-7 me-4 pt-4">
+            <h5 class="mb-2"><strong>Description:</strong></h5>
+            <p class="p-4 rounded" style="background-color: #282a35; color: wheat">{{object.description}} </p>
+        </div>
+        <div class="col-lg-4 ms-4 pt-4">
+            <h5 class=""><strong>Assigned people:</strong></h5>
+            <table class="table table-striped rounded">
+                <thead class="homepage-table-header">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                    <th scope="col">UserType</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for person in course.assigned_people.all %}
+                    <tr>
+                        <th scope="row">{{person.id}}</th>
+                        <td>{{ person.first_name|default:'Unnamed Instructor' }}</td>
+                        <td>{{ person.last_name|default:'Unnamed Instructor' }}</td>
+                        <td>
+                            {% if person|has_group:"Admin" %}
+                                 Admin
+                            {% endif %}
+                            {%if person|has_group:"Instructor" %}
+                                Instructor
+                            {% endif %}
+                            {% if person|has_group:"TA" %}
+                                TA
+                            {% endif %}
+                        </td>
+                    </tr>
 
-    {% url 'course-delete' pk=object.id as course_delete %}
-    <a href='{{ course_delete }}' class="btn btn-primary">Delete Course</a>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="col-lg-12 pt-50">
+            <div class="col-lg-12 d-flex flex-row">
+                <h5 class="mt-2"><strong>Sections:</strong></h5>
+                {% url 'section-create' pk=course.id as section_create %}
+                <a href='{{ section_create }}' class="ms-4 mb-2 btn btn-primary mt-1" style="height: fit-content">Create Section</a>
+            </div>
+
+            <table class="table table-striped rounded">
+                <thead class="homepage-table-header">
+                <tr>
+                    <th scope="col">Class ID</th>
+                    <th scope="col">Section</th>
+                    <th scope="col">Type</th>
+                    <th scope="col">Assigned User</th>
+                    <th scope="col">Start Time</th>
+                    <th scope="col">Section Detail</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                    {% for section in object.section_set.all %}
+                    <tr>
+                        <th scope="row">{{section.class_id}}</th>
+                        <td>{{section.section}}</td>
+                        <td>{{section.type}}</td>
+                        <td>{{section.assigned_user.first_name}} {{section.assigned_user.last_name}}</td>
+                        <td>{{section.meet_start}}</td>
+                        {% url 'section-view' pk=section.id as section_view %}
+                        <td><a href='{{section_view}}' class="btn btn-link">View Section</a></td>
+                    </tr>
+
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
 {% endblock %}
-</html>
