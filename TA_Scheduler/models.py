@@ -135,6 +135,12 @@ class UserModelForm(ModelForm):
         fields = ['first_name', 'last_name', 'email', 'phone_number']
 
 
+class TaSkillsForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['ta_skills']
+
+
 class Course(models.Model):
     assigned_people = models.ManyToManyField(User, through='CourseRestrictions')
 

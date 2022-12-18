@@ -1,3 +1,5 @@
+from abc import ABC
+
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from TA_Scheduler.user import make_admin, make_ta, make_instructor
 from django.core.exceptions import PermissionDenied
@@ -7,8 +9,8 @@ from django.views import View
 from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
 
 from TA_Scheduler.forms import NewUserCreationForm
-from TA_Scheduler.models import UsAddress, User, UserModelForm
-from TA_Scheduler.user import is_admin
+from TA_Scheduler.models import UsAddress, User, UserModelForm, TaSkillsForm
+from TA_Scheduler.user import is_admin, is_ta
 
 
 class CreateAddress(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -148,3 +150,33 @@ class DeleteAccount(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
     def get_success_url(self):
         return reverse_lazy('home-page')
+
+
+class AddSkillsAccount(LoginRequiredMixin, UserPassesTestMixin, View):
+    template_name = 'account/add_skills_account.html'
+    model = User
+
+    def test_func(self):
+        return is_ta(self.request.user)  # and self.get_object() == self.request.user
+
+    def get(self, request, pk):
+        user_model = User.objects.get(pk=pk)
+
+        user = TaSkillsForm(instance=user_model)
+
+        return render(request,
+                      self.template_name, {'skills_form': user})
+
+    def post(self, request, pk):
+        user_model = User.objects.get(pk=pk)
+
+        user = TaSkillsForm(request.POST, instance=user_model)
+
+        if user.is_valid():
+            # we have to process the forms now.
+            user.save()
+            # no m2m relationships should be effected here.
+            return redirect('account-view', pk=pk)
+        else:
+            return render(request,
+                          self.template_name, {'skills_form': user})
