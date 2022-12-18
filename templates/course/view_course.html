@@ -10,6 +10,8 @@
         <div class="col-lg-12 d-flex flex-row">
             <h1 class="me-4">{{course.subject}} {{object.course_number}}</h1>
             <h1 class="ms-4"><strong>{{course.name}}</strong></h1>
+
+            {% url 'course-update' pk=course.id as course_update %}
             <a href='{{ course_update }}' class="btn btn-primary ms-4 me-4 mt-2" style="height: fit-content">Edit Course</a>
             {% url 'course-delete' pk=object.id as course_delete %}
             <a href='{{ course_delete }}' class="btn ms-4 mt-2 btn-danger" style="height: fit-content">Delete Course</a>
@@ -70,7 +72,9 @@
                     <th scope="col">Section</th>
                     <th scope="col">Type</th>
                     <th scope="col">Assigned User</th>
+                    <th scope="col">Start Time</th>
                     <th scope="col">Section Detail</th>
+
                 </tr>
                 </thead>
                 <tbody>
@@ -80,6 +84,7 @@
                         <td>{{section.section}}</td>
                         <td>{{section.type}}</td>
                         <td>{{section.assigned_user.first_name}} {{section.assigned_user.last_name}}</td>
+                        <td>{{section.meet_start}}</td>
                         {% url 'section-view' pk=section.id as section_view %}
                         <td><a href='{{section_view}}' class="btn btn-link">View Section</a></td>
                     </tr>

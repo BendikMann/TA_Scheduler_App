@@ -2,24 +2,32 @@
 {% block content %}
 
 
-    <form class="form-border p-75 form" action="" method="post">
-        {% csrf_token %}
-        <h3 class="mb-4">Register Account</h3>
-        <table class="create-account-table">
-         {{ user_form.as_table }}
-         <tr>
-            <td><label for="group">Group:</label></td>
-            <td>
-                <select name="group" id="group">
-                    <option value="Admin">Admin</option>
-                    <option value="Instructor">Instructor</option>
-                    <option value="TA">TA</option>
-                </select>
-            </td>
-        </tr>
-        </table>
-        <input type="submit" value="Submit" class="btn btn-primary float-end"/>
-    </form>
+<div class="container" style="margin-top: 100px;">
+    <div class="row flex-wrap rounded col-lg-10 bg-color-txt-color p-5">
+        <div class="col-lg-12 d-flex flex-row mb-2">
+            <h3>Register Account</h3>
+        </div>
+        <div class="col-lg-12">
+            <form class="" action="" method="post">
+                {% csrf_token %}
+                <table class="create-account-table">
+                    {{ user_form.as_table }}
+                    <tr>
+                        <td><label for="group"><strong>Group:</strong></label></td>
+                        <td>
+                            <select name="group" id="group">
+                                <option value="Admin">Admin</option>
+                                <option value="Instructor">Instructor</option>
+                                <option value="TA">TA</option>
+                            </select>
+                        </td>
+                    </tr>
+                </table>
+                <input class="btn btn-primary float-end" type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+</div>
 
 
 {% endblock %}
