@@ -181,7 +181,6 @@ class CourseRestrictions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     max_sections = models.PositiveIntegerField(default=3)
-    current_sections = models.PositiveIntegerField(default=0)
 
 
 class Section(models.Model):
