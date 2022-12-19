@@ -3,9 +3,9 @@
 
 <div class="header">
     {% if request.user == object %}
-    <h1>Hiya {{object.first_name|default:"pal"}}</h1>
+    <h1>Hiya {{object.first_name|default:"pal"}} ({{object.groups.first}})</h1>
     {%else%}
-    <h1> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}}</h1>
+    <h1> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}} ({{object.groups.first}})</h1>
     {% endif%}
 </div>
 
@@ -53,12 +53,7 @@
             {% else %}
                 <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
             {% endif %}
-
-        {% for section in object.section_set.all %}
-            {% url 'section-view' pk=section.id as section_view %}
-            {{section.section}} {{section.type}} {{section.class_id}}
-            <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
-        {% endfor %}
+        </div>
     </div>
 
     <div class="row m-5">
@@ -86,7 +81,6 @@
             <div class="col">
                 {%if object.ta_skills%}
                     <p>{{object.ta_skills}}</p>
-
                 {% else %}
                     <p>User hasn't added skills</p>
                 {% endif %}
@@ -104,6 +98,14 @@
     {% endif %}
 
     <div class="row m-5">
+        {% for section in object.section_set.all %}
+        {% url 'section-view' pk=section.id as section_view %}
+        {{section.section}} {{section.type}} {{section.class_id}}
+        <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
+        {% endfor %}
+    </div>
+
+    <div class="row m-5">
         <div class="col">
             {% if request.user|has_group:'Admin' %}
                 {% url 'account-delete' pk=object.id as account_delete %}
@@ -112,18 +114,11 @@
         </div>
     </div>
 </div>
-</div>
 {% else %}
 <div class="container account-view-container form-border w-50">
     <div class="row m-5">
         <div class="col">
             <p>{{object.email|default:"No Email Set"}}</p>
-
-            {% for section in object.section_set.all %}
-            {% url 'section-view' pk=section.id as section_view %}
-            {{section.section}} {{section.type}} {{section.class_id}}
-            <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
-            {% endfor %}
         </div>
     </div>
     {%if object|has_group:'TA' %}
@@ -137,6 +132,13 @@
             </div>
         </div>
     {% endif %}
+    <div class="row m-5">
+        {% for section in object.section_set.all %}
+        {% url 'section-view' pk=section.id as section_view %}
+        {{section.section}} {{section.type}} {{section.class_id}}
+        <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
+        {% endfor %}
+    </div>
 </div>
 {% endif %}
 {% endblock %}
