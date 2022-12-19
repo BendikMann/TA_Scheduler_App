@@ -7,19 +7,16 @@
 
 <h1 class="header">Home Page</h1>
 <div class="d-flex flex-row mt-4 mb-3">
-    <h3 class="me-3">Users:</h3>
-    <a href="/accounts/register/" class="card-link btn-primary btn">Add a User</a>
+    <h3 class="me-3">TAs:</h3>
 </div>
 
 <table class="table table-striped homepage-table">
     <thead class="homepage-table-header">
     <tr>
-        <th scope="col">#</th>
-        <th scope="col">Email</th>
+        <th scope="row">#</th>
         <th scope="col">First</th>
         <th scope="col">Last</th>
-        <th scope="col">Phone Number</th>
-        <th scope="col">User Type</th>
+        <th scope="col">Skills</th>
         <th scope="col">Detail</th>
     </tr>
     </thead>
@@ -27,22 +24,9 @@
     {% for user in users %}
     <tr>
         <th scope="row">{{user.id}}</th>
-
-        <td>{{user.email}}</td>
         <td>{{user.first_name}}</td>
         <td>{{user.last_name}}</td>
-        <td>{{user.phone_number}}</td>
-        <td>
-           {% if user|has_group:"Admin" %}
-                Admin
-            {% endif %}
-            {%if user|has_group:"Instructor" %}
-                Instructor
-            {% endif %}
-            {% if user|has_group:"TA" %}
-                TA
-            {% endif %}
-        </td>
+        <td>{{user.last_name}}</td>
 
         {% url 'account-view' pk=user.id as account_view %}
         <td><a href="{{ account_view }}" class="card-link"> User Detail</a></td>
@@ -54,8 +38,6 @@
 
 <div class="d-flex flex-row mt-4 mb-3">
     <h3 class="me-3">Courses:</h3>
-    {% url 'course-create' as course_create %}
-    <a href="{{ course_create }}" class="card-link btn-primary btn"> Add a Course</a>
 </div>
 
 
@@ -100,6 +82,58 @@
     </tbody>
 </table>
 
+<div class="d-flex flex-row mt-4 mb-3">
+    <h3 class="me-3">Sections:</h3>
+</div>
+
+<table class="table mb-4 table-striped homepage-table">
+    <thead class="homepage-table-header">
+    <tr>
+        <th scope="col">Class</th>
+        <th scope="col">Course</th>
+        <th scope="col">Type</th>
+        <th scope="col">Section Number</th>
+        <th scope="col">Assigned Users</th>
+        <th scope="col">Meeting Days</th>
+        <th scope="col">Detail</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for section in sections %}
+    <tr>
+        <th scope="row">{{section.class_id}}</th>
+        <td>{{section.course.subject}} {{section.course.course_number}}</td>
+        <td>{{section.type}}</td>
+        <td>{{section.section}}</td>
+        <td>{{section.assigned_user.first_name}} {{section.assigned_user.last_name}}</td>
+        <td>
+        {% if section.meet_monday or section.meet_tuesday or section.meet_wednesday or section.meet_thursday or section.meet_friday %}
+            {% if section.meet_monday %}
+            Monday,
+            {% endif %}
+            {% if section.meet_tuesday %}
+            Tuesday,
+            {% endif %}
+            {% if section.meet_wednesday %}
+            Wednesday,
+            {% endif %}
+            {% if section.meet_thursday %}
+            Thursday,
+            {% endif %}
+            {% if section.meet_friday %}
+            Friday,
+            {% endif %}
+        {% else %}
+        None</td>
+        {% endif %}
+        {% url 'section-view' pk=section.id as section_view %}
+        <td><a href="{{ section_view }}" class="card-link"> Section Detail</a></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+
 
 {% else %}
 <p> nope</p>
@@ -109,4 +143,3 @@
 
 
 {% endblock %}
-
