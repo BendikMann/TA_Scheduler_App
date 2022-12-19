@@ -3,7 +3,7 @@ from django.core.mail import send_mail
 from typing import Union
 
 from django.contrib.auth.models import Group
-from TA_Scheduler.models import User
+from TA_Scheduler.models import User, Course
 from django.core.mail import send_mail
 
 class Admin:
@@ -63,9 +63,27 @@ class Instructor:
         emails = []
         # Gets a list of all the emails of the TA's that are assigned to a specific instructor
         for ta in tas:
-            emails.append(ta.account.user.email)
+            emails.append(ta.email)
         send_mail(subject=header, message=content, from_email='NYStingers@ta-scheduler.rocks', recipient_list=emails)
         return True
+
+    def get_assigned_tas(self):
+        # Courses that our instructor is in
+        course_list = list(Course.objects.filter(assigned_people__id=self.account.id))
+        # a list that will contain all the users that share a course with the instructor including the instructor
+        all_users_in_courses = []
+        # the final list that will contain the TA's that share a course with the instructor
+        ta_list = []
+        for course in course_list:
+            # each course get all users and add them to a list
+            all_users_in_courses.append(list(course.assigned_people.all()))
+        for users in all_users_in_courses:
+            for user in users:
+                # check if a user is not a ta or is already in the new list
+                if is_ta(user) and user not in ta_list:
+                    ta_list.append(user)
+        return ta_list
+
 
 
 def get_all_instructors() -> list[Instructor]:

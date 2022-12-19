@@ -47,11 +47,12 @@ urlpatterns = [
          name='address-view'),
 
     # homepage
-    path('accounts/profile/', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
-         name='home-page'),
-
-    path('', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
-         name='home-page'),
+    path('home/admin/', TA_Scheduler.views.HomeView.as_view(template_name='adminHomepage.html'),
+         name='admin-home-page'),
+    path('home/instructor/', TA_Scheduler.views.InstructorHomeView.as_view(template_name='instructorHomepage.html'),
+         name='instructor-home-page'),
+    path('home/ta/', TA_Scheduler.views.TAHomeView.as_view(template_name='taHomepage.html'),
+         name='ta-home-page'),
 
     # course
     path('course/create/', TA_Scheduler.views.CreateCourse.as_view(template_name='course/create_course.html'),
@@ -75,5 +76,9 @@ urlpatterns = [
     path('section/<int:pk>/delete',
          TA_Scheduler.views.DeleteSection.as_view(template_name='section/delete_section.html'),
          name='section-delete'),
+
+    path('announcement/', TA_Scheduler.views.Announcement.as_view(template_name='announcement.html'), name='announcement'),
+    path('enter/', TA_Scheduler.views.EnterView.as_view(), name='home-page'),
+    path('', TA_Scheduler.views.EnterView.as_view(), name='home-page')
 
 ]

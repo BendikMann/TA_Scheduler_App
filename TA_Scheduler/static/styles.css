@@ -1,6 +1,6 @@
       .header{
           margin-bottom: 50px;
-          margin-top: 50px;
+          margin-top: 55px;
       }
 
       .homepage-table-header{
@@ -8,16 +8,13 @@
           color: wheat;
       }
 
-      .homepage-table{
-          margin-bottom: 50px !important;
+      .course-table-header{
+          background-color: #282a35;
+          color: white;
       }
 
-      .container2 {
-          display: flex;
-          flex-direction: column;
-          justify-content: center;
-          align-items: center;
-          min-height: 100vh;
+      .homepage-table{
+          margin-bottom: 50px !important;
       }
 
       .form{
@@ -31,9 +28,11 @@
           padding: 75px;
       }
 
-      th{
+      .create-account-table th{
             vertical-align: top;
+            width:250px;
       }
+
 
       .form-border{
               border: 1px solid #282a35!important;
@@ -62,7 +61,7 @@
           display: block;
           color: wheat;
 
-          padding: 14px 16px;
+          padding: 16px 16px;
           text-decoration: none;
           float: right;
       }
@@ -83,4 +82,42 @@
       .account-view-container{
           background-color: #282a35;
           color: wheat;
+      }
+      .bg-color-txt-color{
+          background-color: #282a35;
+          color: wheat;
+      }
+
+      .pt-50{
+          padding-top: 50px;
+      }
+
+      /*--------------------------------------------*/
+      table.create-section-table th{
+          width:300px;
+      }
+      table.create-section-table tr{
+          margin-top: 5px;
+          margin-bottom: 5px;
+      }
+      #id_class_id, #id_assigned_user, #id_meet_end, #id_meet_start, #id_section, #id_type{
+          width: 500px;
+          margin-bottom: 5px;
+          margin-top: 5px;
+      }
+
+      /*-------------------------------------------------*/
+
+      table.create-course-table th{
+          width:150px;
+      }
+
+      table.create-course-table th{
+            vertical-align: top;
+      }
+
+      #id_assigned_people, #id_term_type, #id_term_year, #id_subject, #id_description, #id_course_number, #id_name{
+          width: 800px;
+          margin-bottom: 5px;
+          margin-top: 5px;
       }

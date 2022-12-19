@@ -605,7 +605,7 @@ class TestNotify(TestCase):
         self.assertEqual(len(mail.outbox), 1, msg='Outbox size wasnt 1!')
         self.assertEqual(mail.outbox[0].subject, self.Header, msg='The subject of the email was wrong')
         self.assertEqual(mail.outbox[0].body, self.Body, msg='The body of the email was wrong')
-        self.assertRedirects(response, f'/')
+        self.assertRedirects(response, f'/home/admin/')
 
     def test_notify_as_instructor(self):
         client = Client()
@@ -615,7 +615,7 @@ class TestNotify(TestCase):
         self.assertEqual(len(mail.outbox), 1, msg='Outbox size wasnt 1!')
         self.assertEqual(mail.outbox[0].subject, self.Header, msg='The subject of the email was wrong')
         self.assertEqual(mail.outbox[0].body, self.Body, msg='The body of the email was wrong')
-        self.assertRedirects(response, f'/instructor')
+        self.assertRedirects(response, f'/home/instructor/')
 
     def test_notify_as_ta(self):
         client = Client()

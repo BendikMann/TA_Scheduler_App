@@ -25,3 +25,6 @@ class NewUserCreationForm(UserCreationForm):
         self.fields['password2'].widget.attrs['class'] = 'form-control'
 
 
+class EmailForm(forms.Form):
+    header = forms.CharField(label='header')
+    content = forms.CharField(label='content')
