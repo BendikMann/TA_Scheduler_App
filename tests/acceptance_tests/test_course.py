@@ -31,8 +31,6 @@ class TestCourseCreate(TestCase):
                                {'assigned_people': self.Instructor.id, 'term_type': 'spr', 'term_year': '2022',
                                 'course_number': '123', 'subject': 'tester',
                                 'name': 'test', 'description': 'test'}, follow=True)
-        for x in response.context:
-            print(x)
         course_id = response.context['course'].id
 
         self.assertRedirects(response, f'/course/{course_id}/view/')
