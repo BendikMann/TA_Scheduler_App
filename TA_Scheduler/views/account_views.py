@@ -128,10 +128,6 @@ class ViewAccount(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 class DeleteAccount(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = User
 
-    def form_valid(self, form):
-        self.get_object().user.delete()
-        return super().form_valid(form)
-
     def test_func(self):
         return is_admin(self.request.user)
 
