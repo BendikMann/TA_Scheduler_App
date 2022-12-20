@@ -47,11 +47,12 @@
         <div class="col-lg-12 d-flex flex-row">
             <h1 class="me-4">{{course.subject}} {{object.course_number}}</h1>
             <h1 class="ms-4"><strong>{{course.name}}</strong></h1>
-
-            {% url 'course-update' pk=course.id as course_update %}
-            <a href='{{ course_update }}' class="btn btn-primary ms-4 me-4 mt-2" style="height: fit-content">Edit Course</a>
-            {% url 'course-delete' pk=object.id as course_delete %}
-            <a href='{{ course_delete }}' class="btn ms-4 mt-2 btn-danger" style="height: fit-content">Delete Course</a>
+            {% if request.user|has_group:'Admin' %}
+                {% url 'course-update' pk=course.id as course_update %}
+                <a href='{{ course_update }}' class="btn btn-primary ms-4 me-4 mt-2" style="height: fit-content">Edit Course</a>
+                {% url 'course-delete' pk=object.id as course_delete %}
+                <a href='{{ course_delete }}' class="btn ms-4 mt-2 btn-danger" style="height: fit-content">Delete Course</a>
+            {% endif %}
         </div>
         <div class="col-lg-6">
             <p><strong>Term: </strong> {{course.term_type}} {{course.term_year}}</p>
@@ -98,8 +99,10 @@
         <div class="col-lg-12 pt-50">
             <div class="col-lg-12 d-flex flex-row">
                 <h5 class="mt-2"><strong>Sections:</strong></h5>
-                {% url 'section-create' pk=course.id as section_create %}
-                <a href='{{ section_create }}' class="ms-4 mb-2 btn btn-primary mt-1" style="height: fit-content">Create Section</a>
+                {% if request.user|has_group:'Admin' or request.user|has_group:'Instructor' %}
+                    {% url 'section-create' pk=course.id as section_create %}
+                    <a href='{{ section_create }}' class="ms-4 mb-2 btn btn-primary mt-1" style="height: fit-content">Create Section</a>
+                {% endif %}
             </div>
 
             <table class="table table-striped rounded">
