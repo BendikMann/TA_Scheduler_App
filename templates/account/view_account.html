@@ -3,9 +3,9 @@
 
 <div class="header">
     {% if request.user == object %}
-    <h1>Hiya {{object.first_name|default:"pal"}}</h1>
+    <h1>Hiya {{object.first_name|default:"pal"}} ({{object.groups.first}})</h1>
     {%else%}
-    <h1> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}}</h1>
+    <h1> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}} ({{object.groups.first}})</h1>
     {% endif%}
 </div>
 
@@ -14,6 +14,7 @@
 <!-- if user is in admin group or this is their account -->
 {% if request.user|has_group:"Admin" or request.user == object %}
 {% url 'account-update' object.id as account_update %}
+{% url 'account-skills' object.id as skills_update %}
 
 <div class="container account-view-container form-border w-50">
     <div class="row m-5">
@@ -52,12 +53,7 @@
             {% else %}
                 <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
             {% endif %}
-
-        {% for section in object.section_set.all %}
-            {% url 'section-view' pk=section.id as section_view %}
-            {{section.section}} {{section.type}} {{section.class_id}}
-            <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
-        {% endfor %}
+        </div>
     </div>
 
     <div class="row m-5">
@@ -80,6 +76,35 @@
         </div>
     </div>
 
+    {%if object|has_group:'TA' %}
+        <div class="row m-5">
+            <div class="col">
+                {%if object.ta_skills%}
+                    <p>{{object.ta_skills}}</p>
+                {% else %}
+                    <p>User hasn't added skills</p>
+                {% endif %}
+            </div>
+            <div class="col">
+                {%if request.user == object or request.user|has_group:'Admin' %}
+                    {%if object.ta_skills%}
+                        <a href='{{ skills_update }}' class="btn btn-primary">Edit Skills</a>
+                    {% else %}
+                        <a href='{{ skills_update }}' class="btn btn-primary">Add Skills</a>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+
+    <div class="row m-5">
+        {% for section in object.section_set.all %}
+        {% url 'section-view' pk=section.id as section_view %}
+        {{section.section}} {{section.type}} {{section.class_id}}
+        <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
+        {% endfor %}
+    </div>
+
     <div class="row m-5">
         <div class="col">
             {% if request.user|has_group:'Admin' %}
@@ -89,12 +114,25 @@
         </div>
     </div>
 </div>
-</div>
 {% else %}
-<div class="row m-5">
-    <div class="col">
-        <p>{{object.email|default:"No Email Set"}}</p>
-
+<div class="container account-view-container form-border w-50">
+    <div class="row m-5">
+        <div class="col">
+            <p>{{object.email|default:"No Email Set"}}</p>
+        </div>
+    </div>
+    {%if object|has_group:'TA' %}
+        <div class="row m-5">
+            <div class="col">
+                {%if object.ta_skills%}
+                    <p>{{object.ta_skills}}</p>
+                {% else %}
+                    <p>User hasn't added skills</p>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
+    <div class="row m-5">
         {% for section in object.section_set.all %}
         {% url 'section-view' pk=section.id as section_view %}
         {{section.section}} {{section.type}} {{section.class_id}}

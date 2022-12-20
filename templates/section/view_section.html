@@ -4,10 +4,6 @@
 
 <html lang="en">
 <p><h1>{{object.course.name}}</h1> <br>
-{% if request.user|has_group:'Admin' %}
-    {% url 'section-update' pk=object.id as section_update %}
-    <a href='{{ section_update }}' class="btn btn-primary">Edit Section</a><br>
-{% endif %}
 
     <div class="row col-lg-8 flex-wrap rounded p-3" style="background-color: #282a35; color: wheat">
         <div class="col-lg-12">
@@ -39,10 +35,12 @@
             </p>
             <p><strong>Time: </strong>{{object.meet_start}} - {{object.meet_end}}</p>
             <div class="col-lg-8 d-flex flex-row mb-1">
-                {% url 'section-update' pk=object.id as section_update %}
-                <a href='{{ section_update }}' class="btn btn-primary me-4" style="height: fit-content">Edit Section</a>
+                {% if request.user|has_group:'Admin' or request.user|has_group:'Instructor' %}
+                    {% url 'section-update' pk=object.id as section_update %}
+                    <a href='{{ section_update }}' class="btn btn-primary me-4" style="height: fit-content">Edit Section</a>
+                {% endif %}
                 {% if request.user|has_group:'Admin' %}
-                {% url 'section-delete' pk=object.id as section_delete %}
+                    {% url 'section-delete' pk=object.id as section_delete %}
                     <a href='{{ section_delete }}' class="btn btn-danger" style="height: fit-content">Delete this Section</a>
                 {% endif %}
 
@@ -50,7 +48,7 @@
             </div>
         </div>
     </div>
-</div>
+</html>
 
 
 {% endblock %}
