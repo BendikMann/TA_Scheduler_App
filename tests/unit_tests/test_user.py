@@ -1,3 +1,4 @@
+from django.core import mail
 from django.test import TestCase
 from tests.Factories import *
 from TA_Scheduler import user
@@ -5,7 +6,7 @@ import random
 from faker import Faker
 from TA_Scheduler.models import User
 from django.contrib.auth.models import Group
-from TA_Scheduler.user import Admin, Instructor, Ta
+from TA_Scheduler.user import Admin, Instructor, Ta, is_ta
 
 
 def init_dummy_database():
@@ -18,8 +19,6 @@ def init_dummy_database():
 
     for i in range(0, 10):
         CourseFactory()
-
-
 
 
 class UserInitTests(TestCase):
@@ -67,7 +66,6 @@ class UserInitTests(TestCase):
             self.fail("Admin __init__ raised TypeError when Admin Account was passed")
         except ValueError:
             self.fail("Admin __init__ raised ValueError when Admin Account was passed")
-
 
     def test_admin_init_wrong_type(self):
         with self.assertRaises(TypeError, msg="TypeError not raised when passing Admin __init__ a string"):
@@ -232,6 +230,7 @@ class Test_Get_All_Tas(TestCase):
 
     pass
 
+
 class Test_Get_All_Instructors(TestCase):
     @classmethod
     def setUpTestData(cls):
@@ -244,7 +243,6 @@ class Test_Get_All_Instructors(TestCase):
 
         for i in range(0, 10):
             CourseFactory()
-
 
     def test_actually_returns_valid(self):
         self.assertIsInstance(user.get_all_instructors(), list,
@@ -303,3 +301,71 @@ class Test_Get_All_Admins(TestCase):
 
         for i in range(0, min(len(tas), len(list_tas))):
             self.assertEqual(tas[i], list_tas[i], msg="All elements in the list should be the same as the db.")
+
+
+class Test_Get_Assigned_Tas(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        """
+            Creates a db with 50 users, 10 courses and 20 labs.
+            All randomly linked in legal (and logical) ways.
+            """
+        for i in range(0, 50):
+            UserFactory(password="sdfshsd")
+
+        for i in range(0, 10):
+            CourseFactory()
+
+    def setUp(self):
+        self.InstructorList = user.get_all_instructors()
+
+    def test_actually_returns_valid(self):
+        for instructor in self.InstructorList:
+            self.assertIsInstance(Instructor(instructor).get_assigned_tas(), list,
+                                  msg=f"Get all should return list, returned {type(Instructor(instructor).get_assigned_tas())}")
+
+    def test_only_tas(self):
+        for instructor in self.InstructorList:
+            for ta in Instructor(instructor).get_assigned_tas():
+                self.assertTrue(is_ta(ta),
+                                msg='get_assigned_tas returned a list that included a user who was not a ta!')
+
+
+class Test_Send_Email(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        """
+            Creates a db with 50 users, 10 courses and 20 labs.
+            All randomly linked in legal (and logical) ways.
+            """
+        for i in range(0, 50):
+            UserFactory(password="sdfshsd")
+
+        for i in range(0, 10):
+            CourseFactory()
+
+    def setUp(self):
+        self.InstructorList = user.get_all_instructors()
+        self.AdminList = user.get_all_admins()
+        self.Header = 'Header'
+        self.Body = 'Body'
+
+    def test_actually_returns_valid(self):
+        for instructor in self.InstructorList:
+            self.assertIsInstance(Instructor(instructor).send_email(self.Header, self.Body), list, msg=f'send_email failed to return a list, returned {type(Instructor(instructor).send_email(self.Header, self.Body))}')
+        for admin in self.AdminList:
+            self.assertTrue(Admin(admin).send_email(self.Header, self.Body), msg=f'send_email failed to return a list, returned {type(Instructor(instructor).send_email(self.Header, self.Body))}')
+
+    def test_correct_recipients(self):
+        for instructor in self.InstructorList:
+            recipients = Instructor(instructor).send_email(self.Header, self.Body)
+            self.assertEqual(len(Instructor(instructor).get_assigned_tas()), len(recipients), msg='The number of tas an instructor has and the amount that recieved an email did not match')
+            for ta in Instructor(instructor).get_assigned_tas():
+                self.assertIn(ta.email, recipients, msg='Not all of the correct ta emails were included in the recipients')
+        for admin in self.AdminList:
+            recipients = Admin(admin).send_email(self.Header, self.Body)
+            self.assertEqual(len(user.get_all_users()), len(recipients), msg='The number of users and the amount that recieved an email did not match')
+            for single_user in user.get_all_users():
+                self.assertIn(single_user.email, recipients, msg='Not all of the correct emails were included in the recipients')

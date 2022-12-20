@@ -101,8 +101,13 @@ class CreateAccount(UserPassesTestMixin, View):
         return self.request.user.is_anonymous or is_admin(self.request.user)
 
 
-class UpdateAccount(View):
+class UpdateAccount(UserPassesTestMixin, View):
     template_name = 'account/update_account.html'
+
+    def test_func(self):
+        if self.request.user.is_anonymous:
+            return False
+        return is_admin(self.request.user) or (self.request.user.id == self.kwargs['pk'])
 
     def get(self, request, pk):
         user_model = User.objects.get(pk=pk)
