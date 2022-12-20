@@ -1,0 +1,116 @@
+{% extends "base.html"%}
+
+
+{% block content %}
+
+{% if user.is_authenticated %}
+
+<h1 class="header">Home Page</h1>
+
+<div class="d-flex flex-row mt-4 mb-3">
+    <h3 class="me-3">Courses:</h3>
+</div>
+
+
+<table class="table mb-4 table-striped homepage-table">
+    <thead class="homepage-table-header">
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Name</th>
+        <th scope="col">Course Number</th>
+        <th scope="col">Subject</th>
+        <th scope="col">Term Type</th>
+        <th scope="col">Term Year</th>
+        <th scope="col">Detail</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for course in courses %}
+    <tr>
+        <th scope="row">{{course.id}}</th>
+        <td>{{course.name}}</td>
+        <td>{{course.course_number}}</td>
+        <td>{{course.subject}}</td>
+        <td>
+            {% if course.term_type == 'spr' %}
+                Spring
+            {% elif course.term_type == 'fal' %}
+                Fall
+            {% elif course.term_type == 'win' %}
+                Winterim
+            {% elif course.term_type == 'sum' %}
+                Summer
+            {% else %}
+                None {{course.term_type}}
+            {% endif %}
+        </td>
+        <td>{{course.term_year}}</td>
+        {% url 'course-view' pk=course.id as course_view %}
+        <td><a href="{{ course_view }}" class="card-link"> Course Detail</a></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+
+<div class="d-flex flex-row mt-4 mb-3">
+    <h3 class="me-3">Sections:</h3>
+</div>
+
+<table class="table mb-4 table-striped homepage-table">
+    <thead class="homepage-table-header">
+    <tr>
+        <th scope="col">Class</th>
+        <th scope="col">Course</th>
+        <th scope="col">Type</th>
+        <th scope="col">Section Number</th>
+        <th scope="col">Assigned Users</th>
+        <th scope="col">Meeting Days</th>
+        <th scope="col">Detail</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for section in sections %}
+    <tr>
+        <th scope="row">{{section.class_id}}</th>
+        <td>{{section.course.subject}} {{section.course.course_number}}</td>
+        <td>{{section.type}}</td>
+        <td>{{section.section}}</td>
+        <td>{{section.assigned_user.first_name}} {{section.assigned_user.last_name}}</td>
+        <td>
+        {% if section.meet_monday or section.meet_tuesday or section.meet_wednesday or section.meet_thursday or section.meet_friday %}
+            {% if section.meet_monday %}
+            Monday,
+            {% endif %}
+            {% if section.meet_tuesday %}
+            Tuesday,
+            {% endif %}
+            {% if section.meet_wednesday %}
+            Wednesday,
+            {% endif %}
+            {% if section.meet_thursday %}
+            Thursday,
+            {% endif %}
+            {% if section.meet_friday %}
+            Friday,
+            {% endif %}
+        {% else %}
+        None</td>
+        {% endif %}
+        {% url 'section-view' pk=section.id as section_view %}
+        <td><a href="{{ section_view }}" class="card-link"> Section Detail</a></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+
+
+{% else %}
+<p> nope</p>
+
+
+{% endif %}
+
+
+{% endblock %}

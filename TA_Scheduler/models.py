@@ -189,7 +189,6 @@ class CourseModelForm(ModelForm):
                                                   Course.objects.get(id=self.instance.id).assigned_people.filter(
                                                       groups__name__in=['Instructor'])]
 
-
 class Section(models.Model):
     # A section MUST have a course assigned to it.
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
