@@ -35,7 +35,7 @@
             </p>
             <p><strong>Time: </strong>{{object.meet_start}} - {{object.meet_end}}</p>
             <div class="col-lg-8 d-flex flex-row mb-1">
-                {% if request.user|has_group:'Admin' or request.user|has_group:'Instructor' %}
+                {% if request.user|has_group:'Admin' %}
                     {% url 'section-update' pk=object.id as section_update %}
                     <a href='{{ section_update }}' class="btn btn-primary me-4" style="height: fit-content">Edit Section</a>
                 {% endif %}

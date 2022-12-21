@@ -62,7 +62,7 @@
         <div class="col-lg-12 pt-50">
             <div class="col-lg-12 d-flex flex-row">
                 <h5 class="mt-2"><strong>Sections:</strong></h5>
-                {% if request.user|has_group:'Admin' or request.user|has_group:'Instructor' %}
+                {% if request.user|has_group:'Admin' %}
                     {% url 'section-create' pk=course.id as section_create %}
                     <a href='{{ section_create }}' class="ms-4 mb-2 btn btn-primary mt-1" style="height: fit-content">Create Section</a>
                 {% endif %}

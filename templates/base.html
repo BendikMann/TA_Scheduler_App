@@ -31,7 +31,9 @@
         <li><h3>Schedular</h3></li>
         <li><a href='{{ logout_view }}'>Logout</a></li>
         <li><a href='{{ account_view }}'>Account</a></li>
+        {% if request.user|has_group:'Admin' or request.user|has_group:'Instructor' %}
         <li><a href='{{ announcement_view }}'>Send Announcement</a></li>
+        {% endif %}
         {% if request.path != '/home/instructor/' and request.path != '/home/admin/' and request.path != '/home/ta/'%}
             <li><a href='{{ home_page }}'>Home Page</a></li>
         {% endif %}
