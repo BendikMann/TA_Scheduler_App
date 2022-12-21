@@ -1,45 +1,7 @@
 <!DOCTYPE html>
 {% extends "base.html"%}
 {% block content %}
-
 <html lang="en">
-<p>
-<h1>{{course.name}}</h1> <br>
-
-{% if request.user|has_group:"Admin"%}
-{% url 'course-update' pk=course.id as course_update %}
-<a href='{{ course_update }}' class="btn btn-primary">Edit Course</a>
-<br/>
-{% endif %}
-
-<b>Subject: </b> {{course.subject}} <br>
-<b>Term: </b> {{course.term_type}}, {{course.term_year}}<br>
-
-<b>Instructors: </b>
-{% for person in object.assigned_people.all %}
-{% if person|has_group:"Instructor" %}
-<br> {{ person.first_name|default:"Unnamed Instructor" }}
-{% endif %}
-{% endfor %}
-<br>
-<b>TAs: </b>
-{% for person in object.assigned_people.all %}
-{% if person|has_group:"TA" %}
-<br> {{ person.first_name|default:'Unnamed TA' }}
-{% endif%}
-{% endfor %} <br>
-
-<b>Course Number: </b> {{object.course_number}} <br>
-<b>Description: </b> {{object.description}} <br>
-<b> Sections</b> <br>
-{% for section in object.section_set.all %}
-{% url 'section-view' pk=section.id as section_view %}
-{{section.section}} {{section.type}} {{section.class_id}} {{section.assigned_user}}
-<a href='{{section_view}}' class="btn btn-primary">Edit Section</a> <br/>
-{% endfor %}
-{% url 'course-update' pk=object.id as course_update %}
-=======
-
 <div class="container" style="margin-top: 100px">
 
     <div class="row flex-wrap">
@@ -49,7 +11,8 @@
             <h1 class="ms-4"><strong>{{course.name}}</strong></h1>
 
             {% url 'course-update' pk=course.id as course_update %}
-            <a href='{{ course_update }}' class="btn btn-primary ms-4 me-4 mt-2" style="height: fit-content">Edit Course</a>
+            <a href='{{ course_update }}' class="btn btn-primary ms-4 me-4 mt-2" style="height: fit-content">Edit
+                Course</a>
             {% url 'course-delete' pk=object.id as course_delete %}
             <a href='{{ course_delete }}' class="btn ms-4 mt-2 btn-danger" style="height: fit-content">Delete Course</a>
         </div>
@@ -61,36 +24,49 @@
             <p class="p-4 rounded" style="background-color: #282a35; color: wheat">{{object.description}} </p>
         </div>
         <div class="col-lg-4 ms-4 pt-4">
-            <h5 class=""><strong>Assigned people:</strong></h5>
+            <h5 class=""><strong>Instructors:</strong></h5>
             <table class="table table-striped rounded">
                 <thead class="homepage-table-header">
                 <tr>
                     <th scope="col">ID</th>
                     <th scope="col">First</th>
                     <th scope="col">Last</th>
-                    <th scope="col">UserType</th>
                 </tr>
                 </thead>
                 <tbody>
-                    {% for person in course.assigned_people.all %}
-                    <tr>
-                        <th scope="row">{{person.id}}</th>
-                        <td>{{ person.first_name|default:'Unnamed Instructor' }}</td>
-                        <td>{{ person.last_name|default:'Unnamed Instructor' }}</td>
-                        <td>
-                            {% if person|has_group:"Admin" %}
-                                 Admin
-                            {% endif %}
-                            {%if person|has_group:"Instructor" %}
-                                Instructor
-                            {% endif %}
-                            {% if person|has_group:"TA" %}
-                                TA
-                            {% endif %}
-                        </td>
-                    </tr>
+                {% for person in course.assigned_people.all %}
+                {% if person|has_group:"Instructor"%}
+                <tr>
+                    <th scope="row">{{person.id}}</th>
+                    <td>{{ person.first_name|default:'Unnamed Instructor' }}</td>
+                    <td>{{ person.last_name|default:'Unnamed Instructor' }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
 
-                    {% endfor %}
+        <div class="col-lg-5 ms-4 pt-4">
+            <h5 class=""><strong>TAs:</strong></h5>
+            <table class="table table-striped rounded">
+                <thead class="homepage-table-header">
+                <tr>
+                    <th scope="col">ID</th>
+                    <th scope="col">First</th>
+                    <th scope="col">Last</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for person in course.assigned_people.all %}
+                {%if person|has_group:"TA"%}
+                <tr>
+                    <th scope="row">{{person.id}}</th>
+                    <td>{{ person.first_name|default:'Unnamed Instructor' }}</td>
+                    <td>{{ person.last_name|default:'Unnamed Instructor' }}</td>
+                </tr>
+                {% endif %}
+                {% endfor %}
                 </tbody>
             </table>
         </div>
@@ -98,8 +74,14 @@
         <div class="col-lg-12 pt-50">
             <div class="col-lg-12 d-flex flex-row">
                 <h5 class="mt-2"><strong>Sections:</strong></h5>
+                {% if request.user|has_group:"Admin"%}
                 {% url 'section-create' pk=course.id as section_create %}
-                <a href='{{ section_create }}' class="ms-4 mb-2 btn btn-primary mt-1" style="height: fit-content">Create Section</a>
+                <a href='{{ section_create }}' class="ms-4 mb-2 btn btn-primary mt-1" style="height: fit-content">Create
+                    Section</a>
+
+
+                {% endif %}
+
             </div>
 
             <table class="table table-striped rounded">
@@ -115,18 +97,18 @@
                 </tr>
                 </thead>
                 <tbody>
-                    {% for section in object.section_set.all %}
-                    <tr>
-                        <th scope="row">{{section.class_id}}</th>
-                        <td>{{section.section}}</td>
-                        <td>{{section.type}}</td>
-                        <td>{{section.assigned_user.first_name}} {{section.assigned_user.last_name}}</td>
-                        <td>{{section.meet_start}}</td>
-                        {% url 'section-view' pk=section.id as section_view %}
-                        <td><a href='{{section_view}}' class="btn btn-link">View Section</a></td>
-                    </tr>
+                {% for section in object.section_set.all %}
+                <tr>
+                    <th scope="row">{{section.class_id}}</th>
+                    <td>{{section.section}}</td>
+                    <td>{{section.type}}</td>
+                    <td>{{section.assigned_user.first_name}} {{section.assigned_user.last_name}}</td>
+                    <td>{{section.meet_start}}</td>
+                    {% url 'section-view' pk=section.id as section_view %}
+                    <td><a href='{{section_view}}' class="btn btn-link">View Section</a></td>
+                </tr>
 
-                    {% endfor %}
+                {% endfor %}
                 </tbody>
             </table>
         </div>

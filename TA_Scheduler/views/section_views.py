@@ -17,12 +17,12 @@ class CreateSection(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request, pk):
         course = Course.objects.get(id=pk)
-        section = SectionModelForm(initial={'course': course}, course=pk)
+        section = SectionModelForm(initial={'course': course})
         return render(request, self.template_name, {'section_form': section})
 
     def post(self, request, pk):
         course = Course.objects.get(id=pk)
-        section = SectionModelForm(pk, request.POST)
+        section = SectionModelForm(request.POST)
 
         if section.is_valid():
             section = section.save(commit=False)
