@@ -1,7 +1,6 @@
 from abc import ABC
 
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from TA_Scheduler.user import make_admin, make_ta, make_instructor
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
@@ -10,7 +9,7 @@ from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
 
 from TA_Scheduler.forms import NewUserCreationForm
 from TA_Scheduler.models import UsAddress, User, UserModelForm, TaSkillsForm
-from TA_Scheduler.user import is_admin, is_ta
+from TA_Scheduler.user import is_admin, is_ta, make_admin, make_instructor, make_ta
 
 
 class CreateAddress(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -98,8 +97,6 @@ class CreateAccount(UserPassesTestMixin, View):
                           self.template_name, {'user_form': user})
 
     def test_func(self):
-        if self.request.user.is_anonymous:
-            return False
         return self.request.user.is_anonymous or is_admin(self.request.user)
 
 
@@ -121,13 +118,14 @@ class UpdateAccount(UserPassesTestMixin, View):
 
     def post(self, request, pk):
         user_model = User.objects.get(pk=pk)
-
         user = UserModelForm(request.POST, instance=user_model)
 
         if user.is_valid():
             # we have to process the forms now.
             user.save()
+
             # no m2m relationships should be effected here.
+
             return redirect('account-view', pk=pk)
         else:
             return render(request,
@@ -145,10 +143,6 @@ class ViewAccount(LoginRequiredMixin, UserPassesTestMixin, DetailView):
 
 class DeleteAccount(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = User
-
-    def form_valid(self, form):
-        self.get_object().delete()
-        return super().form_valid(form)
 
     def test_func(self):
         return is_admin(self.request.user)

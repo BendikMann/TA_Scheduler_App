@@ -1,20 +1,13 @@
-import enum
-from collections import namedtuple
-
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import PermissionsMixin
 from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import PermissionsMixin
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import Q
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.forms import ModelForm
+import django.forms as forms
+from django.utils.translation import gettext_lazy as _
 from localflavor.us.models import USStateField, USZipCodeField
 from phonenumber_field.modelfields import PhoneNumberField
-import phonenumbers
-from localflavor.us import us_states
-from django.core.exceptions import ValidationError
-from django.utils.translation import gettext_lazy as _
 
 from TA_Scheduler.model_choice_data import CourseChoices, SectionChoices
 
@@ -172,16 +165,36 @@ class Course(models.Model):
                f"{*self.section_set.all(),}"
 
 
-class CourseModelForm(ModelForm):
+class CourseAssignModelForm(ModelForm):
     class Meta:
         model = Course
-        fields = ['assigned_people', 'term_type', 'term_year', 'course_number', 'subject', 'name', 'description']
+        fields = ['term_type']
+
+    def __init__(self, *args, **kwargs):
+        super(CourseAssignModelForm, self).__init__(*args, **kwargs)
+        # filtering the instructor field to only include accounts with the group of TA or Instructor
+
+
+class CourseModelForm(ModelForm):
+    tas = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)
+    instructors = forms.ModelMultipleChoiceField(queryset=User.objects.all(), required=False)
+
+    class Meta:
+        model = Course
+        fields = ['tas', 'instructors', 'term_type', 'term_year', 'course_number', 'subject', 'name', 'description']
 
     def __init__(self, *args, **kwargs):
         super(CourseModelForm, self).__init__(*args, **kwargs)
         # filtering the instructor field to only include accounts with the group of TA or Instructor
-        self.fields['assigned_people'].queryset = User.objects.filter(groups__name__in=['Instructor', 'TA'])
+        self.fields['tas'].queryset = User.objects.filter(groups__name__in=['TA'])
+        self.fields['instructors'].queryset = User.objects.filter(groups__name__in=['Instructor'])
 
+        if self.instance.id is not None:
+            self.fields['tas'].initial = [x.id for x in Course.objects.get(id=self.instance.id).assigned_people.filter(
+                groups__name__in=['TA'])]
+            self.fields['instructors'].initial = [x.id for x in
+                                                  Course.objects.get(id=self.instance.id).assigned_people.filter(
+                                                      groups__name__in=['Instructor'])]
 
 class CourseRestrictions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -220,13 +233,27 @@ class Section(models.Model):
 class SectionModelForm(ModelForm):
     class Meta:
         model = Section
-        fields = ['assigned_user', 'class_id', 'section', 'type', 'meet_start', 'meet_end', 'meet_monday',
+        fields = ['class_id', 'section', 'type', 'meet_start', 'meet_end', 'meet_monday',
                   'meet_tuesday', 'meet_wednesday', 'meet_thursday', 'meet_friday']
 
-    def __init__(self, course, *args, **kwargs):
+
+class AssignSectionModelForm(ModelForm):
+    class Meta:
+        model = Section
+        fields = ['assigned_user']
+
+    def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         # filtering to show only Accounts which are a part of the associated course
-        self.fields['assigned_user'].queryset = User.objects.filter(course__id=course)
+
+        if self.instance.id is not None:
+            self.fields['assigned_user'].queryset = User.objects.filter(course=self.instance.course)
+
+            if self.instance.type == 'LEC':
+                self.fields['assigned_user'].queryset = self.fields['assigned_user'].queryset.filter(groups__name__in=['Instructor'])
+            else:
+                self.fields['assigned_user'].queryset = self.fields['assigned_user'].queryset.filter(groups__name__in=['TA'])
+
 
     def clean(self):
         cleaned_data = super().clean()

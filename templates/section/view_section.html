@@ -1,21 +1,17 @@
 <!DOCTYPE html>
 {% extends "base.html"%}
 {% block content %}
-
-<html lang="en">
-<p><h1>{{object.course.name}}</h1> <br>
-
+<div class="container" style="margin-top: 100px">
     <div class="row col-lg-8 flex-wrap rounded p-3" style="background-color: #282a35; color: wheat">
         <div class="col-lg-12">
             <p><strong>Class ID: </strong>{{object.class_id}}</p>
             <p><strong>Section: </strong>{{object.section}}</p>
             <p><strong>Type: </strong>{{object.type}}</p>
             {% if object.assigned_user is None %}
-            <p><strong>Assigned user:</strong> assigned user</p>
+            <p><strong>Assigned user:</strong> No Assigned User</p>
             {% else %}
             <p><strong>Assigned user: </strong>{{object.assigned_user.first_name}} {{object.assigned_user.last_name}}</p>
             {% endif %}
-
             <p><strong>Days:</strong>
                 {% if object.meet_monday %}
                     Monday
@@ -36,11 +32,14 @@
             <p><strong>Time: </strong>{{object.meet_start}} - {{object.meet_end}}</p>
             <div class="col-lg-8 d-flex flex-row mb-1">
                 {% if request.user|has_group:'Admin' or request.user|has_group:'Instructor' %}
-                    {% url 'section-update' pk=object.id as section_update %}
-                    <a href='{{ section_update }}' class="btn btn-primary me-4" style="height: fit-content">Edit Section</a>
+                {% url 'section-assign' pk=object.id as section_assign %}
+                <a href='{{ section_assign }}' class="btn btn-primary">Assign User</a><br>
                 {% endif %}
                 {% if request.user|has_group:'Admin' %}
-                    {% url 'section-delete' pk=object.id as section_delete %}
+                {% url 'section-update' pk=object.id as section_update %}
+                <a href='{{ section_update }}' class="btn btn-primary me-4" style="height: fit-content">Edit Section</a>
+
+                {% url 'section-delete' pk=object.id as section_delete %}
                     <a href='{{ section_delete }}' class="btn btn-danger" style="height: fit-content">Delete this Section</a>
                 {% endif %}
 
@@ -48,7 +47,7 @@
             </div>
         </div>
     </div>
-</html>
+</div>
 
 
 {% endblock %}
