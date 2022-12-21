@@ -438,14 +438,12 @@ class TestEditAccountNoUser(TestCase):
     def test_edit_account_info_not_logged_in(self):
         client = Client()
         response = client.get(f'/accounts/{self.ArbitraryUser.id}/update/', follow=True)
-        self.assertRedirects(response, f'/accounts/login/?next=/accounts/ {self.ArbitraryUser.id}/update/',
-                             status_code=301, target_status_code=200)
+        self.assertRedirects(response, f'/accounts/login/?next=/accounts/{self.ArbitraryUser.id}/update/')
 
-    def test_edit_account_info_user_doesnt_exist(self):
+    def test_edit_account_info_user_doesnt_exist_not_admin(self):
         client = Client()
-        with self.assertRaises(ObjectDoesNotExist, msg="ObjectDoesNotExist error not thrown when going to an account "
-                                                       "page that doesnt exist!"):
-            client.post(f'/accounts/123456/update/', follow=True)
+        response = client.get(f'/accounts/12345667/update/', follow=True)
+        self.assertRedirects(response, f'/accounts/login/?next=/accounts/12345667/update/')
 
 
 class TestEditOwnAccountAsAdmin(TestCase):
@@ -499,6 +497,12 @@ class TestEditOtherAccountAsAdmin(TestCase):
 
         self.assertEqual(self.ArbitraryUser.id, account_id,
                          msg="User was not redirected to the account page they changed after editing its info!")
+
+    def test_edit_account_info_user_doesnt_exist_admin(self):
+        client = Client()
+        client.force_login(self.Admin)
+        with self.assertRaises(ObjectDoesNotExist, msg="DoesNotExist error not thrown when going to an account page that doesnt exist!"):
+            client.post(f'/accounts/123456/update/', follow=True)
 
 
 class TestEditAccountAsInstructor(TestCase):

@@ -27,7 +27,8 @@ class Admin:
         # Gets a list of all user emails excluding blank ones
         emails = list(User.objects.filter(is_active=True).exclude(email='').values_list('email', flat=True))
         send_mail(subject=header, message=content, from_email='NYStingers@ta-scheduler.rocks', recipient_list=emails)
-        return True
+        # returns the recipients of the email
+        return emails
 
 
 class Ta:
@@ -65,7 +66,8 @@ class Instructor:
         for ta in tas:
             emails.append(ta.email)
         send_mail(subject=header, message=content, from_email='NYStingers@ta-scheduler.rocks', recipient_list=emails)
-        return True
+        # returns the recipients of the email
+        return emails
 
     def get_assigned_tas(self):
         # Courses that our instructor is in
