@@ -9,7 +9,7 @@ from django.views.generic import CreateView, UpdateView, DetailView, DeleteView
 
 from TA_Scheduler.forms import NewUserCreationForm
 from TA_Scheduler.models import UsAddress, User, UserModelForm, TaSkillsForm
-from TA_Scheduler.user import is_admin, is_ta
+from TA_Scheduler.user import is_admin, is_ta, make_admin, make_instructor, make_ta
 
 
 class CreateAddress(LoginRequiredMixin, UserPassesTestMixin, CreateView):
@@ -111,7 +111,17 @@ class UpdateAccount(View):
         if user.is_valid():
             # we have to process the forms now.
             user.save()
+
+            # check the selected group and call the appropriate method
+            selected_group = request.POST.get("group")
+            if selected_group == "Admin":
+                make_admin(user.instance)
+            elif selected_group == "Instructor":
+                make_instructor(user.instance)
+            elif selected_group == "TA":
+                make_ta(user.instance)
             # no m2m relationships should be effected here.
+
             return redirect('account-view', pk=pk)
         else:
             return render(request,
