@@ -105,7 +105,6 @@ class UpdateAccount(View):
 
     def post(self, request, pk):
         user_model = User.objects.get(pk=pk)
-
         user = UserModelForm(request.POST, instance=user_model)
 
         if user.is_valid():
