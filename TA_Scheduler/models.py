@@ -80,6 +80,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=50)
     phone_number = PhoneNumberField(blank=True)
     address = models.OneToOneField(UsAddress, null=True, on_delete=models.CASCADE)
+    ta_skills = models.TextField(max_length=200, blank=True)
 
     is_staff = models.BooleanField(
         _("staff status"),
@@ -127,8 +128,14 @@ class UserModelForm(ModelForm):
         fields = ['first_name', 'last_name', 'email', 'phone_number']
 
 
+class TaSkillsForm(ModelForm):
+    class Meta:
+        model = User
+        fields = ['ta_skills']
+
+
 class Course(models.Model):
-    assigned_people = models.ManyToManyField(User)
+    assigned_people = models.ManyToManyField(User, through='CourseRestrictions')
 
     term_type = models.CharField(max_length=3, choices=CourseChoices.TERM_NAMES,
                                  default=CourseChoices.FALL)
@@ -188,6 +195,12 @@ class CourseModelForm(ModelForm):
             self.fields['instructors'].initial = [x.id for x in
                                                   Course.objects.get(id=self.instance.id).assigned_people.filter(
                                                       groups__name__in=['Instructor'])]
+
+class CourseRestrictions(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    max_sections = models.PositiveIntegerField(default=3)
+
 
 class Section(models.Model):
     # A section MUST have a course assigned to it.
