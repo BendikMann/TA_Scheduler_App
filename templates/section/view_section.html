@@ -1,27 +1,7 @@
 <!DOCTYPE html>
 {% extends "base.html"%}
 {% block content %}
-
-<html lang="en">
 <div class="container" style="margin-top: 100px">
-<p><h1>{{object.course.name}}</h1> <br>
-{% if request.user|has_group:'Admin' %}
-    {% url 'section-update' pk=object.id as section_update %}
-    <a href='{{ section_update }}' class="btn btn-primary">Edit Section</a><br>
-    {% url 'section-assign' pk=object.id as section_assign %}
-    <a href='{{ section_assign }}' class="btn btn-primary">Assign User</a><br>
-    <b>Assigned user: </b>
-    {% if object.assigned_user is None %}
-    No assigned user
-    {% endif %}
-    {{object.assigned_user.first_name}} {{object.assigned_user.last_name}} <br>
-    <b>Class id: </b> {{object.class_id}} <br>
-    <b>Section: </b> {{object.section}} <br>
-    <b>Type: </b> {{object.type}} <br>
-
-{% endif %}
-
-
     <div class="row col-lg-8 flex-wrap rounded p-3" style="background-color: #282a35; color: wheat">
         <div class="col-lg-12">
             <p><strong>Class ID: </strong>{{object.class_id}}</p>
@@ -32,7 +12,6 @@
             {% else %}
             <p><strong>Assigned user: </strong>{{object.assigned_user.first_name}} {{object.assigned_user.last_name}}</p>
             {% endif %}
-
             <p><strong>Days:</strong>
                 {% if object.meet_monday %}
                     Monday
