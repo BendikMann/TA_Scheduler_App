@@ -98,10 +98,10 @@
     {% endif %}
 
     <div class="row m-5">
-        {% for section in object.section_set.all %}
-        {% url 'section-view' pk=section.id as section_view %}
-        {{section.section}} {{section.type}} {{section.class_id}}
-        <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
+        {% for course in object.course_set.all %}
+        {% url 'course-view' pk=course.id as course_view %}
+        {{course.course_number}} {{course.subject}} {{course.name}}
+        <a href='{{course_view}}' class="btn btn-primary">View Course</a> <br/>
         {% endfor %}
     </div>
 
@@ -133,10 +133,10 @@
         </div>
     {% endif %}
     <div class="row m-5">
-        {% for section in object.section_set.all %}
-        {% url 'section-view' pk=section.id as section_view %}
-        {{section.section}} {{section.type}} {{section.class_id}}
-        <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
+        {% for course in object.course_set.all %}
+        {% url 'course-view' pk=course.id as course_view %}
+        {{course.course_number}} {{course.subject}} {{course.name}}
+        <a href='{{course_view}}' class="btn btn-primary">View Course</a> <br/>
         {% endfor %}
     </div>
 </div>
