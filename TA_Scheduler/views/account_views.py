@@ -64,8 +64,6 @@ class ViewAddress(UserPassesTestMixin, LoginRequiredMixin, DetailView):
 
         return True
 
-    pass
-
 
 class CreateAccount(UserPassesTestMixin, View):
     template_name = 'account/create_account.html'
@@ -130,6 +128,14 @@ class UpdateAccount(UserPassesTestMixin, View):
         else:
             return render(request,
                           self.template_name, {'user_form': user})
+
+
+class AccountDirectoryView(LoginRequiredMixin, View):
+    template_name = 'account/account_directory.html'
+
+    def get(self, request):
+        users = User.objects.all()
+        return render(request, self.template_name, {'users': users})
 
 
 class ViewAccount(LoginRequiredMixin, UserPassesTestMixin, DetailView):
