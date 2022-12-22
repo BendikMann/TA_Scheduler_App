@@ -27,4 +27,4 @@ class NewUserCreationForm(UserCreationForm):
 
 class EmailForm(forms.Form):
     header = forms.CharField(label='header')
-    content = forms.CharField(label='content')
+    content = forms.CharField(label='content', widget=forms.Textarea)

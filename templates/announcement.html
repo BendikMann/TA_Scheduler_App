@@ -1,16 +1,19 @@
 {% extends "base.html"%}
 {% block content %}
-
-<div class="container">
-  <div class="row">
-    <h3>Announcement</h3>
-    <form action="" method="post">
-      {% csrf_token %}
-    <table>
-        {{ email_form.as_table }}
-    </table>
-      <input type="submit" value="Submit" />
-</form>
-  </div>
+<div class="container" style="margin-top: 100px;">
+    <div class="row flex-wrap rounded col-lg-10 bg-color-txt-color p-5">
+        <div class="col-lg-12 d-flex flex-row mb-2">
+            <h3>Announcement</h3>
+        </div>
+        <div class="col-lg-12">
+            <form class="" action="" method="post">
+                {% csrf_token %}
+                <table class="announcement-table">
+                  {{ email_form.as_table }}
+                </table>
+                <input class="btn btn-primary float-end mt-4" type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
 </div>
 {% endblock %}

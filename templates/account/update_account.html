@@ -1,12 +1,21 @@
 {% extends "base.html"%}
 {% block content %}
-<form class="form-border p-5 form" action="" method="post">
-    {% csrf_token %}
-    <table>
-        {{ user_form.as_table }}
-        {{ account_form.as_table }}
-    </table>
-    <input type="submit" value="Submit" class="btn btn-primary"/>
-  </form>
 
+<div class="container" style="margin-top: 100px;">
+    <div class="row flex-wrap rounded col-lg-6 bg-color-txt-color p-5">
+        <div class="col-lg-12 d-flex flex-row mb-2">
+            <h3>Personal Information</h3>
+        </div>
+        <div class="col-lg-12">
+            <form class="" action="" method="post">
+                {% csrf_token %}
+                <table>
+                    {{ user_form.as_table }}
+                    {{ account_form.as_table }}
+                </table>
+                <input type="submit" value="Submit" class="btn btn-primary float-end"/>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

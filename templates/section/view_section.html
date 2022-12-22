@@ -33,7 +33,7 @@
             <div class="col-lg-8 d-flex flex-row mb-1">
                 {% if request.user|has_group:'Admin' or request.user|has_group:'Instructor' %}
                 {% url 'section-assign' pk=object.id as section_assign %}
-                <a href='{{ section_assign }}' class="btn btn-primary">Assign User</a><br>
+                <a href='{{ section_assign }}' class="btn btn-primary me-4">Assign User</a><br>
                 {% endif %}
                 {% if request.user|has_group:'Admin' %}
                 {% url 'section-update' pk=object.id as section_update %}
