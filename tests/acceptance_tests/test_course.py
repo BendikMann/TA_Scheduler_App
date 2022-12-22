@@ -5,6 +5,7 @@ from TA_Scheduler.model_choice_data import CourseChoices, SectionChoices
 from TA_Scheduler.user import make_admin, make_instructor, make_ta, is_instructor, is_ta
 
 
+
 class TestCourseCreate(TestCase):
     def setUp(self):
         UserFactory()
@@ -25,12 +26,13 @@ class TestCourseCreate(TestCase):
 
     def test_course_create_default(self):
         client = Client()
-        client.login(email='admin1@test.com', password='admin1')
+        client.force_login(self.Admin)
+
 
         response = client.post(f'/course/create/',
-                               {'term_type': 'spr', 'term_year': '2022', 'course_number': '123', 'subject': 'tester',
+                               {'assigned_people': self.Instructor.id, 'term_type': 'spr', 'term_year': '2022',
+                                'course_number': '123', 'subject': 'tester',
                                 'name': 'test', 'description': 'test'}, follow=True)
-
         course_id = response.context['course'].id
 
         self.assertRedirects(response, f'/course/{course_id}/view/')

@@ -4,7 +4,6 @@ class CourseChoices:
     WINTERIM = 'win'
     SUMMER = 'sum'
 
-    # TODO Make term names (Spring semester is different from fall semsester)
     TERM_NAMES = [
         (SPRING, 'Spring'),
         (FALL, 'fall'),

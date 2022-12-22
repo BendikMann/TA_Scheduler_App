@@ -34,6 +34,9 @@ urlpatterns = [
     path('account/<int:pk>/delete/',
          TA_Scheduler.views.DeleteAccount.as_view(template_name='account/delete_account.html'),
          name='account-delete'),
+    path('accounts/<int:pk>/skills/',
+         TA_Scheduler.views.AddSkillsAccount.as_view(template_name='account/add_skills_account.html'),
+         name='account-skills'),
 
     # address
     path('address/create/',
@@ -70,6 +73,7 @@ urlpatterns = [
     path('section/<int:pk>/update/',
          TA_Scheduler.views.UpdateSection.as_view(template_name='section/update_section.html'),
          name='section-update'),
+    path('section/<int:pk>/assign/', TA_Scheduler.views.AssignSection.as_view(), name='section-assign'),
     path('section/<int:pk>/view/', TA_Scheduler.views.ViewSection.as_view(template_name='section/view_section.html'),
          name='section-view'),
     path('section/<int:pk>/delete',
