@@ -45,7 +45,6 @@
 
         <div class="col-lg-12 me-4">
 
-
             {%if object|has_group:'TA' %}
 
             {%if object.ta_skills%}
@@ -55,7 +54,31 @@
             {% endif %}
             {% endif %}
         </div>
+        <div class="col-lg-12 me-4">
 
+            <table class="table table-light rounded">
+                <thead class="">
+                <tr>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Course Number</th>
+                    <th scope="col">Course Name</th>
+                    <th scope="col">Detail</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for course in object.course_set.all %}
+                <tr>
+                    <td>{{course.subject}}</td>
+                    <td>{{course.course_number}}</td>
+                    <td>{{course.name}}</td>
+                    {% url 'course-view' pk=course.id as course_view %}
+                    <td><a href='{{course_view}}' class="btn btn-link">View Course</a></td>
+                </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
         <div class="col-lg-12 d-flex flex-row mb-1 mt-4">
             {%if object.address%}
             {% url 'address-update' pk=object.address.id as address_update %}
@@ -75,9 +98,9 @@
 
 
             {%if object|has_group:'TA' %}
-            {%if request.user == object or request.user|has_group:'Admin' %}
-            {%if object.ta_skills%}
-            <a href='{{ skills_update }}' class="btn btn-primary ms-4 me-4" style="height: fit-content">Edit Skills</a>
+                {%if request.user == object or request.user|has_group:'Admin' %}
+                {%if object.ta_skills%}
+                <a href='{{ skills_update }}' class="btn btn-primary ms-4 me-4" style="height: fit-content">Edit Skills</a>
             {% else %}
             <a href='{{ skills_update }}' class="btn btn-primary ms-4 me-4" style="height: fit-content">Add Skills</a>
             {% endif %}
@@ -98,7 +121,7 @@
     </div>
 
 
-    </div>
+</div>
 </div>
 
 </div>
