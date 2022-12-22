@@ -73,8 +73,8 @@ class AssignSection(LoginRequiredMixin, UserPassesTestMixin, View):
 
     def get(self, request, pk):
         section = AssignSectionModelForm(instance=Section.objects.get(pk=pk))
-
-        return render(request, self.template_name, {'section_form': section})
+        section_data = Section.objects.get(pk=pk)
+        return render(request, self.template_name, {'section_form': section, 'section_data': section_data})
 
     def post(self, request, pk):
         section = AssignSectionModelForm(request.POST, instance=Section.objects.get(pk=pk))
@@ -83,7 +83,6 @@ class AssignSection(LoginRequiredMixin, UserPassesTestMixin, View):
             return redirect('section-view', pk=pk)
         else:
             return render(request, self.template_name, {'section_form': section})
-
 
     def test_func(self):
         return is_admin(self.request.user) or is_instructor(self.request.user)

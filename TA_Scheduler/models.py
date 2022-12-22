@@ -1,5 +1,5 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Group
 from django.contrib.auth.models import PermissionsMixin
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -66,6 +66,7 @@ class CustomUserManager(BaseUserManager):
         )
         user.is_superuser = True  # All perms
         user.is_staff = True  # Admin portal
+        user.groups.add(Group.objects.get(name="Admin"))
         user.save()
 
         return user
@@ -114,9 +115,8 @@ class User(AbstractBaseUser, PermissionsMixin):
         return self.groups.filter(name='Admin').exists()
 
     def __str__(self):
-        return f"User: {self.first_name} {self.last_name} Group: {self.groups.first()}\n" \
-               f"Email: {self.email} Phone Number: {self.phone_number} \n" \
-               f"{self.address}"
+        return f"{self.first_name} {self.last_name}" \
+               f" | {self.email}"
 
 
 # This clever way of extending User was found here:
