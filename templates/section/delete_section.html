@@ -1,13 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
 {% extends "base.html"%}
 {% block content %}
 
-<h1>Are you sure you want to delete {{object.name}}?</h1>
-<p> This is not reversible.</p>
-<form action="" method="post">
-    {% csrf_token %}
-    <input type="submit" value="Delete" class="btn btn-danger":>
-</form>
+
+<div class="container" style="margin-top: 100px;">
+    <div class="row flex-wrap col-lg-8 bg-color-txt-color p-5">
+        <div class="col-lg-12 flex-wrap flex-row p-5">
+
+            <h3>Are you sure you want to delete {{object.name}}?</h3>
+            <p> This is not reversible.</p>
+            <form action="" method="post">
+                {% csrf_token %}
+                <input type="submit" value="Delete" class="btn btn-danger" :>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}
-</html>

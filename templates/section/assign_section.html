@@ -1,18 +1,19 @@
-<!DOCTYPE html>
-<html lang="en">
 {% extends "base.html"%}
 {% block content %}
-<p>
-{{section_data.class_id}} {{section_data.section}} {{section_data.type}}
-</p>
 
-<form class="form" action="" method="post">
-    {% csrf_token %}
-    <table>
-        {{ section_form.as_table }}
-    </table>
-    <input type="submit" value="Submit"/>
-  </form>
+<div class="container" style="margin-top: 100px">
+    <div class="row flex-wrap">
+        <div class="col-lg-7 bg-color-txt-color p-5 rounded">
+            <form class="" action="" method="post">
+                {% csrf_token %}
+                <table>
+                    {{ section_form.as_table }}
+                </table>
+                <input class="btn btn-primary mt-4" type="submit" value="Submit"/>
+            </form>
+        </div>
+    </div>
+</div>
+
 
 {% endblock %}
-</html>

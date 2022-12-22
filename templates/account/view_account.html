@@ -1,14 +1,6 @@
 {% extends "base.html"%}
 {% block content %}
 
-<div class="header">
-    {% if request.user == object %}
-    <h1>Hiya {{object.first_name|default:"pal"}} ({{object.groups.first}})</h1>
-    {%else%}
-    <h1> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}} ({{object.groups.first}})</h1>
-    {% endif%}
-</div>
-
 
 <!-- Private User information goes here! -->
 <!-- if user is in admin group or this is their account -->
@@ -16,129 +8,184 @@
 {% url 'account-update' object.id as account_update %}
 {% url 'account-skills' object.id as skills_update %}
 
-<div class="container account-view-container form-border w-50">
-    <div class="row m-5">
-        <div class="col">
+<div class="container" style="margin-top: 100px">
+
+    <div class="row flex-wrap col-lg-8 p-4 bg-color-txt-color rounded">
+        <div class="col-lg-12 d-flex mb-15 flex-row">
+            {% if request.user == object %}
+            <h2>Hiya {{object.first_name|default:"pal"}} ({{object.groups.first}})</h2>
+            {%else%}
+            <h2> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}}
+                ({{object.groups.first}})</h2>
+            {% endif%}
+        </div>
+
+        <div class="col-lg-12 d-flex mt-2 flex-row">
             {% if object.address %}
-                <p>{{object.address.street_address}} <br> {{object.address.city}}, {{object.address.state}} {{object.address.zip_code}} <br> USA
-                </p>
+            <p><strong>Address: </strong>{{object.address.street_address}} {{object.address.city}},
+                {{object.address.state}} {{object.address.zip_code}} USA</p>
             {% else %}
-                    <p>No address set</p>
+            <p><strong>Address: </strong>No address set</p>
             {% endif %}
         </div>
-        <div class="col">
+        <div class="col-lg-12">
+            {%if object.phone_number%}
+            <p><strong>Phone Number: </strong> {{object.phone_number}}</p>
+            {% else %}
+            <p><strong>Phone Number: </strong>No phone number set</p>
+            {% endif %}
+        </div>
+        <div class="col-lg-12 me-4">
+            {%if object.email%}
+            <p><strong>Email: </strong>{{object.email}}</p>
+            {% else %}
+            <p>No email set: </p>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-12 me-4">
+
+            {%if object|has_group:'TA' %}
+
+            {%if object.ta_skills%}
+            <p><strong>Skills: </strong>{{object.ta_skills}}</p>
+            {% else %}
+            <p><strong>Skills: </strong>User hasn't added skills</p>
+            {% endif %}
+            {% endif %}
+        </div>
+        <div class="col-lg-12 me-4">
+
+            <table class="table table-light rounded">
+                <thead class="">
+                <tr>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Course Number</th>
+                    <th scope="col">Course Name</th>
+                    <th scope="col">Detail</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for course in object.course_set.all %}
+                <tr>
+                    <td>{{course.subject}}</td>
+                    <td>{{course.course_number}}</td>
+                    <td>{{course.name}}</td>
+                    {% url 'course-view' pk=course.id as course_view %}
+                    <td><a href='{{course_view}}' class="btn btn-link">View Course</a></td>
+                </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="col-lg-12 d-flex flex-row mb-1 mt-4">
             {%if object.address%}
-                {% url 'address-update' pk=object.address.id as address_update %}
-                <a href='{{ address_update }}' class="btn btn-primary">Edit Address</a>
+            {% url 'address-update' pk=object.address.id as address_update %}
+            <a href='{{ address_update }}' class="btn btn-primary me-4" style="height: fit-content">Edit Address</a>
             {% else %}
-                {% url 'address-create' as address_create %}
-                <a href='{{ address_create }}' class="btn btn-primary">Set Address</a>
+            {% url 'address-create' as address_create %}
+            <a href='{{ address_create }}' class="btn btn-primary me-4" style="height: fit-content">Set Address</a>
             {% endif %}
 
-        </div>
-    </div>
-
-    <div class="row m-5">
-        <div class="col">
             {%if object.phone_number%}
-                <p>{{object.phone_number}}</p>
+            <a href='{{ account_update }}' class="btn btn-primary ms-4 me-4" style="height: fit-content">Edit Personal
+                Information</a>
             {% else %}
-                <p>No phone number set: </p>
-
-            {% endif %}
-        </div>
-        <div class="col">
-            {%if object.phone_number%}
-                <a href='{{ account_update }}' class="btn btn-primary">Edit Phone Number</a>
-            {% else %}
-                <a href='{{ account_update }}' class="btn btn-primary">Set Phone Number</a>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="row m-5">
-        <div class="col">
-            {%if object.email%}
-                <p>{{object.email}}</p>
-
-            {% else %}
-                <p>No email set: </p>
-            {% endif %}
-        </div>
-        <div class="col">
-            {%if object.email%}
-                <a href='{{ account_update }}' class="btn btn-primary">Edit Email</a>
-            {% else %}
-                {% url 'address-create' as address_create %}
-                <a href='{{ account_update }}' class="btn btn-primary">Edit Email</a>
+            <a href='{{ account_update }}' class="btn btn-primary ms-4 me-4" style="height: fit-content">Set Personal
+                Information</a>
             {% endif %}
 
-        </div>
-    </div>
 
-    {%if object|has_group:'TA' %}
-        <div class="row m-5">
-            <div class="col">
-                {%if object.ta_skills%}
-                    <p>{{object.ta_skills}}</p>
-                {% else %}
-                    <p>User hasn't added skills</p>
-                {% endif %}
-            </div>
-            <div class="col">
+            {%if object|has_group:'TA' %}
                 {%if request.user == object or request.user|has_group:'Admin' %}
-                    {%if object.ta_skills%}
-                        <a href='{{ skills_update }}' class="btn btn-primary">Edit Skills</a>
-                    {% else %}
-                        <a href='{{ skills_update }}' class="btn btn-primary">Add Skills</a>
-                    {% endif %}
-                {% endif %}
-            </div>
-        </div>
-    {% endif %}
+                {%if object.ta_skills%}
+                <a href='{{ skills_update }}' class="btn btn-primary ms-4 me-4" style="height: fit-content">Edit Skills</a>
+            {% else %}
+            <a href='{{ skills_update }}' class="btn btn-primary ms-4 me-4" style="height: fit-content">Add Skills</a>
+            {% endif %}
+            {% endif %}
+            {% endif %}
 
-    <div class="row m-5">
-        {% for course in object.course_set.all %}
-        {% url 'course-view' pk=course.id as course_view %}
-        {{course.course_number}} {{course.subject}} {{course.name}}
-        <a href='{{course_view}}' class="btn btn-primary">View Course</a> <br/>
-        {% endfor %}
-    </div>
-
-    <div class="row m-5">
-        <div class="col">
+            {% for section in object.section_set.all %}
+            {% url 'section-view' pk=section.id as section_view %}
+            {{section.section}} {{section.type}} {{section.class_id}}
+            <a href='{{section_view}}' class="btn btn-primary">View Section</a> <br/>
+            {% endfor %}
             {% if request.user|has_group:'Admin' %}
-                {% url 'account-delete' pk=object.id as account_delete %}
-                <a href='{{ account_delete }}' class="btn m-auto btn-danger">Delete this Account</a>
+            {% url 'account-delete' pk=object.id as account_delete %}
+            <a href='{{ account_delete }}' class="btn btn-danger ms-4 me-4" style="height: fit-content">Delete this
+                Account</a>
             {% endif %}
         </div>
     </div>
+
+
 </div>
+</div>
+
+</div>
+
+
+</div>
+
 {% else %}
-<div class="container account-view-container form-border w-50">
-    <div class="row m-5">
-        <div class="col">
+
+<div class="container" style="margin-top: 100px">
+
+    <div class="row flex-wrap col-lg-8 p-4 bg-color-txt-color rounded">
+        <div class="col-lg-12 d-flex mb-15 flex-row">
+            {% if request.user == object %}
+            <h2>Hiya {{object.first_name|default:"pal"}} ({{object.groups.first}})</h2>
+            {%else%}
+            <h2> {{object.first_name|default:"(No First Name Set)"}} {{object.last_name|default:"(No Last Name Set)"}}
+                ({{object.groups.first}})</h2>
+            {% endif%}
+        </div>
+        <div class="col-lg-12">
             <p>{{object.email|default:"No Email Set"}}</p>
         </div>
-    </div>
-    {%if object|has_group:'TA' %}
-        <div class="row m-5">
-            <div class="col">
-                {%if object.ta_skills%}
-                    <p>{{object.ta_skills}}</p>
-                {% else %}
-                    <p>User hasn't added skills</p>
-                {% endif %}
-            </div>
+
+        <div class="col-lg-12 me-4">
+
+            {%if object|has_group:'TA' %}
+
+            {%if object.ta_skills%}
+            <p><strong>Skills: </strong>{{object.ta_skills}}</p>
+            {% else %}
+            <p><strong>Skills: </strong>User hasn't added skills</p>
+            {% endif %}
+            {% endif %}
         </div>
-    {% endif %}
-    <div class="row m-5">
-        {% for course in object.course_set.all %}
-        {% url 'course-view' pk=course.id as course_view %}
-        {{course.course_number}} {{course.subject}} {{course.name}}
-        <a href='{{course_view}}' class="btn btn-primary">View Course</a> <br/>
-        {% endfor %}
+
+        <table class="table table-light rounded">
+                <thead class="">
+                <tr>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Course Number</th>
+                    <th scope="col">Course Name</th>
+                    <th scope="col">Detail</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for course in object.course_set.all %}
+                <tr>
+                    <td>{{course.subject}}</td>
+                    <td>{{course.course_number}}</td>
+                    <td>{{course.name}}</td>
+                    {% url 'course-view' pk=course.id as course_view %}
+                    <td><a href='{{course_view}}' class="btn btn-link">View Course</a></td>
+                </tr>
+
+                {% endfor %}
+                </tbody>
+            </table>
+
     </div>
 </div>
+
+
+
 {% endif %}
+
 {% endblock %}

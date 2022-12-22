@@ -1,7 +1,14 @@
 {% extends "base.html"%}
 {% block content %}
-<h1>And stay out!</h1>
+<div class="container" style="margin-top: 100px;">
+    <div class="row flex-wrap col-lg-5 bg-color-txt-color p-5 rounded">
+        <div class="col-lg-12 flex-wrap">
+            <h3>You have been logged out</h3>
+            {% url 'login' as login_view %}
+            <a href='{{ login_view }}'  class="btn btn-primary">Login</a>
+        </div>
+    </div>
 
-<p>It's less buggy that way.</p>
+</div>
 
 {% endblock %}

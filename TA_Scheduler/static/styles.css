@@ -55,6 +55,10 @@
           color: wheat;
       }
 
+      .mb-15{
+          margin-bottom: 15px;
+      }
+
 
 
       li a {
@@ -116,8 +120,30 @@
             vertical-align: top;
       }
 
-      #id_assigned_people, #id_term_type, #id_term_year, #id_subject, #id_description, #id_course_number, #id_name{
+      #id_assigned_people, #id_term_type, #id_term_year, #id_subject, #id_description, #id_course_number, #id_name, #id_tas, #id_instructors{
           width: 800px;
           margin-bottom: 5px;
           margin-top: 5px;
+      }
+
+      #id_username, #id_password{
+          margin-left: 10px;
+          margin-bottom: 10px;
+          margin-top: 10px;
+          width: 600px;
+      }
+      #id_content, #id_header{
+          width: 800px;
+      }
+      #id_ta_skills{
+          width: 800px;
+      }
+
+      table.announcement-table th{
+            vertical-align: top;
+      }
+
+       table.skills-table th{
+            vertical-align: top;
+            display: none;
       }
