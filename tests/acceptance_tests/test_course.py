@@ -79,7 +79,7 @@ class TestAssignToCourse(TestCase):
         client = Client()
         client.login(email='admin@admin.com', password='password')
 
-        resp = client.post(f'/course/{self.Course.id}/update/', {'assigned_people': self.Instructor.id,
+        resp = client.post(f'/course/{self.Course.id}/update/', {'instructors': self.Instructor.id,
                                                                  'term_type': self.Course.term_type,
                                                                  'term_year': self.Course.term_year,
                                                                  'course_number': self.Course.course_number,
@@ -98,7 +98,7 @@ class TestAssignToCourse(TestCase):
         client = Client()
         client.login(email='admin@admin.com', password='password')
 
-        resp = client.post(f'/course/{self.Course.id}/update/', {'assigned_people': self.Ta.id,
+        resp = client.post(f'/course/{self.Course.id}/update/', {'tas': self.Ta.id,
                                                                  'term_type': self.Course.term_type,
                                                                  'term_year': self.Course.term_year,
                                                                  'course_number': self.Course.course_number,
@@ -117,7 +117,8 @@ class TestAssignToCourse(TestCase):
         client = Client()
         client.login(email='admin@admin.com', password='password')
 
-        resp = client.post(f'/course/{self.Course.id}/update/', {'assigned_people': [self.Instructor.id, self.Ta.id],
+        resp = client.post(f'/course/{self.Course.id}/update/', {'instructors': self.Instructor.id,
+                                                                 'tas': self.Ta.id,
                                                                  'term_type': self.Course.term_type,
                                                                  'term_year': self.Course.term_year,
                                                                  'course_number': self.Course.course_number,
@@ -132,9 +133,9 @@ class TestAssignToCourse(TestCase):
 
         assigned_people_set = self.Course.assigned_people.all()
 
-        self.assertEqual(assigned_people_set[0], self.Instructor, "Assigned Instructor not found in "
+        self.assertEqual(assigned_people_set[1], self.Instructor, "Assigned Instructor not found in "
                                                                   "assigned people queryset")
-        self.assertEqual(assigned_people_set[1], self.Ta, "Assigned TA not found in assigned people "
+        self.assertEqual(assigned_people_set[0], self.Ta, "Assigned TA not found in assigned people "
                                                           "queryset")
 
     def test_not_logged_in(self):
