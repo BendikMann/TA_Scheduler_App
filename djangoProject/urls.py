@@ -37,6 +37,8 @@ urlpatterns = [
     path('accounts/<int:pk>/skills/',
          TA_Scheduler.views.AddSkillsAccount.as_view(template_name='account/add_skills_account.html'),
          name='account-skills'),
+    path('accounts/directory', TA_Scheduler.views.AccountDirectoryView.as_view(template_name='account/account_directory.html'),
+         name='account-directory'),
 
     # address
     path('address/create/',
