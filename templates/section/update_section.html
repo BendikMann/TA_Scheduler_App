@@ -1,14 +1,22 @@
 {% extends "base.html"%}
 {% block content %}
-<div class="container">
-    <div class="col-lg-6">
-        <form class="form" action="" method="post">
-            {% csrf_token %}
-            <table>
-                {{ section_form.as_table }}
-            </table>
-            <input type="submit" value="Submit"/>
-        </form>
+
+<div class="container" style="margin-top: 100px;">
+    <div class="row flex-wrap col-lg-8 bg-color-txt-color rounded p-5">
+        <div class="col-lg-12 d-flex flex-row">
+            <h3>Update Section</h3>
+        </div>
+        <div class="col-lg-12 d-flex flex-row p-5">
+
+            <form action="" method="post">
+                {% csrf_token %}
+
+                <table class="create-section-table">
+                    {{ section_form.as_table }}
+                </table>
+                <input type="submit" class="btn btn-primary float-end" value="Submit"/>
+            </form>
+        </div>
     </div>
 
 </div>
