@@ -109,6 +109,9 @@ class UserFactory(factory.django.DjangoModelFactory):
         password = factory.LazyFunction(lambda: make_password("password"))
         address = factory.SubFactory(UsAddressFactory)
         phone_number = factory.Faker('phone_number')
+        ta_skills = factory.Faker('text', max_nb_chars=64)
+
+
         @factory.post_generation
         def groups_set(self, create, extracted, **kwargs):
             if not create:
@@ -116,3 +119,5 @@ class UserFactory(factory.django.DjangoModelFactory):
 
             group: Group = random.choice(Group.objects.all())
             group.user_set.add(self)
+
+

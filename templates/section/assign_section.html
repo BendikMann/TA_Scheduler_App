@@ -1,5 +1,16 @@
 {% extends "base.html"%}
 {% block content %}
+<p>
+{{section_data.class_id}} {{section_data.section}} {{section_data.type}}
+</p>
+
+<form class="form" action="" method="post">
+    {% csrf_token %}
+    <table>
+        {{ section_form.as_table }}
+    </table>
+    <input type="submit" value="Submit"/>
+  </form>
 
 
 <div class="container" style="margin-top: 100px">

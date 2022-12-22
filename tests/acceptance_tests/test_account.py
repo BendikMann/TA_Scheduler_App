@@ -369,12 +369,6 @@ class TestUserCreation(TestCase):
         self.assertEqual(create_account.status_code, 403,
                          msg="User was not met with a 403 error when not logged in as an admin!")
 
-    def test_create_user_not_logged_in(self):
-        client = Client()
-        create_account = client.get(f'/accounts/register', follow=True)
-        self.assertRedirects(create_account, '/accounts/login/?next=%2Faccounts%2Fregister%2F', status_code=301,
-                             target_status_code=200)
-
 
 class TestAccountDeletion(TestCase):
     def setUp(self):

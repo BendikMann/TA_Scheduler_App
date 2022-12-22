@@ -31,6 +31,9 @@
             </p>
             <p><strong>Time: </strong>{{object.meet_start}} - {{object.meet_end}}</p>
             <div class="col-lg-8 d-flex flex-row mb-1">
+                {% url 'course-view' pk=object.course.id as course_view%}
+                <a href='{{course_view}}' class="btn btn-primary">Back</a><br>
+
                 {% if request.user|has_group:'Admin' or request.user|has_group:'Instructor' %}
                 {% url 'section-assign' pk=object.id as section_assign %}
                 <a href='{{ section_assign }}' class="btn btn-primary me-4">Assign User</a><br>

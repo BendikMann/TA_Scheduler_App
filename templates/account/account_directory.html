@@ -1,0 +1,33 @@
+{% extends "base.html"%}
+{% block content %}
+<h1 class="header">Account Directory</h1>
+
+<table class="table table-striped homepage-table">
+    <thead class="homepage-table-header">
+    <tr>
+        <th scope="col">First</th>
+        <th scope="col">Last</th>
+        <th scope="col">Skills</th>
+        <th scope="col">Detail</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for user in users %}
+    <tr>
+        <td>{{user.first_name}}</td>
+        <td>{{user.last_name}}</td>
+        <td>
+            {% if user|has_group:"TA" %}
+            {{user.ta_skills}}
+            {% endif %}
+        </td>
+
+        {% url 'account-view' pk=user.id as account_view %}
+        <td><a href="{{ account_view }}" class="card-link"> User Detail</a></td>
+    </tr>
+
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}
